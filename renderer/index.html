@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>VR Tournament App</title>
+    <link rel="stylesheet" href="styles.css">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+</head>
+<body>
+    <div class="container">
+        <h1>VR Tournament App</h1>
+        <div id="content">
+            <div class="sidebar">
+                <ul class="menu">
+                    <li><a href="#" data-section="dashboard">Dashboard</a></li>
+                    <li><a href="#" data-section="tournaments">Tournaments</a></li>
+                    <li><a href="#" data-section="players">Players</a></li>
+                    <li><a href="#" data-section="settings">Settings</a></li>
+                </ul>
+            </div>
+            <div class="main-content">
+                <div id="dashboard" class="section active">
+                    <h2>Dashboard</h2>
+                    <div class="dashboard-widgets">
+                        <div class="widget">
+                            <h3>Active Tournaments</h3>
+                            <p class="count">0</p>
+                        </div>
+                        <div class="widget">
+                            <h3>Total Players</h3>
+                            <p class="count">0</p>
+                        </div>
+                        <div class="widget">
+                            <h3>Upcoming Matches</h3>
+                            <p class="count">0</p>
+                        </div>
+                    </div>
+                </div>
+                <div id="tournaments" class="section">
+                    <h2>Tournaments</h2>
+                    <button id="create-tournament">Create New Tournament</button>
+                    <div id="tournaments-list">
+                        <!-- Tournament items will be populated here -->
+                        <p>No tournaments available</p>
+                    </div>
+                </div>
+                <div id="players" class="section">
+                    <h2>Players</h2>
+                    <div id="players-list">
+                        <!-- Players will be populated here -->
+                        <p>No players registered</p>
+                    </div>
+                </div>
+                <div id="settings" class="section">
+                    <h2>Settings</h2>
+                    <form id="settings-form">
+                        <div class="form-group">
+                            <label for="app-name">Application Name</label>
+                            <input type="text" id="app-name" name="app-name" value="VR Tournament App">
+                        </div>
+                        <div class="form-group">
+                            <label for="db-path">Database Path</label>
+                            <input type="text" id="db-path" name="db-path" value="./data/tournament.db">
+                        </div>
+                        <button type="submit">Save Settings</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="renderer.js"></script>
+</body>
+</html>

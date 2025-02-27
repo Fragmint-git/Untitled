@@ -1,8 +1,25 @@
 const { ipcMain } = require('electron');
 const { Tournament, Player, Match, Game, sequelize } = require('./backend/database');
+const express = require('express');
+const path = require('path');
+const cors = require('cors');
+const fs = require('fs');
 
 // Initialize backend API integration
 function initBackendIntegration() {
+    // Start the Express server
+    const startExpressServer = () => {
+        try {
+            const server = require('./backend/server');
+            console.log('Express server started successfully');
+        } catch (error) {
+            console.error('Failed to start Express server:', error);
+        }
+    };
+    
+    // Start the Express server
+    startExpressServer();
+    
     // Handle game-related IPC events
     ipcMain.handle('get-games', async () => {
         try {

@@ -1,74 +1,224 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>VR Tournament App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Untitled</title>
     <link rel="stylesheet" href="styles.css">
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <h1>VR Tournament App</h1>
-        <div id="content">
-            <div class="sidebar">
-                <ul class="menu">
-                    <li><a href="#" data-section="dashboard">Dashboard</a></li>
-                    <li><a href="#" data-section="tournaments">Tournaments</a></li>
-                    <li><a href="#" data-section="players">Players</a></li>
-                    <li><a href="#" data-section="settings">Settings</a></li>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo-container">
+                <div class="app-logo">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h1 class="app-name">Untitled</h1>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li class="nav-item active" data-section="dashboard">
+                        <a href="#"><i class="fas fa-chart-line"></i> Overview</a>
+                    </li>
+                    <li class="nav-item" data-section="tournaments">
+                        <a href="#"><i class="fas fa-trophy"></i> Tournaments</a>
+                    </li>
+                    <li class="nav-item" data-section="players">
+                        <a href="#"><i class="fas fa-users"></i> Players</a>
+                    </li>
+                    <li class="nav-item" data-section="games">
+                        <a href="#"><i class="fas fa-gamepad"></i> Games</a>
+                    </li>
+                    <li class="nav-item" data-section="settings">
+                        <a href="#"><i class="fas fa-cog"></i> Settings</a>
+                    </li>
                 </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Header Bar -->
+            <header class="top-bar">
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" placeholder="Search" class="search-input">
+                </div>
+                <div class="top-bar-actions">
+                    <button class="icon-button notifications">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <button class="icon-button settings">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <div class="user-profile">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User Profile" class="profile-image">
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Sections -->
+            <div class="content-container">
+                <!-- Dashboard Section -->
+                <section id="dashboard" class="content-section active">
+                    <div class="section-header">
+                        <h2>Statistics</h2>
+                        <button class="btn-secondary">See all <i class="fas fa-chevron-right"></i></button>
+                    </div>
+
+                    <div class="stats-cards">
+                        <div class="stats-card primary">
+                            <div class="stats-info">
+                                <h3 id="total-tournaments">0</h3>
+                                <p>Total Tournaments</p>
+                            </div>
+                        </div>
+                        <div class="stats-card secondary">
+                            <div class="stats-info">
+                                <h3 id="total-players">0</h3>
+                                <p>Total Players</p>
+                            </div>
+                        </div>
+                        <div class="stats-card success">
+                            <div class="stats-info">
+                                <h3 id="total-games">0</h3>
+                                <p>Total Games</p>
+                            </div>
+                        </div>
+                        <div class="stats-card warning">
+                            <div class="stats-info">
+                                <h3 id="active-tournaments">0</h3>
+                                <p>Active Tournaments</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <div class="dashboard-card">
+                            <div class="card-header">
+                                <h3>Recent Tournaments</h3>
+                                <button class="btn-text">View All</button>
+                            </div>
+                            <div class="card-content" id="recent-tournaments">
+                                <p>No tournaments found.</p>
+                            </div>
+                        </div>
+                        <div class="dashboard-card">
+                            <div class="card-header">
+                                <h3>Upcoming Matches</h3>
+                                <button class="btn-text">View All</button>
+                            </div>
+                            <div class="card-content" id="upcoming-matches">
+                                <p>No upcoming matches scheduled.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Tournaments Section -->
+                <section id="tournaments" class="content-section">
+                    <div class="section-header">
+                        <h2>Tournaments</h2>
+                    </div>
+                    <div id="tournaments-container" class="content-container-inner">
+                        <!-- Tournament content will be loaded here -->
+                    </div>
+                </section>
+
+                <!-- Players Section -->
+                <section id="players" class="content-section">
+                    <div class="section-header">
+                        <h2>Players</h2>
+                    </div>
+                    <div id="players-container" class="content-container-inner">
+                        <!-- Players content will be loaded here -->
+                    </div>
+                </section>
+
+                <!-- Games Section -->
+                <section id="games" class="content-section">
+                    <div class="section-header">
+                        <h2>Games</h2>
+                    </div>
+                    <div id="games-container" class="content-container-inner">
+                        <!-- Games content will be loaded here -->
+                    </div>
+                </section>
+
+                <!-- Settings Section -->
+                <section id="settings" class="content-section">
+                    <div class="section-header">
+                        <h2>Settings</h2>
+                    </div>
+                    <div class="settings-container">
+                        <div class="settings-card">
+                            <h3>Application Settings</h3>
+                            <div class="settings-group">
+                                <div class="setting-item">
+                                    <span>Dark Mode</span>
+                                    <label class="switch">
+                                        <input type="checkbox" id="dark-mode-toggle" checked>
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item">
+                                    <span>Notifications</span>
+                                    <label class="switch">
+                                        <input type="checkbox" id="notifications-toggle" checked>
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-card">
+                            <h3>User Settings</h3>
+                            <div class="settings-group">
+                                <div class="setting-item">
+                                    <span>Profile</span>
+                                    <button class="btn-secondary">Edit Profile</button>
+                                </div>
+                                <div class="setting-item">
+                                    <span>Password</span>
+                                    <button class="btn-secondary">Change Password</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-card">
+                            <h3>Administrator Access</h3>
+                            <div class="settings-group">
+                                <div class="setting-item">
+                                    <span>Admin Panel</span>
+                                    <a href="pages/admin.html" class="btn-primary">Access Admin Panel</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
-            <div class="main-content">
-                <div id="dashboard" class="section active">
-                    <h2>Dashboard</h2>
-                    <div class="dashboard-widgets">
-                        <div class="widget">
-                            <h3>Active Tournaments</h3>
-                            <p class="count">0</p>
-                        </div>
-                        <div class="widget">
-                            <h3>Total Players</h3>
-                            <p class="count">0</p>
-                        </div>
-                        <div class="widget">
-                            <h3>Upcoming Matches</h3>
-                            <p class="count">0</p>
-                        </div>
-                    </div>
-                </div>
-                <div id="tournaments" class="section">
-                    <h2>Tournaments</h2>
-                    <button id="create-tournament">Create New Tournament</button>
-                    <div id="tournaments-list">
-                        <!-- Tournament items will be populated here -->
-                        <p>No tournaments available</p>
-                    </div>
-                </div>
-                <div id="players" class="section">
-                    <h2>Players</h2>
-                    <div id="players-list">
-                        <!-- Players will be populated here -->
-                        <p>No players registered</p>
-                    </div>
-                </div>
-                <div id="settings" class="section">
-                    <h2>Settings</h2>
-                    <form id="settings-form">
-                        <div class="form-group">
-                            <label for="app-name">Application Name</label>
-                            <input type="text" id="app-name" name="app-name" value="VR Tournament App">
-                        </div>
-                        <div class="form-group">
-                            <label for="db-path">Database Path</label>
-                            <input type="text" id="db-path" name="db-path" value="./data/tournament.db">
-                        </div>
-                        <button type="submit">Save Settings</button>
-                    </form>
-                </div>
-            </div>
+        </main>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="notification-toast" class="notification-toast">
+        <div class="notification-content">
+            <span id="notification-message">This is a notification</span>
         </div>
     </div>
+
+    <!-- Module Scripts -->
+    <script src="js/modules/ui.js"></script>
+    <script src="js/modules/navigation.js"></script>
+    <script src="js/modules/dashboard.js"></script>
+    <script src="js/modules/tournaments.js"></script>
+    <script src="js/modules/players.js"></script>
+    <script src="js/modules/games.js"></script>
     
-    <script src="renderer.js"></script>
+    <!-- Main Application Script -->
+    <script src="js/main.js"></script>
 </body>
 </html>

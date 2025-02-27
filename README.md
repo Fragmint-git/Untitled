@@ -84,4 +84,4 @@ See the `/mobile` directory for more details on the mobile implementation strate
 
 ## License
 
-ISC
+MIT

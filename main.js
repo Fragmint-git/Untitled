@@ -41,8 +41,10 @@ function createWindow() {
 // This method will be called when Electron has finished initialization
 app.on('ready', async () => {
   try {
-    // Initialize database
-    await sequelize.sync();
+    // Initialize database with force: true to recreate tables
+    // WARNING: This will drop existing tables and recreate them
+    // Only use this during development or when you need to update schema
+    await sequelize.sync({ force: true });
     console.log('Database synchronized');
     
     // Initialize backend integration

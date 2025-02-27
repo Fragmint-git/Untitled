@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>VR Tournament Admin Panel</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="../styles/admin.css">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+</head>
+<body class="admin-panel">
+    <div class="admin-container">
+        <header class="admin-header">
+            <h1>VR Tournament Admin Panel</h1>
+            <div class="admin-user-info">
+                <span id="admin-username">Admin User</span>
+                <button id="admin-logout" class="btn-secondary">Logout</button>
+            </div>
+        </header>
+
+        <div class="admin-content">
+            <div class="admin-sidebar">
+                <ul class="admin-menu">
+                    <li><a href="#" data-admin-section="dashboard" class="active">Dashboard</a></li>
+                    <li><a href="#" data-admin-section="games">Manage Games</a></li>
+                    <li><a href="#" data-admin-section="tournaments">Manage Tournaments</a></li>
+                    <li><a href="#" data-admin-section="players">Manage Players</a></li>
+                    <li><a href="#" data-admin-section="settings">Admin Settings</a></li>
+                    <li><a href="../index.html" class="back-to-app">Back to Application</a></li>
+                </ul>
+            </div>
+
+            <div class="admin-main">
+                <!-- Admin Dashboard Section -->
+                <div id="admin-dashboard" class="admin-section active">
+                    <h2>Admin Dashboard</h2>
+                    <div class="admin-stats">
+                        <div class="admin-stat-card">
+                            <h3>Total Games</h3>
+                            <p class="stat-count" id="total-games-count">0</p>
+                        </div>
+                        <div class="admin-stat-card">
+                            <h3>Total Tournaments</h3>
+                            <p class="stat-count" id="total-tournaments-count">0</p>
+                        </div>
+                        <div class="admin-stat-card">
+                            <h3>Total Players</h3>
+                            <p class="stat-count" id="total-players-count">0</p>
+                        </div>
+                        <div class="admin-stat-card">
+                            <h3>Active Tournaments</h3>
+                            <p class="stat-count" id="active-tournaments-count">0</p>
+                        </div>
+                    </div>
+                    
+                    <div class="admin-recent-activity">
+                        <h3>Recent Activity</h3>
+                        <div class="activity-list" id="recent-activity-list">
+                            <p class="empty-state">No recent activity</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Manage Games Section -->
+                <div id="admin-games" class="admin-section">
+                    <div class="section-header">
+                        <h2>Manage Games</h2>
+                        <button id="add-game-btn" class="btn-primary">Add New Game</button>
+                    </div>
+                    
+                    <div class="search-filter-bar">
+                        <input type="text" id="admin-game-search" placeholder="Search games...">
+                        <select id="admin-game-filter">
+                            <option value="all">All Games</option>
+                            <option value="active">Active Games</option>
+                            <option value="inactive">Inactive Games</option>
+                        </select>
+                    </div>
+                    
+                    <div class="admin-table-container">
+                        <table class="admin-table" id="games-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Cover</th>
+                                    <th>Name</th>
+                                    <th>Developer</th>
+                                    <th>Release Date</th>
+                                    <th>Platforms</th>
+                                    <th>Tournaments</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="games-table-body">
+                                <!-- Game rows will be populated here -->
+                                <tr>
+                                    <td colspan="9" class="empty-table">No games available</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Other admin sections would go here -->
+                <div id="admin-tournaments" class="admin-section">
+                    <h2>Manage Tournaments</h2>
+                    <p class="placeholder-content">Tournament management interface will be implemented here.</p>
+                </div>
+                
+                <div id="admin-players" class="admin-section">
+                    <h2>Manage Players</h2>
+                    <p class="placeholder-content">Player management interface will be implemented here.</p>
+                </div>
+                
+                <div id="admin-settings" class="admin-section">
+                    <h2>Admin Settings</h2>
+                    <p class="placeholder-content">Admin settings interface will be implemented here.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Form Modal -->
+    <div id="game-form-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3 id="game-form-title">Add New Game</h3>
+            
+            <form id="game-form">
+                <input type="hidden" id="game-id" name="id">
+                
+                <div class="form-group">
+                    <label for="game-name">Game Name*</label>
+                    <input type="text" id="game-name" name="name" required placeholder="Enter game name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="game-developer">Developer*</label>
+                    <input type="text" id="game-developer" name="developer" required placeholder="Enter developer name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="game-release-date">Release Date*</label>
+                    <input type="date" id="game-release-date" name="releaseDate" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="game-description">Description*</label>
+                    <textarea id="game-description" name="description" rows="4" required placeholder="Enter game description"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Platforms*</label>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="platform-oculus" name="platforms" value="oculus">
+                        <label for="platform-oculus">Oculus</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="platform-vive" name="platforms" value="vive">
+                        <label for="platform-vive">HTC Vive</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="platform-index" name="platforms" value="index">
+                        <label for="platform-index">Valve Index</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="platform-psvr" name="platforms" value="psvr">
+                        <label for="platform-psvr">PlayStation VR</label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Genres*</label>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="genre-action" name="genres" value="action">
+                        <label for="genre-action">Action</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="genre-sports" name="genres" value="sports">
+                        <label for="genre-sports">Sports</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="genre-rhythm" name="genres" value="rhythm">
+                        <label for="genre-rhythm">Rhythm</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="genre-shooter" name="genres" value="shooter">
+                        <label for="genre-shooter">Shooter</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="genre-puzzle" name="genres" value="puzzle">
+                        <label for="genre-puzzle">Puzzle</label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="game-cover">Cover Image*</label>
+                    <div class="file-upload-container">
+                        <input type="file" id="game-cover" name="coverImage" accept="image/*">
+                        <div class="file-preview" id="cover-preview">
+                            <img id="cover-preview-image" src="../assets/default-game-cover.png" alt="Game cover preview">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="game-status">Status*</label>
+                    <select id="game-status" name="status" required>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Save Game</button>
+                    <button type="button" class="btn-secondary" id="cancel-game-form">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirm-modal" class="modal">
+        <div class="modal-content confirm-modal-content">
+            <h3 id="confirm-title">Confirm Action</h3>
+            <p id="confirm-message">Are you sure you want to proceed with this action?</p>
+            <div class="confirm-actions">
+                <button id="confirm-yes" class="btn-danger">Yes, Proceed</button>
+                <button id="confirm-no" class="btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/admin.js"></script>
+</body>
+</html> 

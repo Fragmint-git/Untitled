@@ -111,7 +111,100 @@
                 
                 <div id="admin-settings" class="admin-section">
                     <h2>Admin Settings</h2>
-                    <p class="placeholder-text">Admin settings interface will be implemented in a future update.</p>
+                    <form id="admin-settings-form" class="settings-form">
+                        <div class="settings-section">
+                            <h3>General Settings</h3>
+                            <div class="form-group">
+                                <label for="site-name">Site Name</label>
+                                <input type="text" id="site-name" name="site-name">
+                            </div>
+                            <div class="form-group">
+                                <label for="site-description">Site Description</label>
+                                <textarea id="site-description" name="site-description" rows="3"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="maintenance-mode">Maintenance Mode</label>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="maintenance-mode" name="maintenance-mode">
+                                    <span class="toggle-slider"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="settings-section">
+                            <h3>Email Settings</h3>
+                            <div class="form-group">
+                                <label for="email-notifications">Enable Email Notifications</label>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="email-notifications" name="email-notifications">
+                                    <span class="toggle-slider"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="email-from">From Email</label>
+                                <input type="email" id="email-from" name="email-from">
+                            </div>
+                            <div class="form-group">
+                                <label for="email-smtp-host">SMTP Host</label>
+                                <input type="text" id="email-smtp-host" name="email-smtp-host">
+                            </div>
+                            <div class="form-group">
+                                <label for="email-smtp-port">SMTP Port</label>
+                                <input type="text" id="email-smtp-port" name="email-smtp-port">
+                            </div>
+                            <div class="form-group">
+                                <label for="email-smtp-user">SMTP Username</label>
+                                <input type="text" id="email-smtp-user" name="email-smtp-user">
+                            </div>
+                            <div class="form-group">
+                                <label for="email-smtp-password">SMTP Password</label>
+                                <input type="password" id="email-smtp-password" name="email-smtp-password">
+                            </div>
+                        </div>
+
+                        <div class="settings-section">
+                            <h3>Tournament Settings</h3>
+                            <div class="form-group">
+                                <label for="max-tournaments">Maximum Active Tournaments</label>
+                                <input type="number" id="max-tournaments" name="max-tournaments" min="1" max="50">
+                            </div>
+                            <div class="form-group">
+                                <label for="tournament-approval">Require Tournament Approval</label>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="tournament-approval" name="tournament-approval">
+                                    <span class="toggle-slider"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="tournament-registration-days">Registration Period (Days)</label>
+                                <input type="number" id="tournament-registration-days" name="tournament-registration-days" min="1" max="30">
+                            </div>
+                        </div>
+
+                        <div class="settings-section">
+                            <h3>Security Settings</h3>
+                            <div class="form-group">
+                                <label for="two-factor-auth">Enable Two-Factor Authentication</label>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="two-factor-auth" name="two-factor-auth">
+                                    <span class="toggle-slider"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="session-timeout">Session Timeout (Minutes)</label>
+                                <input type="number" id="session-timeout" name="session-timeout" min="5" max="240">
+                            </div>
+                            <div class="form-group">
+                                <label for="max-login-attempts">Maximum Login Attempts</label>
+                                <input type="number" id="max-login-attempts" name="max-login-attempts" min="1" max="10">
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">Save Settings</button>
+                            <button type="button" id="reset-settings-btn" class="btn-secondary">Reset to Default</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

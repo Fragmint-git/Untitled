@@ -41,46 +41,133 @@ window.adminSettingsTabModule = {
     // Load settings
     loadSettings: async function() {
         try {
+            console.log('Attempting to load admin settings...');
+            
             // Fetch settings from the backend
-            const response = await fetch('http://localhost:3000/api/admin/settings');
+            const response = await fetch('http://localhost:3000/api/admin/settings', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            console.log('Admin settings API response status:', response.status);
             
             // If the API endpoint doesn't exist yet, use mock data
             let settings;
             if (response.ok) {
-                settings = await response.json();
+                try {
+                    settings = await response.json();
+                    console.log('Successfully loaded settings from API');
+                } catch (parseError) {
+                    console.error('Error parsing settings JSON:', parseError);
+                    settings = this.getMockSettings();
+                    console.log('Using mock settings due to JSON parse error');
+                }
             } else {
+                console.warn(`API returned status ${response.status}, using mock data`);
                 // Mock data for development
                 settings = this.getMockSettings();
             }
             
             // Populate form with settings
             if (settings) {
-                // General settings
-                document.getElementById('site-name').value = settings.general.siteName;
-                document.getElementById('site-description').value = settings.general.siteDescription;
-                document.getElementById('maintenance-mode').checked = settings.general.maintenanceMode;
-                
-                // Email settings
-                document.getElementById('email-notifications').checked = settings.email.enableNotifications;
-                document.getElementById('email-from').value = settings.email.fromEmail;
-                document.getElementById('email-smtp-host').value = settings.email.smtpHost;
-                document.getElementById('email-smtp-port').value = settings.email.smtpPort;
-                document.getElementById('email-smtp-user').value = settings.email.smtpUser;
-                
-                // Tournament settings
-                document.getElementById('max-tournaments').value = settings.tournaments.maxActive;
-                document.getElementById('tournament-approval').checked = settings.tournaments.requireApproval;
-                document.getElementById('tournament-registration-days').value = settings.tournaments.registrationDays;
-                
-                // Security settings
-                document.getElementById('two-factor-auth').checked = settings.security.twoFactorAuth;
-                document.getElementById('session-timeout').value = settings.security.sessionTimeout;
-                document.getElementById('max-login-attempts').value = settings.security.maxLoginAttempts;
+                try {
+                    // Helper function to safely set form element values
+                    const setElementValue = (id, value) => {
+                        const element = document.getElementById(id);
+                        if (element) {
+                            if (element.type === 'checkbox') {
+                                element.checked = value;
+                            } else {
+                                element.value = value;
+                            }
+                        } else {
+                            console.warn(`Element with ID "${id}" not found`);
+                        }
+                    };
+                    
+                    // General settings
+                    setElementValue('site-name', settings.general.siteName);
+                    setElementValue('site-description', settings.general.siteDescription);
+                    setElementValue('maintenance-mode', settings.general.maintenanceMode);
+                    
+                    // Email settings
+                    setElementValue('email-notifications', settings.email.enableNotifications);
+                    setElementValue('email-from', settings.email.fromEmail);
+                    setElementValue('email-smtp-host', settings.email.smtpHost);
+                    setElementValue('email-smtp-port', settings.email.smtpPort);
+                    setElementValue('email-smtp-user', settings.email.smtpUser);
+                    
+                    // Tournament settings
+                    setElementValue('max-tournaments', settings.tournaments.maxActive);
+                    setElementValue('tournament-approval', settings.tournaments.requireApproval);
+                    setElementValue('tournament-registration-days', settings.tournaments.registrationDays);
+                    
+                    // Security settings
+                    setElementValue('two-factor-auth', settings.security.twoFactorAuth);
+                    setElementValue('session-timeout', settings.security.sessionTimeout);
+                    setElementValue('max-login-attempts', settings.security.maxLoginAttempts);
+                    
+                    console.log('Settings form populated successfully');
+                } catch (formError) {
+                    console.error('Error populating form with settings:', formError);
+                    throw new Error('Failed to populate form fields: ' + formError.message);
+                }
+            } else {
+                throw new Error('No settings data available');
             }
         } catch (error) {
             console.error('Error loading settings:', error);
-            if (window.adminModule) {
-                window.adminModule.showMessage('Error loading settings. Please try again.', 'error');
+            
+            // Try to use mock data as a fallback
+            try {
+                console.log('Attempting to use mock data as fallback...');
+                const mockSettings = this.getMockSettings();
+                
+                // Helper function to safely set form element values
+                const setElementValue = (id, value) => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        if (element.type === 'checkbox') {
+                            element.checked = value;
+                        } else {
+                            element.value = value;
+                        }
+                    } else {
+                        console.warn(`Element with ID "${id}" not found in fallback`);
+                    }
+                };
+                
+                // General settings
+                setElementValue('site-name', mockSettings.general.siteName);
+                setElementValue('site-description', mockSettings.general.siteDescription);
+                setElementValue('maintenance-mode', mockSettings.general.maintenanceMode);
+                
+                // Email settings
+                setElementValue('email-notifications', mockSettings.email.enableNotifications);
+                setElementValue('email-from', mockSettings.email.fromEmail);
+                setElementValue('email-smtp-host', mockSettings.email.smtpHost);
+                setElementValue('email-smtp-port', mockSettings.email.smtpPort);
+                setElementValue('email-smtp-user', mockSettings.email.smtpUser);
+                
+                // Tournament settings
+                setElementValue('max-tournaments', mockSettings.tournaments.maxActive);
+                setElementValue('tournament-approval', mockSettings.tournaments.requireApproval);
+                setElementValue('tournament-registration-days', mockSettings.tournaments.registrationDays);
+                
+                // Security settings
+                setElementValue('two-factor-auth', mockSettings.security.twoFactorAuth);
+                setElementValue('session-timeout', mockSettings.security.sessionTimeout);
+                setElementValue('max-login-attempts', mockSettings.security.maxLoginAttempts);
+                
+                console.log('Successfully used mock data as fallback');
+            } catch (fallbackError) {
+                console.error('Even fallback to mock data failed:', fallbackError);
+                if (window.adminModule) {
+                    window.adminModule.showMessage('Error loading settings. Please try again.', 'error');
+                }
             }
         }
     },
@@ -88,40 +175,67 @@ window.adminSettingsTabModule = {
     // Save settings
     saveSettings: async function() {
         try {
-            // Get form data
-            const settings = {
-                general: {
-                    siteName: document.getElementById('site-name').value,
-                    siteDescription: document.getElementById('site-description').value,
-                    maintenanceMode: document.getElementById('maintenance-mode').checked
-                },
-                email: {
-                    enableNotifications: document.getElementById('email-notifications').checked,
-                    fromEmail: document.getElementById('email-from').value,
-                    smtpHost: document.getElementById('email-smtp-host').value,
-                    smtpPort: document.getElementById('email-smtp-port').value,
-                    smtpUser: document.getElementById('email-smtp-user').value,
-                    smtpPassword: document.getElementById('email-smtp-password').value
-                },
-                tournaments: {
-                    maxActive: parseInt(document.getElementById('max-tournaments').value),
-                    requireApproval: document.getElementById('tournament-approval').checked,
-                    registrationDays: parseInt(document.getElementById('tournament-registration-days').value)
-                },
-                security: {
-                    twoFactorAuth: document.getElementById('two-factor-auth').checked,
-                    sessionTimeout: parseInt(document.getElementById('session-timeout').value),
-                    maxLoginAttempts: parseInt(document.getElementById('max-login-attempts').value)
+            // Helper function to safely get form element values
+            const getElementValue = (id, defaultValue = '') => {
+                const element = document.getElementById(id);
+                if (element) {
+                    if (element.type === 'checkbox') {
+                        return element.checked;
+                    } else {
+                        return element.value;
+                    }
+                } else {
+                    console.warn(`Element with ID "${id}" not found when saving`);
+                    return defaultValue;
                 }
             };
             
-            // In a real app, this would send data to the backend
-            // For now, we'll just simulate a successful save
-            console.log('Saving settings:', settings);
+            // Get form data
+            const settings = {
+                general: {
+                    siteName: getElementValue('site-name', 'VR Battle Royale'),
+                    siteDescription: getElementValue('site-description', 'VR Gaming Tournament Platform'),
+                    maintenanceMode: getElementValue('maintenance-mode', false)
+                },
+                email: {
+                    enableNotifications: getElementValue('email-notifications', false),
+                    fromEmail: getElementValue('email-from', 'noreply@vrbattleroyale.com'),
+                    smtpHost: getElementValue('email-smtp-host', ''),
+                    smtpPort: getElementValue('email-smtp-port', '587'),
+                    smtpUser: getElementValue('email-smtp-user', ''),
+                    smtpPassword: getElementValue('email-smtp-password', '')
+                },
+                tournaments: {
+                    maxActive: parseInt(getElementValue('max-tournaments', '5')),
+                    requireApproval: getElementValue('tournament-approval', true),
+                    registrationDays: parseInt(getElementValue('tournament-registration-days', '5'))
+                },
+                security: {
+                    twoFactorAuth: getElementValue('two-factor-auth', false),
+                    sessionTimeout: parseInt(getElementValue('session-timeout', '30')),
+                    maxLoginAttempts: parseInt(getElementValue('max-login-attempts', '3'))
+                }
+            };
             
-            // Show success message
-            if (window.adminModule) {
-                window.adminModule.showMessage('Settings saved successfully!', 'success');
+            // Send settings to the backend
+            const response = await fetch('http://localhost:3000/api/admin/settings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(settings)
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                console.log('Settings saved:', result);
+                
+                // Show success message
+                if (window.adminModule) {
+                    window.adminModule.showMessage('Settings saved successfully!', 'success');
+                }
+            } else {
+                throw new Error('Failed to save settings');
             }
             
         } catch (error) {
@@ -138,30 +252,44 @@ window.adminSettingsTabModule = {
             // Get default settings
             const defaultSettings = this.getDefaultSettings();
             
+            // Helper function to safely set form element values
+            const setElementValue = (id, value) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    if (element.type === 'checkbox') {
+                        element.checked = value;
+                    } else {
+                        element.value = value;
+                    }
+                } else {
+                    console.warn(`Element with ID "${id}" not found when resetting`);
+                }
+            };
+            
             // Populate form with default settings
             if (defaultSettings) {
                 // General settings
-                document.getElementById('site-name').value = defaultSettings.general.siteName;
-                document.getElementById('site-description').value = defaultSettings.general.siteDescription;
-                document.getElementById('maintenance-mode').checked = defaultSettings.general.maintenanceMode;
+                setElementValue('site-name', defaultSettings.general.siteName);
+                setElementValue('site-description', defaultSettings.general.siteDescription);
+                setElementValue('maintenance-mode', defaultSettings.general.maintenanceMode);
                 
                 // Email settings
-                document.getElementById('email-notifications').checked = defaultSettings.email.enableNotifications;
-                document.getElementById('email-from').value = defaultSettings.email.fromEmail;
-                document.getElementById('email-smtp-host').value = defaultSettings.email.smtpHost;
-                document.getElementById('email-smtp-port').value = defaultSettings.email.smtpPort;
-                document.getElementById('email-smtp-user').value = defaultSettings.email.smtpUser;
-                document.getElementById('email-smtp-password').value = '';
+                setElementValue('email-notifications', defaultSettings.email.enableNotifications);
+                setElementValue('email-from', defaultSettings.email.fromEmail);
+                setElementValue('email-smtp-host', defaultSettings.email.smtpHost);
+                setElementValue('email-smtp-port', defaultSettings.email.smtpPort);
+                setElementValue('email-smtp-user', defaultSettings.email.smtpUser);
+                setElementValue('email-smtp-password', '');
                 
                 // Tournament settings
-                document.getElementById('max-tournaments').value = defaultSettings.tournaments.maxActive;
-                document.getElementById('tournament-approval').checked = defaultSettings.tournaments.requireApproval;
-                document.getElementById('tournament-registration-days').value = defaultSettings.tournaments.registrationDays;
+                setElementValue('max-tournaments', defaultSettings.tournaments.maxActive);
+                setElementValue('tournament-approval', defaultSettings.tournaments.requireApproval);
+                setElementValue('tournament-registration-days', defaultSettings.tournaments.registrationDays);
                 
                 // Security settings
-                document.getElementById('two-factor-auth').checked = defaultSettings.security.twoFactorAuth;
-                document.getElementById('session-timeout').value = defaultSettings.security.sessionTimeout;
-                document.getElementById('max-login-attempts').value = defaultSettings.security.maxLoginAttempts;
+                setElementValue('two-factor-auth', defaultSettings.security.twoFactorAuth);
+                setElementValue('session-timeout', defaultSettings.security.sessionTimeout);
+                setElementValue('max-login-attempts', defaultSettings.security.maxLoginAttempts);
             }
             
             // Show success message

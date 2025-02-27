@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
-const { sequelize, Tournament, Player, Match } = require('./database');
+const { sequelize, Tournament, Player, Match, db } = require('./database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -70,22 +70,38 @@ async function initializeDatabase() {
         const tournamentCount = await Tournament.count();
         if (tournamentCount === 0) {
             console.log('Seeding initial data...');
-            // Add some sample data
+            
+            // First create a game
+            const game = await sequelize.models.Game.create({
+                name: 'Beat Saber',
+                developer: 'Beat Games',
+                releaseDate: new Date('2018-05-01'),
+                description: 'A VR rhythm game where players slash blocks with lightsabers in time to music.',
+                platforms: ['Oculus Quest', 'Oculus Rift', 'SteamVR', 'PlayStation VR'],
+                genres: ['Rhythm', 'Music', 'Action'],
+                status: 'active'
+            });
+            
+            // Add some sample data with GameId
             await Tournament.create({
                 name: 'VR Championship 2025',
                 description: 'The biggest VR tournament of the year',
                 startDate: new Date('2025-03-15'),
                 endDate: new Date('2025-03-20'),
                 status: 'draft',
-                gameType: 'Beat Saber',
-                maxPlayers: 64
+                maxPlayers: 64,
+                GameId: game.id  // Set the GameId
             });
             
-            await Player.bulkCreate([
-                { username: 'player1', email: 'player1@example.com', displayName: 'Pro Player 1' },
-                { username: 'player2', email: 'player2@example.com', displayName: 'Pro Player 2' },
-                { username: 'player3', email: 'player3@example.com', displayName: 'Pro Player 3' }
-            ]);
+            // Check if players already exist
+            const playerCount = await Player.count();
+            if (playerCount === 0) {
+                await Player.bulkCreate([
+                    { username: 'player1', email: 'player1@example.com', displayName: 'Pro Player 1' },
+                    { username: 'player2', email: 'player2@example.com', displayName: 'Pro Player 2' },
+                    { username: 'player3', email: 'player3@example.com', displayName: 'Pro Player 3' }
+                ]);
+            }
             
             console.log('Sample data created');
         }
@@ -122,6 +138,16 @@ app.post('/api/upload/game-image', upload.single('image'), (req, res) => {
 // Games API
 app.get('/api/games', async (req, res) => {
     try {
+        // Check if db is defined
+        if (!db || typeof db.getAllGames !== 'function') {
+            console.error('db object or getAllGames method is not defined');
+            // Fallback to direct model query
+            const games = await sequelize.models.Game.findAll({
+                order: [['name', 'ASC']]
+            });
+            return res.json(games);
+        }
+        
         const games = await db.getAllGames();
         res.json(games);
     } catch (error) {
@@ -132,6 +158,17 @@ app.get('/api/games', async (req, res) => {
 
 app.get('/api/games/:id', async (req, res) => {
     try {
+        // Check if db is defined
+        if (!db || typeof db.getGameById !== 'function') {
+            console.error('db object or getGameById method is not defined');
+            // Fallback to direct model query
+            const game = await sequelize.models.Game.findByPk(req.params.id);
+            if (!game) {
+                return res.status(404).json({ error: 'Game not found' });
+            }
+            return res.json(game);
+        }
+        
         const game = await db.getGameById(req.params.id);
         if (!game) {
             return res.status(404).json({ error: 'Game not found' });
@@ -268,9 +305,65 @@ app.get('/api/matches', async (req, res) => {
     }
 });
 
-// Start the server
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+// Admin Settings routes
+app.get('/api/admin/settings', (req, res) => {
+    try {
+        // For now, return mock settings data
+        // In a real application, this would be fetched from a database
+        const settings = {
+            general: {
+                siteName: 'VR Battle Royale',
+                siteDescription: 'The ultimate platform for VR gaming tournaments',
+                maintenanceMode: false
+            },
+            email: {
+                enableNotifications: true,
+                fromEmail: 'notifications@vrbattleroyale.com',
+                smtpHost: 'smtp.example.com',
+                smtpPort: '587',
+                smtpUser: 'smtp_user'
+            },
+            tournaments: {
+                maxActive: 10,
+                requireApproval: true,
+                registrationDays: 7
+            },
+            security: {
+                twoFactorAuth: false,
+                sessionTimeout: 60,
+                maxLoginAttempts: 5
+            }
+        };
+        
+        res.json(settings);
+    } catch (error) {
+        console.error('Error fetching admin settings:', error);
+        res.status(500).json({ error: 'Failed to fetch admin settings' });
+    }
 });
+
+app.post('/api/admin/settings', (req, res) => {
+    try {
+        // In a real application, this would save to a database
+        // For now, just log the received settings and return success
+        console.log('Received settings update:', req.body);
+        
+        res.json({ 
+            success: true, 
+            message: 'Settings updated successfully'
+        });
+    } catch (error) {
+        console.error('Error updating admin settings:', error);
+        res.status(500).json({ error: 'Failed to update admin settings' });
+    }
+});
+
+// Start the server
+if (require.main === module) {
+    // Only start the server if this file is run directly
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
+}
 
 module.exports = app;

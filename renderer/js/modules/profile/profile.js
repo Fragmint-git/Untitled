@@ -161,8 +161,21 @@ window.profileModule = {
         };
         
         // Get saved user data from localStorage, if any
-        const savedUserData = localStorage.getItem('userData');
-        const userData = savedUserData ? JSON.parse(savedUserData) : mockUserData;
+        let userData;
+        try {
+            const savedUserData = localStorage.getItem('userData');
+            userData = savedUserData ? JSON.parse(savedUserData) : mockUserData;
+            
+            // Ensure all required sections exist
+            userData.personalInfo = userData.personalInfo || mockUserData.personalInfo;
+            userData.accountSettings = userData.accountSettings || mockUserData.accountSettings;
+            userData.notificationSettings = userData.notificationSettings || mockUserData.notificationSettings;
+            userData.appearanceSettings = userData.appearanceSettings || mockUserData.appearanceSettings;
+            userData.privacySettings = userData.privacySettings || mockUserData.privacySettings;
+        } catch (error) {
+            console.error('Error loading user data from localStorage:', error);
+            userData = mockUserData;
+        }
         
         // Load profile picture if available
         if (userData.profilePicture) {

@@ -351,7 +351,7 @@ const initDatabase = async () => {
 initDatabase();
 
 module.exports = {
-    ...db,
+    db,
     sequelize,
     Game,
     Tournament,

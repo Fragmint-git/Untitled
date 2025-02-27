@@ -53,13 +53,13 @@ function handleAccountSettingsSubmit(e) {
 
 // Handle loading account settings
 function handleLoadAccountSettings(e) {
-    const accountSettings = e.detail;
+    const accountSettings = e.detail || {}; // Add default empty object if detail is null
     
     // Populate form fields
     const languageSelect = document.getElementById('language-select');
     
     if (languageSelect) {
-        languageSelect.value = accountSettings.language || 'en';
+        languageSelect.value = (accountSettings && accountSettings.language) || 'en';
     }
 }
 

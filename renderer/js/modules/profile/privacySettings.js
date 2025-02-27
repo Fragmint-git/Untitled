@@ -38,16 +38,16 @@ function handlePrivacySettingsSubmit(e) {
 
 // Handle loading privacy settings
 function handleLoadPrivacySettings(e) {
-    const privacySettings = e.detail;
+    const privacySettings = e.detail || {}; // Add default empty object if detail is null
     
     // Populate form fields
     const profileVisibility = document.getElementById('profile-visibility');
     const showRealName = document.getElementById('show-real-name');
     const shareStatistics = document.getElementById('share-statistics');
     
-    if (profileVisibility) profileVisibility.checked = privacySettings.profileVisibility;
-    if (showRealName) showRealName.checked = privacySettings.showRealName;
-    if (shareStatistics) shareStatistics.checked = privacySettings.shareStatistics;
+    if (profileVisibility) profileVisibility.checked = privacySettings.profileVisibility || false;
+    if (showRealName) showRealName.checked = privacySettings.showRealName || false;
+    if (shareStatistics) shareStatistics.checked = privacySettings.shareStatistics || false;
 }
 
 // Save privacy settings to localStorage

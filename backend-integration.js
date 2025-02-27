@@ -10,6 +10,12 @@ function initBackendIntegration() {
     // Start the Express server
     const startExpressServer = () => {
         try {
+            // Check if we're running the server directly or as part of Electron
+            if (process.argv[1] && process.argv[1].endsWith('backend/server.js')) {
+                console.log('Express server already being started directly, skipping initialization');
+                return;
+            }
+            
             const server = require('./backend/server');
             console.log('Express server started successfully');
         } catch (error) {
@@ -24,7 +30,8 @@ function initBackendIntegration() {
     ipcMain.handle('get-games', async () => {
         try {
             const games = await Game.findAll({
-                order: [['name', 'ASC']]
+                order: [['name', 'ASC']],
+                raw: true // Return plain JavaScript objects
             });
             return games;
         } catch (error) {
@@ -36,7 +43,9 @@ function initBackendIntegration() {
     ipcMain.handle('get-game', async (event, id) => {
         try {
             const game = await Game.findByPk(id, {
-                include: [Tournament]
+                include: [Tournament],
+                nest: true,
+                raw: true // Return plain JavaScript objects
             });
             return game;
         } catch (error) {
@@ -48,7 +57,7 @@ function initBackendIntegration() {
     ipcMain.handle('create-game', async (event, gameData) => {
         try {
             const game = await Game.create(gameData);
-            return game;
+            return game.toJSON(); // Return plain object
         } catch (error) {
             console.error('Error creating game:', error);
             throw error;
@@ -62,7 +71,7 @@ function initBackendIntegration() {
                 throw new Error('Game not found');
             }
             await game.update(data);
-            return game;
+            return game.toJSON(); // Return plain object
         } catch (error) {
             console.error(`Error updating game ${id}:`, error);
             throw error;
@@ -87,7 +96,9 @@ function initBackendIntegration() {
     ipcMain.handle('get-tournaments', async () => {
         try {
             const tournaments = await Tournament.findAll({
-                include: [Game]
+                include: [Game],
+                nest: true,
+                raw: true // Return plain JavaScript objects instead of Sequelize model instances
             });
             return tournaments;
         } catch (error) {
@@ -99,7 +110,9 @@ function initBackendIntegration() {
     ipcMain.handle('get-tournament', async (event, id) => {
         try {
             const tournament = await Tournament.findByPk(id, {
-                include: [Player, Match, Game]
+                include: [Player, Match, Game],
+                nest: true,
+                raw: true // Return plain JavaScript objects
             });
             return tournament;
         } catch (error) {
@@ -111,7 +124,7 @@ function initBackendIntegration() {
     ipcMain.handle('create-tournament', async (event, tournamentData) => {
         try {
             const tournament = await Tournament.create(tournamentData);
-            return tournament;
+            return tournament.toJSON(); // Return plain object
         } catch (error) {
             console.error('Error creating tournament:', error);
             throw error;
@@ -125,7 +138,7 @@ function initBackendIntegration() {
                 throw new Error('Tournament not found');
             }
             await tournament.update(data);
-            return tournament;
+            return tournament.toJSON(); // Return plain object
         } catch (error) {
             console.error(`Error updating tournament ${id}:`, error);
             throw error;
@@ -135,7 +148,9 @@ function initBackendIntegration() {
     // Handle player-related IPC events
     ipcMain.handle('get-players', async () => {
         try {
-            const players = await Player.findAll();
+            const players = await Player.findAll({
+                raw: true // Return plain JavaScript objects
+            });
             return players;
         } catch (error) {
             console.error('Error fetching players:', error);
@@ -146,7 +161,7 @@ function initBackendIntegration() {
     ipcMain.handle('create-player', async (event, playerData) => {
         try {
             const player = await Player.create(playerData);
-            return player;
+            return player.toJSON(); // Return plain object
         } catch (error) {
             console.error('Error creating player:', error);
             throw error;
@@ -160,7 +175,7 @@ function initBackendIntegration() {
                 throw new Error('Player not found');
             }
             await player.update(data);
-            return player;
+            return player.toJSON(); // Return plain object
         } catch (error) {
             console.error(`Error updating player ${id}:`, error);
             throw error;
@@ -171,7 +186,9 @@ function initBackendIntegration() {
     ipcMain.handle('get-matches', async () => {
         try {
             const matches = await Match.findAll({
-                include: [Tournament, Player]
+                include: [Tournament, Player],
+                nest: true,
+                raw: true // Return plain JavaScript objects
             });
             return matches;
         } catch (error) {
@@ -183,7 +200,7 @@ function initBackendIntegration() {
     ipcMain.handle('create-match', async (event, matchData) => {
         try {
             const match = await Match.create(matchData);
-            return match;
+            return match.toJSON(); // Return plain object
         } catch (error) {
             console.error('Error creating match:', error);
             throw error;
@@ -197,7 +214,7 @@ function initBackendIntegration() {
                 throw new Error('Match not found');
             }
             await match.update(data);
-            return match;
+            return match.toJSON(); // Return plain object
         } catch (error) {
             console.error(`Error updating match ${id}:`, error);
             throw error;

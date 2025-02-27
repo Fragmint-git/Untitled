@@ -40,7 +40,7 @@ function handleNotificationSettingsSubmit(e) {
 
 // Handle loading notification settings
 function handleLoadNotificationSettings(e) {
-    const notificationSettings = e.detail;
+    const notificationSettings = e.detail || {}; // Add default empty object if detail is null
     
     // Populate form fields
     const emailNotifications = document.getElementById('email-notifications');
@@ -49,11 +49,11 @@ function handleLoadNotificationSettings(e) {
     const resultNotifications = document.getElementById('result-notifications');
     const desktopNotifications = document.getElementById('desktop-notifications');
     
-    if (emailNotifications) emailNotifications.checked = notificationSettings.emailNotifications;
-    if (tournamentUpdates) tournamentUpdates.checked = notificationSettings.tournamentUpdates;
-    if (matchReminders) matchReminders.checked = notificationSettings.matchReminders;
-    if (resultNotifications) resultNotifications.checked = notificationSettings.resultNotifications;
-    if (desktopNotifications) desktopNotifications.checked = notificationSettings.desktopNotifications;
+    if (emailNotifications) emailNotifications.checked = notificationSettings.emailNotifications || false;
+    if (tournamentUpdates) tournamentUpdates.checked = notificationSettings.tournamentUpdates || false;
+    if (matchReminders) matchReminders.checked = notificationSettings.matchReminders || false;
+    if (resultNotifications) resultNotifications.checked = notificationSettings.resultNotifications || false;
+    if (desktopNotifications) desktopNotifications.checked = notificationSettings.desktopNotifications || false;
 }
 
 // Save notification settings to localStorage

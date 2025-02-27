@@ -1,5 +1,7 @@
 // DOM Elements
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('Initializing standalone profile page...');
+    
     // Navigation elements
     const profileMenuLinks = document.querySelectorAll('.profile-menu a');
     const profileSections = document.querySelectorAll('.profile-section');
@@ -27,69 +29,109 @@ document.addEventListener('DOMContentLoaded', () => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             
-            // Remove active class from all links and sections
-            profileMenuLinks.forEach(item => item.classList.remove('active'));
-            profileSections.forEach(section => section.classList.remove('active'));
-            
-            // Add active class to clicked link
-            link.classList.add('active');
-            
-            // Show corresponding section
+            // Get the target section ID from the href attribute
             const targetSectionId = link.getAttribute('href').substring(1);
-            const targetSection = document.getElementById(targetSectionId);
-            if (targetSection) {
-                targetSection.classList.add('active');
-            }
+            navigateToProfileSection(targetSectionId);
         });
     });
+    
+    // Function to handle profile section navigation
+    function navigateToProfileSection(sectionId) {
+        console.log(`Navigating to profile section: ${sectionId}`);
+        
+        // Remove active class from all links and sections
+        profileMenuLinks.forEach(item => item.classList.remove('active'));
+        profileSections.forEach(section => section.classList.remove('active'));
+        
+        // Add active class to clicked link
+        const activeLink = document.querySelector(`.profile-menu a[href="#${sectionId}"]`);
+        if (activeLink) {
+            activeLink.classList.add('active');
+        }
+        
+        // Show corresponding section
+        const targetSection = document.getElementById(sectionId);
+        if (targetSection) {
+            targetSection.classList.add('active');
+        } else {
+            console.error(`Profile section with ID "${sectionId}" not found`);
+            return;
+        }
+        
+        // Store the active tab in localStorage for persistence
+        localStorage.setItem('activeProfilePageTab', sectionId);
+    }
+    
+    // Check if there's a stored active tab and activate it
+    const activeTab = localStorage.getItem('activeProfilePageTab') || 'personal-info';
+    navigateToProfileSection(activeTab);
     
     // Handle profile picture change
-    changePictureBtn.addEventListener('click', () => {
-        // In Electron, we'd use dialog API to select files
-        // For now, simulate with a file input
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = 'image/*';
-        fileInput.style.display = 'none';
-        
-        fileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    profilePicture.src = e.target.result;
-                    
-                    // Save to local storage or send to backend
-                    saveProfilePicture(e.target.result);
-                };
-                reader.readAsDataURL(file);
-            }
+    if (changePictureBtn && profilePicture) {
+        changePictureBtn.addEventListener('click', () => {
+            // In Electron, we'd use dialog API to select files
+            // For now, simulate with a file input
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*';
+            fileInput.style.display = 'none';
+            
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        profilePicture.src = e.target.result;
+                        
+                        // Save to local storage or send to backend
+                        saveProfilePicture(e.target.result);
+                        
+                        // Show success message
+                        showMessage('Profile picture updated successfully', 'success');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            document.body.appendChild(fileInput);
+            fileInput.click();
+            
+            // Clean up
+            setTimeout(() => {
+                document.body.removeChild(fileInput);
+            }, 1000);
         });
-        
-        document.body.appendChild(fileInput);
-        fileInput.click();
-        
-        // Clean up
-        setTimeout(() => {
-            document.body.removeChild(fileInput);
-        }, 1000);
-    });
+    } else {
+        console.warn('Profile picture elements not found');
+    }
     
     // Update font size display
-    fontSizeRange.addEventListener('input', () => {
-        const size = fontSizeRange.value;
-        fontSizeValue.textContent = `${size}px`;
-        
-        // Preview font size
-        document.documentElement.style.setProperty('--font-size', `${size}px`);
-    });
+    if (fontSizeRange && fontSizeValue) {
+        fontSizeRange.addEventListener('input', () => {
+            const size = fontSizeRange.value;
+            fontSizeValue.textContent = `${size}px`;
+            
+            // Preview font size
+            document.documentElement.style.setProperty('--font-size', `${size}px`);
+        });
+    }
     
     // Form submissions
-    personalInfoForm.addEventListener('submit', handleFormSubmit);
-    accountSettingsForm.addEventListener('submit', handleFormSubmit);
-    notificationSettingsForm.addEventListener('submit', handleFormSubmit);
-    appearanceSettingsForm.addEventListener('submit', handleFormSubmit);
-    privacySettingsForm.addEventListener('submit', handleFormSubmit);
+    if (personalInfoForm) {
+        personalInfoForm.addEventListener('submit', handleFormSubmit);
+    }
+    if (accountSettingsForm) {
+        accountSettingsForm.addEventListener('submit', handleFormSubmit);
+    }
+    if (notificationSettingsForm) {
+        notificationSettingsForm.addEventListener('submit', handleFormSubmit);
+    }
+    if (appearanceSettingsForm) {
+        appearanceSettingsForm.addEventListener('submit', handleFormSubmit);
+    }
+    if (privacySettingsForm) {
+        privacySettingsForm.addEventListener('submit', handleFormSubmit);
+    }
     
     // Reset buttons
     document.querySelectorAll('button[type="reset"]').forEach(button => {
@@ -107,6 +149,8 @@ document.addEventListener('DOMContentLoaded', () => {
  * In a real app, this would likely come from a database via IPC
  */
 function loadUserProfile() {
+    console.log('Loading user profile data');
+    
     // For this example, we'll use mock data
     // In a real application, this would come from backend/database
     const mockUserData = {
@@ -144,39 +188,65 @@ function loadUserProfile() {
     const userData = savedUserData ? JSON.parse(savedUserData) : mockUserData;
     
     // Populate personal info form
-    document.getElementById('display-name').value = userData.personalInfo.displayName || '';
-    document.getElementById('full-name').value = userData.personalInfo.fullName || '';
-    document.getElementById('email').value = userData.personalInfo.email || '';
-    document.getElementById('phone').value = userData.personalInfo.phone || '';
-    document.getElementById('bio').value = userData.personalInfo.bio || '';
+    const displayNameInput = document.getElementById('display-name');
+    const fullNameInput = document.getElementById('full-name');
+    const emailInput = document.getElementById('email');
+    const phoneInput = document.getElementById('phone');
+    const bioInput = document.getElementById('bio');
     
-    // Populate account settings
-    document.getElementById('language-select').value = userData.accountSettings.language || 'en';
+    if (displayNameInput) displayNameInput.value = userData.personalInfo.displayName || '';
+    if (fullNameInput) fullNameInput.value = userData.personalInfo.fullName || '';
+    if (emailInput) emailInput.value = userData.personalInfo.email || '';
+    if (phoneInput) phoneInput.value = userData.personalInfo.phone || '';
+    if (bioInput) bioInput.value = userData.personalInfo.bio || '';
     
-    // Populate notification settings
-    document.getElementById('email-notifications').checked = userData.notificationSettings.emailNotifications;
-    document.getElementById('tournament-updates').checked = userData.notificationSettings.tournamentUpdates;
-    document.getElementById('match-reminders').checked = userData.notificationSettings.matchReminders;
-    document.getElementById('result-notifications').checked = userData.notificationSettings.resultNotifications;
-    document.getElementById('desktop-notifications').checked = userData.notificationSettings.desktopNotifications;
+    // Populate account settings form
+    const languageSelect = document.getElementById('language-select');
+    if (languageSelect) languageSelect.value = userData.accountSettings.language || 'en';
     
-    // Populate appearance settings
-    document.getElementById('theme-select').value = userData.appearanceSettings.theme || 'light';
-    document.getElementById('font-size').value = userData.appearanceSettings.fontSize || 16;
-    document.getElementById('font-size-value').textContent = `${userData.appearanceSettings.fontSize || 16}px`;
+    // Populate notification settings form
+    const emailNotificationsCheckbox = document.getElementById('email-notifications');
+    const tournamentUpdatesCheckbox = document.getElementById('tournament-updates');
+    const matchRemindersCheckbox = document.getElementById('match-reminders');
+    const resultNotificationsCheckbox = document.getElementById('result-notifications');
+    const desktopNotificationsCheckbox = document.getElementById('desktop-notifications');
     
-    // Populate privacy settings
-    document.getElementById('profile-visibility').checked = userData.privacySettings.profileVisibility;
-    document.getElementById('show-real-name').checked = userData.privacySettings.showRealName;
-    document.getElementById('share-statistics').checked = userData.privacySettings.shareStatistics;
+    if (emailNotificationsCheckbox) emailNotificationsCheckbox.checked = userData.notificationSettings.emailNotifications;
+    if (tournamentUpdatesCheckbox) tournamentUpdatesCheckbox.checked = userData.notificationSettings.tournamentUpdates;
+    if (matchRemindersCheckbox) matchRemindersCheckbox.checked = userData.notificationSettings.matchReminders;
+    if (resultNotificationsCheckbox) resultNotificationsCheckbox.checked = userData.notificationSettings.resultNotifications;
+    if (desktopNotificationsCheckbox) desktopNotificationsCheckbox.checked = userData.notificationSettings.desktopNotifications;
     
-    // Set profile picture if available
-    if (userData.profilePicture) {
-        document.getElementById('profile-picture').src = userData.profilePicture;
+    // Populate appearance settings form
+    const themeSelect = document.getElementById('theme-select');
+    const fontSizeRange = document.getElementById('font-size');
+    const fontSizeValue = document.getElementById('font-size-value');
+    
+    if (themeSelect) themeSelect.value = userData.appearanceSettings.theme || 'light';
+    if (fontSizeRange) {
+        fontSizeRange.value = userData.appearanceSettings.fontSize || 16;
+        if (fontSizeValue) fontSizeValue.textContent = `${fontSizeRange.value}px`;
     }
     
-    // Apply theme if available
+    // Apply theme
     applyTheme(userData.appearanceSettings.theme || 'light');
+    
+    // Populate privacy settings form
+    const profileVisibilityCheckbox = document.getElementById('profile-visibility');
+    const showRealNameCheckbox = document.getElementById('show-real-name');
+    const shareStatisticsCheckbox = document.getElementById('share-statistics');
+    
+    if (profileVisibilityCheckbox) profileVisibilityCheckbox.checked = userData.privacySettings.profileVisibility;
+    if (showRealNameCheckbox) showRealNameCheckbox.checked = userData.privacySettings.showRealName;
+    if (shareStatisticsCheckbox) shareStatisticsCheckbox.checked = userData.privacySettings.shareStatistics;
+    
+    // Load profile picture if available
+    if (userData.profilePicture) {
+        const profilePicture = document.getElementById('profile-picture');
+        if (profilePicture) {
+            profilePicture.src = userData.profilePicture;
+        }
+    }
 }
 
 /**

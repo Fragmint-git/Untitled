@@ -1,6 +1,55 @@
-# VR Tournament Desktop Application
+# VR Tournament Platform
 
-A cross-platform desktop application for managing VR tournaments, built with Electron.
+A web-based platform for managing VR tournaments, games, and players.
+
+## Admin Panel Refactoring
+
+The admin panel has been refactored to use a modular architecture:
+
+### Directory Structure
+
+```
+renderer/
+├── js/
+│   ├── admin.js                  # Main entry point for admin panel
+│   ├── modules/
+│   │   ├── admin/
+│   │   │   ├── admin.js          # Core admin module
+│   │   │   ├── games.js          # Games management module
+│   │   │   └── ...               # Future modules (tournaments, players, etc.)
+```
+
+### Module System
+
+The admin panel now uses a modular approach:
+
+1. **Main Entry Point (`admin.js`)**: 
+   - Loads all required modules
+   - Initializes the admin panel
+
+2. **Core Admin Module (`modules/admin/admin.js`)**:
+   - Handles navigation
+   - Manages dashboard
+   - Provides shared utilities (modals, notifications)
+
+3. **Games Module (`modules/admin/games.js`)**:
+   - Manages game CRUD operations
+   - Handles game filtering and search
+   - Manages game form
+
+### Benefits of Refactoring
+
+- **Improved Maintainability**: Each module has a single responsibility
+- **Better Organization**: Code is organized by feature
+- **Easier Debugging**: Issues can be isolated to specific modules
+- **Scalability**: New features can be added as separate modules
+
+## Future Improvements
+
+- Add modules for tournaments, players, and settings
+- Implement proper authentication
+- Add real API integration
+- Improve error handling and validation
 
 ## Features
 

@@ -1,6 +1,6 @@
 /**
  * UI Module
- * Handles common UI functionality like notifications and theme switching
+ * Handles UI-related functionality like notifications and theme switching
  */
 
 // Initialize UI components
@@ -60,31 +60,52 @@ function initUI() {
 // Apply theme based on dark mode preference
 function applyTheme(isDarkMode) {
     if (isDarkMode) {
-        // Dark mode - remove light-mode class if it exists
+        document.body.classList.add('dark-mode');
         document.body.classList.remove('light-mode');
     } else {
-        // Light mode - add light-mode class
         document.body.classList.add('light-mode');
+        document.body.classList.remove('dark-mode');
     }
+    
+    // Save theme preference
+    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
 }
 
 // Show notification toast
 function showNotification(message, type = 'info') {
-    const toast = document.getElementById('notification-toast');
-    const messageElement = document.getElementById('notification-message');
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+            <span>${message}</span>
+        </div>
+        <button class="close-notification">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
     
-    if (!toast || !messageElement) {
-        console.error('Notification elements not found');
-        return;
-    }
+    document.body.appendChild(notification);
     
-    messageElement.textContent = message;
-    toast.className = `notification-toast ${type}`;
-    toast.classList.add('show');
+    // Add event listener to close button
+    notification.querySelector('.close-notification').addEventListener('click', () => {
+        notification.classList.add('fade-out');
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    });
     
+    // Auto-remove after 5 seconds
     setTimeout(() => {
-        toast.classList.remove('show');
-    }, 3000);
+        if (document.body.contains(notification)) {
+            notification.classList.add('fade-out');
+            setTimeout(() => {
+                if (document.body.contains(notification)) {
+                    document.body.removeChild(notification);
+                }
+            }, 300);
+        }
+    }, 5000);
 }
 
 // Format date

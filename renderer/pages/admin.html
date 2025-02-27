@@ -5,6 +5,7 @@
     <title>VR Tournament Admin Panel</title>
     <link rel="stylesheet" href="../styles.css">
     <link rel="stylesheet" href="../styles/admin.css">
+    <link rel="stylesheet" href="../styles/toast.css">
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
 </head>
 <body class="admin-panel">
@@ -13,18 +14,18 @@
             <h1>VR Tournament Admin Panel</h1>
             <div class="admin-user-info">
                 <span id="admin-username">Admin User</span>
-                <button id="admin-logout" class="btn-secondary">Logout</button>
+                <button id="logout-btn" class="btn-secondary">Logout</button>
             </div>
         </header>
 
         <div class="admin-content">
             <div class="admin-sidebar">
                 <ul class="admin-menu">
-                    <li><a href="#" data-admin-section="dashboard" class="active">Dashboard</a></li>
-                    <li><a href="#" data-admin-section="games">Manage Games</a></li>
-                    <li><a href="#" data-admin-section="tournaments">Manage Tournaments</a></li>
-                    <li><a href="#" data-admin-section="players">Manage Players</a></li>
-                    <li><a href="#" data-admin-section="settings">Admin Settings</a></li>
+                    <li><a href="#" data-section="dashboard" class="admin-menu-link active">Dashboard</a></li>
+                    <li><a href="#" data-section="games" class="admin-menu-link">Manage Games</a></li>
+                    <li><a href="#" data-section="tournaments" class="admin-menu-link">Manage Tournaments</a></li>
+                    <li><a href="#" data-section="players" class="admin-menu-link">Manage Players</a></li>
+                    <li><a href="#" data-section="settings" class="admin-menu-link">Admin Settings</a></li>
                     <li><a href="../index.html" class="back-to-app">Back to Application</a></li>
                 </ul>
             </div>
@@ -54,30 +55,29 @@
                     
                     <div class="admin-recent-activity">
                         <h3>Recent Activity</h3>
-                        <div class="activity-list" id="recent-activity-list">
-                            <p class="empty-state">No recent activity</p>
+                        <div id="recent-activity-list" class="activity-list">
+                            <!-- Activity items will be populated by JavaScript -->
                         </div>
                     </div>
                 </div>
 
-                <!-- Manage Games Section -->
+                <!-- Admin Games Section -->
                 <div id="admin-games" class="admin-section">
-                    <div class="section-header">
-                        <h2>Manage Games</h2>
+                    <h2>Manage Games</h2>
+                    <div class="admin-actions">
                         <button id="add-game-btn" class="btn-primary">Add New Game</button>
-                    </div>
-                    
-                    <div class="search-filter-bar">
-                        <input type="text" id="admin-game-search" placeholder="Search games...">
-                        <select id="admin-game-filter">
-                            <option value="all">All Games</option>
-                            <option value="active">Active Games</option>
-                            <option value="inactive">Inactive Games</option>
-                        </select>
+                        <div class="admin-filter">
+                            <input type="text" id="game-search" placeholder="Search games...">
+                            <select id="game-filter">
+                                <option value="all">All Status</option>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
                     </div>
                     
                     <div class="admin-table-container">
-                        <table class="admin-table" id="games-table">
+                        <table class="admin-table">
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -92,145 +92,117 @@
                                 </tr>
                             </thead>
                             <tbody id="games-table-body">
-                                <!-- Game rows will be populated here -->
-                                <tr>
-                                    <td colspan="9" class="empty-table">No games available</td>
-                                </tr>
+                                <!-- Game rows will be populated by JavaScript -->
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- Other admin sections would go here -->
+                <!-- Admin Tournaments Section -->
                 <div id="admin-tournaments" class="admin-section">
                     <h2>Manage Tournaments</h2>
-                    <p class="placeholder-content">Tournament management interface will be implemented here.</p>
+                    <p class="placeholder-text">Tournament management interface will be implemented in a future update.</p>
                 </div>
                 
                 <div id="admin-players" class="admin-section">
                     <h2>Manage Players</h2>
-                    <p class="placeholder-content">Player management interface will be implemented here.</p>
+                    <p class="placeholder-text">Player management interface will be implemented in a future update.</p>
                 </div>
                 
                 <div id="admin-settings" class="admin-section">
                     <h2>Admin Settings</h2>
-                    <p class="placeholder-content">Admin settings interface will be implemented here.</p>
+                    <p class="placeholder-text">Admin settings interface will be implemented in a future update.</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Game Form Modal -->
-    <div id="game-form-modal" class="modal">
+    <!-- Game Modal -->
+    <div id="game-modal" class="modal">
         <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h3 id="game-form-title">Add New Game</h3>
-            
-            <form id="game-form">
-                <input type="hidden" id="game-id" name="id">
-                
-                <div class="form-group">
-                    <label for="game-name">Game Name*</label>
-                    <input type="text" id="game-name" name="name" required placeholder="Enter game name">
-                </div>
-                
-                <div class="form-group">
-                    <label for="game-developer">Developer*</label>
-                    <input type="text" id="game-developer" name="developer" required placeholder="Enter developer name">
-                </div>
-                
-                <div class="form-group">
-                    <label for="game-release-date">Release Date*</label>
-                    <input type="date" id="game-release-date" name="releaseDate" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="game-description">Description*</label>
-                    <textarea id="game-description" name="description" rows="4" required placeholder="Enter game description"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label>Platforms*</label>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="platform-oculus" name="platforms" value="oculus">
-                        <label for="platform-oculus">Oculus</label>
+            <div class="modal-header">
+                <h2 id="game-form-title">Add New Game</h2>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="game-form">
+                    <input type="hidden" id="game-id">
+                    <div class="form-group">
+                        <label for="game-name">Game Name*</label>
+                        <input type="text" id="game-name" required>
                     </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="platform-vive" name="platforms" value="vive">
-                        <label for="platform-vive">HTC Vive</label>
+                    <div class="form-group">
+                        <label for="game-developer">Developer*</label>
+                        <input type="text" id="game-developer" required>
                     </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="platform-index" name="platforms" value="index">
-                        <label for="platform-index">Valve Index</label>
+                    <div class="form-group">
+                        <label for="game-release-date">Release Date*</label>
+                        <input type="date" id="game-release-date" required>
                     </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="platform-psvr" name="platforms" value="psvr">
-                        <label for="platform-psvr">PlayStation VR</label>
+                    <div class="form-group">
+                        <label for="game-description">Description</label>
+                        <textarea id="game-description" rows="4"></textarea>
                     </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>Genres*</label>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="genre-action" name="genres" value="action">
-                        <label for="genre-action">Action</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="genre-sports" name="genres" value="sports">
-                        <label for="genre-sports">Sports</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="genre-rhythm" name="genres" value="rhythm">
-                        <label for="genre-rhythm">Rhythm</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="genre-shooter" name="genres" value="shooter">
-                        <label for="genre-shooter">Shooter</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="genre-puzzle" name="genres" value="puzzle">
-                        <label for="genre-puzzle">Puzzle</label>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="game-cover">Cover Image*</label>
-                    <div class="file-upload-container">
-                        <input type="file" id="game-cover" name="coverImage" accept="image/*">
-                        <div class="file-preview" id="cover-preview">
-                            <img id="cover-preview-image" src="../assets/default-game-cover.png" alt="Game cover preview">
+                    <div class="form-group">
+                        <label>Platforms</label>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" name="game-platforms" value="Oculus"> Oculus</label>
+                            <label><input type="checkbox" name="game-platforms" value="SteamVR"> SteamVR</label>
+                            <label><input type="checkbox" name="game-platforms" value="PSVR"> PSVR</label>
+                            <label><input type="checkbox" name="game-platforms" value="Other"> Other</label>
                         </div>
                     </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="game-status">Status*</label>
-                    <select id="game-status" name="status" required>
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                    </select>
-                </div>
-                
-                <div class="form-actions">
-                    <button type="submit" class="btn-primary">Save Game</button>
-                    <button type="button" class="btn-secondary" id="cancel-game-form">Cancel</button>
-                </div>
-            </form>
+                    <div class="form-group">
+                        <label>Genres</label>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" name="game-genres" value="Action"> Action</label>
+                            <label><input type="checkbox" name="game-genres" value="Adventure"> Adventure</label>
+                            <label><input type="checkbox" name="game-genres" value="FPS"> FPS</label>
+                            <label><input type="checkbox" name="game-genres" value="Rhythm"> Rhythm</label>
+                            <label><input type="checkbox" name="game-genres" value="Puzzle"> Puzzle</label>
+                            <label><input type="checkbox" name="game-genres" value="Social"> Social</label>
+                            <label><input type="checkbox" name="game-genres" value="Casual"> Casual</label>
+                            <label><input type="checkbox" name="game-genres" value="Survival"> Survival</label>
+                            <label><input type="checkbox" name="game-genres" value="Horror"> Horror</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="game-cover">Cover Image</label>
+                        <input type="file" id="game-cover" accept="image/*">
+                        <div class="image-preview">
+                            <img id="cover-preview" src="" alt="Cover Preview" style="display: none;">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="game-status">Status*</label>
+                        <select id="game-status" required>
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Save Game</button>
+                        <button type="button" class="btn-secondary close-modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
     <!-- Confirmation Modal -->
     <div id="confirm-modal" class="modal">
         <div class="modal-content confirm-modal-content">
-            <h3 id="confirm-title">Confirm Action</h3>
-            <p id="confirm-message">Are you sure you want to proceed with this action?</p>
-            <div class="confirm-actions">
-                <button id="confirm-yes" class="btn-danger">Yes, Proceed</button>
-                <button id="confirm-no" class="btn-secondary">Cancel</button>
+            <span class="close-modal">&times;</span>
+            <h3 id="confirm-modal-title">Confirm Action</h3>
+            <p id="confirm-modal-message">Are you sure you want to perform this action?</p>
+            <div class="form-actions">
+                <button id="confirm-btn" class="btn-primary">Yes</button>
+                <button id="cancel-btn" class="btn-secondary">No</button>
             </div>
         </div>
     </div>
 
+    <!-- Load the main admin script which will load all modules -->
     <script src="../js/admin.js"></script>
 </body>
 </html> 

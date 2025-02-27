@@ -7,14 +7,30 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Initializing application...');
     
-    // Initialize UI components
-    window.uiModule.initUI();
+    // Initialize UI module
+    if (window.uiModule) {
+        window.uiModule.initUI();
+    }
     
     // Initialize navigation
-    window.navigationModule.initNavigation();
+    if (window.navigationModule) {
+        window.navigationModule.initNavigation();
+    }
     
-    // Load dashboard data on initial load
-    window.dashboardModule.loadDashboardData();
+    // Initialize dashboard
+    if (window.dashboardModule) {
+        window.dashboardModule.loadDashboardData();
+    }
+    
+    // Initialize profile module
+    if (window.profileModule) {
+        window.profileModule.initProfile();
+    }
+    
+    // Show welcome notification
+    if (window.uiModule) {
+        window.uiModule.showNotification('Welcome to VR Tournament Manager', 'info');
+    }
     
     console.log('Application initialized successfully');
 }); 

@@ -3,6 +3,7 @@
 /* General Admin Layout */
 .admin-panel {
     background-color: #f8f9fa;
+    color: #333333; /* Ensure default text color has good contrast */
 }
 
 .admin-container {
@@ -88,6 +89,8 @@
     flex: 1;
     padding: 20px;
     overflow-y: auto;
+    background-color: #f8f9fa;
+    color: #333333;
 }
 
 .admin-section {
@@ -113,6 +116,7 @@
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     text-align: center;
     transition: transform 0.2s, box-shadow 0.2s;
+    color: #333333;
 }
 
 .admin-stat-card:hover {
@@ -138,6 +142,7 @@
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    color: #333333;
 }
 
 .admin-recent-activity h3 {
@@ -158,6 +163,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    color: #333333;
 }
 
 .activity-item:last-child {
@@ -196,6 +202,7 @@
 
 .activity-details p {
     margin: 0;
+    color: #333333;
 }
 
 .activity-time {
@@ -213,6 +220,7 @@
 
 .section-header h2 {
     margin: 0;
+    color: #2c3e50;
 }
 
 /* Search and Filter Bar */
@@ -228,6 +236,8 @@
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 14px;
+    color: #333333;
+    background-color: #ffffff;
 }
 
 .search-filter-bar select {
@@ -236,6 +246,8 @@
     border-radius: 4px;
     font-size: 14px;
     min-width: 150px;
+    color: #333333;
+    background-color: #ffffff;
 }
 
 /* Admin Tables */
@@ -249,6 +261,7 @@
 .admin-table {
     width: 100%;
     border-collapse: collapse;
+    color: #333333;
 }
 
 .admin-table th,
@@ -340,6 +353,37 @@
     color: #f44336;
 }
 
+/* Button Styles */
+.btn-primary, 
+.btn-secondary {
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    font-weight: 500;
+}
+
+.btn-primary {
+    background-color: #3498db;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+}
+
+.btn-secondary {
+    background-color: #ecf0f1;
+    color: #333333;
+    border: 1px solid #ddd;
+}
+
+.btn-secondary:hover {
+    background-color: #dfe6e9;
+}
+
 /* Modal Styles */
 .modal {
     display: none;
@@ -362,6 +406,7 @@
     max-width: 700px;
     border-radius: 8px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    color: #333333;
 }
 
 .close-modal {
@@ -371,6 +416,7 @@
     font-size: 24px;
     cursor: pointer;
     color: #95a5a6;
+    z-index: 1010;
 }
 
 .close-modal:hover {
@@ -384,6 +430,41 @@
 }
 
 /* Form Styles */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group input[type="number"],
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #333333;
+    background-color: #ffffff;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
 .file-upload-container {
     display: flex;
     flex-direction: column;
@@ -420,6 +501,7 @@
 
 #confirm-message {
     margin-bottom: 20px;
+    color: #333333;
 }
 
 .confirm-actions {
@@ -449,6 +531,32 @@
     text-align: center;
     color: #95a5a6;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.placeholder-text {
+    color: #7f8c8d;
+    font-style: italic;
+}
+
+/* Checkbox and Radio Styles */
+.checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 5px;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0;
+    cursor: pointer;
+    font-weight: normal;
+}
+
+.checkbox-group input[type="checkbox"],
+.checkbox-group input[type="radio"] {
+    margin-right: 8px;
 }
 
 /* Responsive Design */

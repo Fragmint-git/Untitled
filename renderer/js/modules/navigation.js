@@ -1,52 +1,94 @@
 /**
  * Navigation Module
- * Handles sidebar navigation and section switching
+ * Handles navigation between different sections of the application
  */
 
-// Initialize navigation
-function initNavigation() {
-    const navItems = document.querySelectorAll('.nav-item');
-    const contentSections = document.querySelectorAll('.content-section');
-
-    // Add click event listeners to navigation items
-    navItems.forEach(item => {
-        item.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            // Get the section id from the data attribute
-            const sectionId = this.getAttribute('data-section');
-            
-            // Remove active class from all nav items
-            navItems.forEach(navItem => {
-                navItem.classList.remove('active');
+// Navigation Module
+window.navigationModule = {
+    // Initialize navigation
+    initNavigation: function() {
+        // Add event listeners to sidebar navigation items
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const targetSection = this.getAttribute('data-section');
+                window.navigationModule.navigateTo(targetSection);
             });
-            
-            // Add active class to clicked nav item
-            this.classList.add('active');
-            
-            // Hide all content sections
-            contentSections.forEach(section => {
-                section.classList.remove('active');
+        });
+        
+        // Add event listener to user profile button
+        const userProfileButton = document.getElementById('user-profile-button');
+        if (userProfileButton) {
+            userProfileButton.addEventListener('click', function() {
+                window.navigationModule.navigateTo('profile');
             });
+        }
+        
+        // Check if there's a hash in the URL to navigate to a specific section on load
+        if (window.location.hash) {
+            const sectionId = window.location.hash.substring(1);
+            this.navigateTo(sectionId);
+        }
+    },
+    
+    // Navigate to a specific section
+    navigateTo: function(sectionId) {
+        console.log(`Navigating to section: ${sectionId}`);
+        
+        // Hide all sections
+        const contentSections = document.querySelectorAll('.content-section');
+        contentSections.forEach(section => {
+            section.classList.remove('active');
+        });
+        
+        // Show target section
+        const targetSection = document.getElementById(sectionId);
+        if (targetSection) {
+            targetSection.classList.add('active');
             
-            // Show the selected content section
-            document.getElementById(sectionId).classList.add('active');
-            
-            // Load section-specific content if needed
-            if (sectionId === 'dashboard') {
-                window.dashboardModule.loadDashboardData();
-            } else if (sectionId === 'tournaments') {
-                window.tournamentsModule.loadTournaments();
-            } else if (sectionId === 'players') {
-                window.playersModule.loadPlayers();
-            } else if (sectionId === 'games') {
-                window.gamesModule.loadGames();
+            // Load section data if needed
+            this.loadSectionData(sectionId);
+        } else {
+            console.error(`Section with ID "${sectionId}" not found`);
+        }
+        
+        // Update active state in sidebar
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            if (item.getAttribute('data-section') === sectionId) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
             }
         });
-    });
-}
-
-// Export module
-window.navigationModule = {
-    initNavigation
+        
+        // Update URL hash for bookmarking/sharing
+        window.location.hash = sectionId;
+    },
+    
+    // Load section-specific data
+    loadSectionData: function(sectionId) {
+        switch(sectionId) {
+            case 'tournaments':
+                if (window.tournamentsModule && typeof window.tournamentsModule.loadTournaments === 'function') {
+                    window.tournamentsModule.loadTournaments();
+                }
+                break;
+            case 'players':
+                if (window.playersModule && typeof window.playersModule.loadPlayers === 'function') {
+                    window.playersModule.loadPlayers();
+                }
+                break;
+            case 'games':
+                if (window.gamesModule && typeof window.gamesModule.loadGames === 'function') {
+                    window.gamesModule.loadGames();
+                }
+                break;
+            case 'profile':
+                if (window.profileModule && typeof window.profileModule.loadUserProfile === 'function') {
+                    window.profileModule.loadUserProfile();
+                }
+                break;
+        }
+    }
 }; 

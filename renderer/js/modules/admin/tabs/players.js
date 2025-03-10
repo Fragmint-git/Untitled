@@ -65,7 +65,7 @@ window.adminPlayersTabModule = {
                         <tr data-player-id="${player.id}">
                             <td>${player.id}</td>
                             <td>
-                                <img src="${player.avatar || 'assets/images/default-avatar.jpg'}" alt="${player.username}" class="player-avatar-thumb">
+                                <img src="${player.avatar || '../assets/images/default-avatar.png'}" alt="${player.username}" class="player-avatar-thumb">
                                 ${player.username}
                             </td>
                             <td>${player.email}</td>

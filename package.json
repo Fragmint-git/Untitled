@@ -4,7 +4,9 @@
   "description": "VR Tournament Desktop Application",
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
+    "start": "node start.js",
+    "start:electron": "electron .",
+    "start:backend": "node backend/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "electron-builder --mac --windows",
     "build:mac": "electron-builder --mac",

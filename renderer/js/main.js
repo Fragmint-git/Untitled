@@ -22,14 +22,41 @@ document.addEventListener('DOMContentLoaded', function() {
         window.dashboardModule.loadDashboardData();
     }
     
+    // Initialize store module
+    if (window.storeModule) {
+        window.storeModule.initStore();
+    }
+    
     // Initialize profile module
     if (window.profileModule) {
         window.profileModule.initProfile();
     }
     
+    // Initialize matchfinder UI
+    if (window.matchfinderUIModule) {
+        window.matchfinderUIModule.initMatchfinderUI();
+    }
+    
+    // Initialize quit button
+    const quitButton = document.getElementById('quit-button');
+    if (quitButton) {
+        quitButton.addEventListener('click', async () => {
+            // Show confirmation dialog
+            const confirmed = window.confirm('Are you sure you want to quit the application?');
+            if (confirmed) {
+                try {
+                    await window.api.quitApp();
+                } catch (error) {
+                    console.error('Error quitting application:', error);
+                    window.uiModule.showNotification('Failed to quit application', 'error');
+                }
+            }
+        });
+    }
+    
     // Show welcome notification
     if (window.uiModule) {
-        window.uiModule.showNotification('Welcome to VR Tournament Manager', 'info');
+        window.uiModule.showNotification('Welcome to VR Tournament', 'info');
     }
     
     console.log('Application initialized successfully');

@@ -105,6 +105,16 @@ const Tournament = sequelize.define('Tournament', {
         type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 32
+    },
+    prizePool: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: false,
+        defaultValue: 0
+    },
+    players: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0
     }
 });
 

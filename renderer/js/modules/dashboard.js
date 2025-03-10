@@ -11,52 +11,61 @@ async function loadDashboardData() {
         const players = await window.api.getPlayers();
         const games = await window.api.getGames();
         
-        // Update dashboard statistics
-        document.getElementById('total-tournaments').textContent = tournaments.length;
-        document.getElementById('total-players').textContent = players.length;
-        document.getElementById('total-games').textContent = games.length;
+        // Update dashboard statistics if elements exist
+        const updateElement = (id, value) => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.textContent = value;
+            }
+        };
+
+        updateElement('total-tournaments', tournaments.length);
+        updateElement('total-players', players.length);
+        updateElement('total-games', games.length);
         
         // Get active tournaments (status = 'active')
         const activeTournaments = tournaments.filter(t => t.status === 'active');
-        document.getElementById('active-tournaments').textContent = activeTournaments.length;
+        updateElement('active-tournaments', activeTournaments.length);
         
         // Display recent tournaments in the dashboard
         const recentTournamentsContainer = document.getElementById('recent-tournaments');
-        recentTournamentsContainer.innerHTML = '';
-        
-        // Sort tournaments by start date (most recent first)
-        const sortedTournaments = [...tournaments].sort((a, b) => 
-            new Date(b.startDate) - new Date(a.startDate)
-        ).slice(0, 5); // Get only the 5 most recent
-        
-        if (sortedTournaments.length === 0) {
-            recentTournamentsContainer.innerHTML = '<p>No tournaments found. Create your first tournament!</p>';
-        } else {
-            sortedTournaments.forEach(tournament => {
-                const tournamentCard = document.createElement('div');
-                tournamentCard.className = 'tournament-card';
-                tournamentCard.innerHTML = `
-                    <h3>${tournament.name}</h3>
-                    <p>${tournament.description.substring(0, 100)}${tournament.description.length > 100 ? '...' : ''}</p>
-                    <div class="tournament-meta">
-                        <span class="status ${tournament.status}">${tournament.status}</span>
-                        <span class="date">Starts: ${new Date(tournament.startDate).toLocaleDateString()}</span>
-                    </div>
-                    <button class="btn view-tournament" data-id="${tournament.id}">View Details</button>
-                `;
-                recentTournamentsContainer.appendChild(tournamentCard);
-            });
+        if (recentTournamentsContainer) {
+            recentTournamentsContainer.innerHTML = '';
             
-            // Add event listeners to view tournament buttons
-            document.querySelectorAll('.view-tournament').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const tournamentId = e.target.getAttribute('data-id');
-                    // Navigate to tournament details
-                    document.querySelector('.nav-item[data-section="tournaments"]').click();
-                    // Show tournament details
-                    window.tournamentsModule.showTournamentDetails(tournamentId);
+            // Sort tournaments by start date (most recent first)
+            const sortedTournaments = [...tournaments].sort((a, b) => 
+                new Date(b.startDate) - new Date(a.startDate)
+            ).slice(0, 5);
+            
+            if (sortedTournaments.length === 0) {
+                recentTournamentsContainer.innerHTML = '<p>No tournaments found. Create your first tournament!</p>';
+            } else {
+                sortedTournaments.forEach(tournament => {
+                    const tournamentCard = document.createElement('div');
+                    tournamentCard.className = 'tournament-card';
+                    tournamentCard.innerHTML = `
+                        <h3>${tournament.name}</h3>
+                        <p>${tournament.description ? tournament.description.substring(0, 100) + (tournament.description.length > 100 ? '...' : '') : 'No description available.'}</p>
+                        <div class="tournament-meta">
+                            <span class="status ${tournament.status}">${tournament.status}</span>
+                            <span class="date">Starts: ${new Date(tournament.startDate).toLocaleDateString()}</span>
+                        </div>
+                        <button class="btn view-tournament" data-id="${tournament.id}">View Details</button>
+                    `;
+                    recentTournamentsContainer.appendChild(tournamentCard);
                 });
-            });
+                
+                // Add event listeners to view tournament buttons
+                document.querySelectorAll('.view-tournament').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const tournamentId = e.target.getAttribute('data-id');
+                        // Navigate to tournament details
+                        document.querySelector('.nav-item[data-section="tournaments"]').click();
+                        // Show tournament details
+                        window.tournamentsModule.showTournamentDetails(tournamentId);
+                    });
+                });
+            }
         }
         
         // Display upcoming matches
@@ -73,6 +82,8 @@ async function loadUpcomingMatches() {
     try {
         const matches = await window.api.getMatches();
         const upcomingMatchesContainer = document.getElementById('upcoming-matches');
+        if (!upcomingMatchesContainer) return;
+
         upcomingMatchesContainer.innerHTML = '';
         
         // Filter for upcoming matches (those with future start times)

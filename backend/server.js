@@ -10,8 +10,18 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: ['http://localhost:3000', 'file://*'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
+
+// Add logging middleware
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    next();
+});
 
 // Create uploads directory if it doesn't exist
 const uploadsDir = path.join(__dirname, 'uploads');
@@ -59,6 +69,20 @@ const upload = multer({
 // Serve static files from uploads directory
 app.use('/uploads', express.static(uploadsDir));
 
+// Serve static files from assets directory
+const assetsPath = path.join(__dirname, '..', 'assets');
+console.log('Serving static files from:', assetsPath);
+app.use('/assets', express.static(assetsPath, {
+    setHeaders: (res, filepath) => {
+        // Ensure correct content type for webp images
+        if (filepath.endsWith('.webp')) {
+            res.setHeader('Content-Type', 'image/webp');
+        }
+        // Add proper caching headers
+        res.setHeader('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
+    }
+}));
+
 // Initialize database
 async function initializeDatabase() {
     try {
@@ -73,25 +97,52 @@ async function initializeDatabase() {
             
             // First create a game
             const game = await sequelize.models.Game.create({
-                name: 'Beat Saber',
-                developer: 'Beat Games',
-                releaseDate: new Date('2018-05-01'),
-                description: 'A VR rhythm game where players slash blocks with lightsabers in time to music.',
-                platforms: ['Oculus Quest', 'Oculus Rift', 'SteamVR', 'PlayStation VR'],
-                genres: ['Rhythm', 'Music', 'Action'],
-                status: 'active'
+                name: 'Echo Arena',
+                developer: 'Ready At Dawn',
+                releaseDate: new Date('2017-07-20'),
+                description: 'Echo Arena is a zero-gravity VR sport where players compete in high-speed matches combining elements of ultimate frisbee and soccer.',
+                platforms: ['Oculus', 'SteamVR'],
+                genres: ['Sport', 'Action'],
+                status: 'active',
+                coverImage: 'echoarena.webp'  // Using .webp extension to match the actual file
             });
             
             // Add some sample data with GameId
             await Tournament.create({
-                name: 'VR Championship 2025',
-                description: 'The biggest VR tournament of the year',
+                name: 'Echo Arena Championship 2025',
+                description: 'The biggest zero-gravity sports tournament of the year',
                 startDate: new Date('2025-03-15'),
                 endDate: new Date('2025-03-20'),
                 status: 'draft',
                 maxPlayers: 64,
-                GameId: game.id  // Set the GameId
+                GameId: game.id,
+                prizePool: 10000,
+                players: 0
             });
+
+            // Create additional games
+            await sequelize.models.Game.bulkCreate([
+                {
+                    name: 'Nock',
+                    developer: 'Normal VR',
+                    releaseDate: new Date('2022-03-10'),
+                    description: 'Nock is a unique VR archery sport game that combines soccer and archery.',
+                    platforms: ['Quest'],
+                    genres: ['Sport', 'Action'],
+                    status: 'active',
+                    coverImage: 'nock.webp'  // Ensure consistent file extension
+                },
+                {
+                    name: 'Breachers',
+                    developer: 'Triangle Factory',
+                    releaseDate: new Date('2023-06-15'),
+                    description: 'Tactical VR shooter with destructible environments.',
+                    platforms: ['Quest', 'SteamVR'],
+                    genres: ['FPS', 'Tactical'],
+                    status: 'active',
+                    coverImage: 'Breachers.webp'  // Ensure matching case with actual file
+                }
+            ]);
             
             // Check if players already exist
             const playerCount = await Player.count();
@@ -110,8 +161,10 @@ async function initializeDatabase() {
     }
 }
 
-// Initialize database when server starts
-initializeDatabase();
+// Call initializeDatabase when the server starts
+initializeDatabase().catch(err => {
+    console.error('Database initialization error:', err);
+});
 
 // API Routes
 // Upload game image
@@ -241,13 +294,30 @@ app.get('/api/games/:id/tournaments', async (req, res) => {
     }
 });
 
-// Tournament routes
+// Tournaments API
 app.get('/api/tournaments', async (req, res) => {
     try {
-        const tournaments = await Tournament.findAll();
-        res.json(tournaments);
+        const tournaments = await Tournament.findAll({
+            include: [{
+                model: sequelize.models.Game,
+                attributes: ['id', 'name', 'coverImage']
+            }],
+            order: [['startDate', 'DESC']]
+        });
+
+        // Transform the response to include full image URLs
+        const transformedTournaments = tournaments.map(tournament => {
+            const plainTournament = tournament.get({ plain: true });
+            if (plainTournament.Game && plainTournament.Game.coverImage) {
+                plainTournament.Game.coverImage = `/assets/images/games/GameLogos/${plainTournament.Game.coverImage}`;
+            }
+            return plainTournament;
+        });
+
+        res.json(transformedTournaments);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Error fetching tournaments:', error);
+        res.status(500).json({ error: 'Failed to fetch tournaments' });
     }
 });
 
@@ -358,12 +428,200 @@ app.post('/api/admin/settings', (req, res) => {
     }
 });
 
+// Add a debug route to check static file serving
+app.get('/api/debug/check-image/:filename', (req, res) => {
+    try {
+        const filename = req.params.filename;
+        const imagePath = path.join(assetsPath, 'images', 'games', 'GameLogos', filename);
+        
+        console.log('Debug route - checking image path:', imagePath);
+        
+        // Check if file exists
+        if (fs.existsSync(imagePath)) {
+            console.log('Image file exists:', filename);
+            
+            // Send file info
+            const stats = fs.statSync(imagePath);
+            res.json({
+                exists: true,
+                filename: filename,
+                fullPath: imagePath,
+                size: stats.size,
+                lastModified: stats.mtime
+            });
+        } else {
+            console.log('Image file does not exist:', filename);
+            res.status(404).json({
+                exists: false,
+                filename: filename,
+                fullPath: imagePath,
+                message: 'File not found'
+            });
+        }
+    } catch (error) {
+        console.error('Error checking image:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Add a debug route to list all available images
+app.get('/api/debug/list-images', (req, res) => {
+    try {
+        const imageDir = path.join(assetsPath, 'images', 'games', 'GameLogos');
+        console.log('Debug route - listing images in:', imageDir);
+        
+        if (fs.existsSync(imageDir)) {
+            const files = fs.readdirSync(imageDir);
+            res.json({
+                directory: imageDir,
+                fileCount: files.length,
+                files: files
+            });
+        } else {
+            res.status(404).json({
+                error: 'Directory not found',
+                directory: imageDir
+            });
+        }
+    } catch (error) {
+        console.error('Error listing images:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Add a dedicated route to serve game images directly
+app.get('/game-images/:filename', (req, res) => {
+    try {
+        const filename = req.params.filename;
+        const imagePath = path.join(assetsPath, 'images', 'games', 'GameLogos', filename);
+        
+        console.log('Game image request for:', filename);
+        
+        // Check if file exists
+        if (fs.existsSync(imagePath)) {
+            // Set appropriate content type for WebP
+            if (filename.toLowerCase().endsWith('.webp')) {
+                res.setHeader('Content-Type', 'image/webp');
+            }
+            
+            // Add cache control
+            res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache for 24 hours
+            
+            // Send the file
+            res.sendFile(imagePath);
+        } else {
+            console.error(`Image not found: ${filename}`);
+            res.status(404).send('Image not found');
+        }
+    } catch (error) {
+        console.error('Error serving game image:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
 // Start the server
-if (require.main === module) {
-    // Only start the server if this file is run directly
-    app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
+let server = null;
+
+// Function to start the server
+function startServer() {
+    // Check if server is already running
+    if (server) {
+        console.log('Server is already running');
+        return server;
+    }
+    
+    // Try to find an available port
+    function tryPort(port) {
+        return new Promise((resolve, reject) => {
+            // Create a test server to check if port is available
+            const testServer = require('http').createServer();
+            
+            testServer.once('error', (err) => {
+                if (err.code === 'EADDRINUSE') {
+                    console.log(`Port ${port} is already in use. Trying next port.`);
+                    // Try the next port
+                    testServer.close(() => {
+                        resolve(tryPort(port + 1));
+                    });
+                } else {
+                    reject(err);
+                }
+            });
+            
+            testServer.once('listening', () => {
+                // Port is available, close test server and return the port
+                testServer.close(() => {
+                    resolve(port);
+                });
+            });
+            
+            testServer.listen(port);
+        });
+    }
+    
+    // Find an available port starting from the default PORT
+    return tryPort(PORT).then(availablePort => {
+        // Update the PORT constant to the available port
+        app.set('port', availablePort);
+        
+        // Now start the server on the available port
+        server = app.listen(availablePort, () => {
+            console.log(`Server is running on port ${availablePort}`);
+        });
+        
+        // Add graceful shutdown handler
+        process.on('SIGINT', () => {
+            console.log('Received SIGINT. Shutting down server gracefully...');
+            shutdown();
+        });
+        
+        process.on('SIGTERM', () => {
+            console.log('Received SIGTERM. Shutting down server gracefully...');
+            shutdown();
+        });
+        
+        return server;
+    }).catch(err => {
+        console.error('Failed to start server:', err);
+        throw err;
     });
 }
 
-module.exports = app;
+// Function to handle graceful shutdown
+function shutdown() {
+    if (!server) {
+        console.log('Server is not running');
+        return Promise.resolve();
+    }
+    
+    return new Promise((resolve) => {
+        console.log('Closing HTTP server...');
+        server.close(() => {
+            console.log('HTTP server closed.');
+            // Close database connection
+            sequelize.close()
+                .then(() => {
+                    console.log('Database connection closed.');
+                    resolve();
+                })
+                .catch(err => {
+                    console.error('Error closing database connection:', err);
+                    resolve();
+                });
+        });
+        
+        // Force close after 10 seconds
+        setTimeout(() => {
+            console.error('Could not close connections in time, forcing shutdown');
+            resolve();
+        }, 10000);
+    });
+}
+
+// Only start the server if this file is run directly (not when required as a module)
+if (require.main === module) {
+    startServer();
+}
+
+// Export the app, server, startServer and shutdown functions
+module.exports = { app, server, startServer, shutdown };

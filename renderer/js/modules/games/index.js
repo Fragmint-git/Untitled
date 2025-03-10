@@ -57,8 +57,9 @@ async function loadGames() {
         if (games.length === 0) {
             gamesGrid.innerHTML = `
                 <div class="empty-state">
+                    <i class="fas fa-gamepad"></i>
                     <h3>No Games Found</h3>
-                    <p>Add games through the admin panel to get started!</p>
+                    <p>No VR games are currently available.</p>
                 </div>
             `;
         } else {
@@ -67,9 +68,13 @@ async function loadGames() {
                 gameCard.className = 'game-card';
                 gameCard.setAttribute('data-id', game.id);
                 
-                // Parse platforms and genres from strings to arrays
-                const platforms = game.platforms ? game.platforms.split(',').map(p => p.trim()) : [];
-                const genres = game.genres ? game.genres.split(',').map(g => g.trim()) : [];
+                // Parse platforms and genres from strings to arrays if needed
+                const platforms = Array.isArray(game.platforms) 
+                    ? game.platforms 
+                    : (game.platforms ? game.platforms.split(',').map(p => p.trim()) : []);
+                const genres = Array.isArray(game.genres)
+                    ? game.genres
+                    : (game.genres ? game.genres.split(',').map(g => g.trim()) : []);
                 
                 // Create platform badges HTML
                 const platformBadges = platforms.map(platform => 
@@ -81,14 +86,41 @@ async function loadGames() {
                     `<span class="genre-tag">${genre}</span>`
                 ).join('');
                 
+                // Get proper image path for game
+                let imagePath = '/assets/default-game-cover.png'; // Default fallback
+                if (game.coverImage) {
+                    console.log(`Raw coverImage for ${game.name}:`, game.coverImage);
+                    
+                    // Check if coverImage already has a full path
+                    if (game.coverImage.startsWith('http://') || game.coverImage.startsWith('https://')) {
+                        imagePath = game.coverImage;
+                        console.log(`Using server-provided URL: ${imagePath}`);
+                    } else if (game.coverImage.startsWith('/assets/')) {
+                        imagePath = game.coverImage;
+                        console.log(`Using asset path: ${imagePath}`);
+                    } else {
+                        // Otherwise construct the full path
+                        imagePath = `/assets/images/games/GameLogos/${game.coverImage}`;
+                        console.log(`Constructed asset path: ${imagePath}`);
+                    }
+                    // Log the final image path for debugging
+                    console.log(`Final image path for game ${game.name}:`, imagePath);
+                } else {
+                    console.warn(`No cover image found for game ${game.name}, using default`);
+                }
+                
                 gameCard.innerHTML = `
-                    <div class="game-cover">
-                        <img src="${game.coverImage || 'assets/default-game-cover.png'}" alt="${game.name}">
+                    <div class="game-image">
+                        <img src="${imagePath}" alt="${game.name}" 
+                             onerror="this.onerror=null; console.error('Failed to load image:', this.src); this.src='/assets/default-game-cover.png'; console.log('Using fallback image');">
                     </div>
                     <div class="game-info">
                         <h3>${game.name}</h3>
                         <p class="game-developer">${game.developer || 'Unknown Developer'}</p>
-                        <p class="game-release">${game.releaseDate ? new Date(game.releaseDate).getFullYear() : 'TBA'}</p>
+                        <div class="game-meta">
+                            <span class="platforms">${Array.isArray(game.platforms) ? game.platforms.join(', ') : game.platforms}</span>
+                            <span class="release-date">${new Date(game.releaseDate).getFullYear()}</span>
+                        </div>
                         <div class="platform-badges">
                             ${platformBadges}
                         </div>
@@ -224,9 +256,13 @@ async function showGameDetails(gameId) {
         const gameDetails = document.createElement('div');
         gameDetails.className = 'game-details';
         
-        // Parse platforms and genres from strings to arrays
-        const platforms = game.platforms ? game.platforms.split(',').map(p => p.trim()) : [];
-        const genres = game.genres ? game.genres.split(',').map(g => g.trim()) : [];
+        // Parse platforms and genres from strings to arrays if needed
+        const platforms = Array.isArray(game.platforms) 
+            ? game.platforms 
+            : (game.platforms ? game.platforms.split(',').map(p => p.trim()) : []);
+        const genres = Array.isArray(game.genres)
+            ? game.genres
+            : (game.genres ? game.genres.split(',').map(g => g.trim()) : []);
         
         // Create platform badges HTML
         const platformBadges = platforms.map(platform => 
@@ -244,7 +280,8 @@ async function showGameDetails(gameId) {
             </div>
             <div class="game-header">
                 <div class="game-cover-large">
-                    <img src="${game.coverImage || 'assets/default-game-cover.png'}" alt="${game.name}">
+                    <img src="${game.coverImage || '/assets/default-game-cover.png'}" alt="${game.name}"
+                         onerror="this.onerror=null; this.src='/assets/default-game-cover.png';">
                 </div>
                 <div class="game-info-large">
                     <h2>${game.name}</h2>
@@ -257,7 +294,7 @@ async function showGameDetails(gameId) {
                         ${genreTags}
                     </div>
                     <div class="game-status">
-                        <span class="status ${game.status || 'active'}">${game.status || 'Active'}</span>
+                        <span class="status ${game.status?.toLowerCase() || 'active'}">${game.status || 'Active'}</span>
                     </div>
                 </div>
             </div>

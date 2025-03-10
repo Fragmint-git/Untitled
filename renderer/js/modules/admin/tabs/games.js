@@ -28,6 +28,24 @@ window.adminGamesTabModule = {
                 e.preventDefault();
                 this.saveGame();
             });
+            
+            // Add event listeners for modal close buttons
+            const closeButtons = gameForm.querySelectorAll('.close-modal');
+            closeButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    this.closeGameForm();
+                });
+            });
+        }
+        
+        // Close modal when clicking outside
+        const gameModal = document.getElementById('game-modal');
+        if (gameModal) {
+            window.addEventListener('click', (e) => {
+                if (e.target === gameModal) {
+                    this.closeGameForm();
+                }
+            });
         }
         
         // Game search
@@ -106,7 +124,7 @@ window.adminGamesTabModule = {
                         <tr data-game-id="${game.id}">
                             <td>${game.id}</td>
                             <td>
-                                <img src="${game.coverImage || 'assets/images/placeholder-game.jpg'}" alt="${game.name}" class="game-cover-thumb">
+                                <img src="${game.coverImage || '/assets/default-game-cover.png'}" alt="${game.name}" class="game-cover-thumb">
                             </td>
                             <td>${game.name}</td>
                             <td>${game.developer}</td>
@@ -293,7 +311,7 @@ window.adminGamesTabModule = {
             
             // Get cover image
             const coverInput = document.getElementById('game-cover');
-            let coverImage = null;
+            let coverImage = '/assets/default-game-cover.png';
             
             if (coverInput.files.length > 0) {
                 const file = coverInput.files[0];

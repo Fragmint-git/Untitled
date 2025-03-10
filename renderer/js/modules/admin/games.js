@@ -106,7 +106,7 @@ window.adminGamesModule = {
                         <tr data-game-id="${game.id}">
                             <td>${game.id}</td>
                             <td>
-                                <img src="${game.coverImage || 'assets/images/placeholder-game.jpg'}" alt="${game.name}" class="game-cover-thumb">
+                                <img src="${game.coverImage || '../assets/default-game-cover.png'}" alt="${game.name}" class="game-cover-thumb">
                             </td>
                             <td>${game.name}</td>
                             <td>${game.developer}</td>
@@ -293,7 +293,7 @@ window.adminGamesModule = {
             
             // Get cover image
             const coverInput = document.getElementById('game-cover');
-            let coverImage = null;
+            let coverImage = '/assets/images/games/GameLogos/vr-battles.webp';
             
             if (coverInput.files.length > 0) {
                 const file = coverInput.files[0];
@@ -319,7 +319,7 @@ window.adminGamesModule = {
                 status,
                 platforms,
                 genres,
-                coverImage
+                coverImage: coverImage || '../assets/default-game-cover.png'
             };
             
             // Add ID if editing
@@ -386,75 +386,75 @@ window.adminGamesModule = {
         return [
             {
                 id: 1,
-                name: 'Beat Saber',
-                developer: 'Beat Games',
-                releaseDate: '2019-05-21',
-                description: 'Beat Saber is a VR rhythm game where you slash the beats of adrenaline-pumping music as they fly towards you, surrounded by a futuristic world.',
+                name: 'Echo Arena',
+                developer: 'Ready At Dawn',
+                releaseDate: '2017-07-20',
+                description: 'Echo Arena is a zero-gravity VR sport where players compete in high-speed matches combining elements of ultimate frisbee and soccer.',
                 status: 'Active',
-                platforms: ['Oculus', 'SteamVR', 'PSVR'],
-                genres: ['Rhythm', 'Action'],
+                platforms: ['Oculus', 'SteamVR'],
+                genres: ['Sport', 'Action'],
                 tournaments: 5,
-                coverImage: 'assets/images/games/beat-saber.jpg'
+                coverImage: '/assets/images/games/GameLogos/echoarena.webp'
             },
             {
                 id: 2,
-                name: 'Half-Life: Alyx',
-                developer: 'Valve',
-                releaseDate: '2020-03-23',
-                description: 'Half-Life: Alyx is Valve\'s VR return to the Half-Life series. It\'s the story of an impossible fight against a vicious alien race known as the Combine.',
+                name: 'Nock',
+                developer: 'Normal VR',
+                releaseDate: '2022-03-10',
+                description: 'Nock is a unique VR archery sport game where players use bow and arrow in zero gravity to score goals.',
                 status: 'Active',
-                platforms: ['SteamVR'],
-                genres: ['FPS', 'Action', 'Adventure'],
+                platforms: ['Oculus'],
+                genres: ['Sport', 'Action'],
                 tournaments: 3,
-                coverImage: 'assets/images/games/half-life-alyx.jpg'
+                coverImage: '/assets/images/games/GameLogos/nock.webp'
             },
             {
                 id: 3,
-                name: 'Superhot VR',
-                developer: 'SUPERHOT Team',
-                releaseDate: '2016-12-05',
-                description: 'SUPERHOT VR is a virtual reality adaptation of SUPERHOT, a first-person shooter video game where time moves only when the player moves.',
+                name: 'Echo Combat',
+                developer: 'Ready At Dawn',
+                releaseDate: '2018-11-15',
+                description: 'Echo Combat is a zero-gravity team shooter set in the Echo VR universe.',
                 status: 'Active',
-                platforms: ['Oculus', 'SteamVR', 'PSVR'],
-                genres: ['FPS', 'Action', 'Puzzle'],
+                platforms: ['Oculus'],
+                genres: ['FPS', 'Action'],
                 tournaments: 2,
-                coverImage: 'assets/images/games/superhot-vr.jpg'
+                coverImage: '/assets/images/games/GameLogos/EchoCombat.webp'
             },
             {
                 id: 4,
-                name: 'Pistol Whip',
-                developer: 'Cloudhead Games',
-                releaseDate: '2019-11-07',
-                description: 'Pistol Whip is an unstoppable action-rhythm FPS. Journey through a cinematic bullet hell powered by a breakneck soundtrack to become the ultimate action hero legend.',
+                name: 'Breachers',
+                developer: 'Triangle Factory',
+                releaseDate: '2023-12-14',
+                description: 'Breachers is a tactical 5v5 VR shooter focused on close-quarters combat and strategic gameplay.',
                 status: 'Active',
-                platforms: ['Oculus', 'SteamVR', 'PSVR'],
-                genres: ['Rhythm', 'Action', 'FPS'],
+                platforms: ['Oculus', 'SteamVR'],
+                genres: ['FPS', 'Action', 'Tactical'],
                 tournaments: 1,
-                coverImage: 'assets/images/games/pistol-whip.jpg'
+                coverImage: '/assets/images/games/GameLogos/Breachers.webp'
             },
             {
                 id: 5,
-                name: 'The Walking Dead: Saints & Sinners',
-                developer: 'Skydance Interactive',
-                releaseDate: '2020-01-23',
-                description: 'Saints & Sinners is a game unlike any other in The Walking Dead universe. Every challenge you face and decision you make is driven by YOU.',
+                name: 'Vail',
+                developer: 'AEXLAB',
+                releaseDate: '2024-02-15',
+                description: 'Vail is a competitive VR first-person shooter focused on tactical gameplay and gunplay mechanics.',
                 status: 'Active',
-                platforms: ['Oculus', 'SteamVR', 'PSVR'],
-                genres: ['Survival', 'Horror', 'Action'],
+                platforms: ['SteamVR'],
+                genres: ['FPS', 'Action', 'Tactical'],
                 tournaments: 0,
-                coverImage: 'assets/images/games/walking-dead-saints-sinners.jpg'
+                coverImage: '/assets/images/games/GameLogos/Vail.webp'
             },
             {
                 id: 6,
-                name: 'VR Chat',
-                developer: 'VRChat Inc.',
-                releaseDate: '2017-02-01',
-                description: 'VRChat offers an endless collection of social VR experiences by giving the power of creation to its community.',
-                status: 'Inactive',
+                name: 'Blacktop Hoops',
+                developer: 'Gaze VR',
+                releaseDate: '2023-08-06',
+                description: 'Blacktop Hoops is a VR basketball game that brings street basketball to virtual reality.',
+                status: 'Active',
                 platforms: ['Oculus', 'SteamVR'],
-                genres: ['Social', 'Casual'],
+                genres: ['Sport', 'Action'],
                 tournaments: 0,
-                coverImage: 'assets/images/games/vrchat.jpg'
+                coverImage: '/assets/images/games/GameLogos/blacktophoops.webp'
             }
         ];
     }

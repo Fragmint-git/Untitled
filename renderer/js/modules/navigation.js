@@ -23,6 +23,14 @@ window.navigationModule = {
                 window.navigationModule.navigateTo('profile');
             });
         }
+
+        // Add event listener to settings button in top bar
+        const settingsButton = document.querySelector('.top-bar-actions .settings');
+        if (settingsButton) {
+            settingsButton.addEventListener('click', function() {
+                window.navigationModule.navigateTo('settings');
+            });
+        }
         
         // Check if there's a hash in the URL to navigate to a specific section on load
         if (window.location.hash) {

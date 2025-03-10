@@ -4,6 +4,15 @@ const { contextBridge, ipcRenderer } = require('electron');
 // the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld(
     'api', {
+        // Store operations
+        getFeaturedItems: () => ipcRenderer.invoke('get-featured-items'),
+        getSpecialOffers: () => ipcRenderer.invoke('get-special-offers'),
+        getNewReleases: () => ipcRenderer.invoke('get-new-releases'),
+        getTopSellers: () => ipcRenderer.invoke('get-top-sellers'),
+        getRecommendedItems: () => ipcRenderer.invoke('get-recommended-items'),
+        getCategoryItems: (category) => ipcRenderer.invoke('get-category-items', category),
+        addToCart: (itemId) => ipcRenderer.invoke('add-to-cart', itemId),
+        
         // Game operations
         getGames: () => ipcRenderer.invoke('get-games'),
         getGame: (id) => ipcRenderer.invoke('get-game', id),
@@ -29,6 +38,9 @@ contextBridge.exposeInMainWorld(
         
         // Database operations
         getDatabaseTables: () => ipcRenderer.invoke('get-database-tables'),
-        getTableData: (tableName) => ipcRenderer.invoke('get-table-data', tableName)
+        getTableData: (tableName) => ipcRenderer.invoke('get-table-data', tableName),
+        
+        // Add quit application function
+        quitApp: () => ipcRenderer.invoke('quit-app')
     }
 );

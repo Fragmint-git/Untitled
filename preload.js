@@ -40,6 +40,11 @@ contextBridge.exposeInMainWorld(
         getDatabaseTables: () => ipcRenderer.invoke('get-database-tables'),
         getTableData: (tableName) => ipcRenderer.invoke('get-table-data', tableName),
         
+        // Window control operations
+        minimizeWindow: () => ipcRenderer.invoke('window-minimize'),
+        maximizeWindow: () => ipcRenderer.invoke('window-maximize'),
+        closeWindow: () => ipcRenderer.invoke('window-close'),
+        
         // Add quit application function
         quitApp: () => ipcRenderer.invoke('quit-app')
     }

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, Menu, protocol, net } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu, protocol, net, nativeTheme } = require('electron');
 const { initBackendIntegration, cleanupBackendIntegration } = require('./backend-integration');
 const { sequelize } = require('./backend/database');
 const path = require('path');
@@ -11,10 +11,16 @@ let mainWindow;
 let serverProcess = null;
 
 function createWindow() {
+  // Force dark mode
+  nativeTheme.themeSource = 'dark';
+  
   // Create the browser window
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
+    frame: false,
+    darkTheme: true,
+    backgroundColor: '#1e1e1e',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
@@ -134,6 +140,25 @@ app.on('ready', async () => {
     
     // Create the main window
     createWindow();
+    
+    // Handle window control IPC events
+    ipcMain.handle('window-minimize', () => {
+      if (mainWindow) mainWindow.minimize();
+    });
+    
+    ipcMain.handle('window-maximize', () => {
+      if (mainWindow) {
+        if (mainWindow.isMaximized()) {
+          mainWindow.unmaximize();
+        } else {
+          mainWindow.maximize();
+        }
+      }
+    });
+    
+    ipcMain.handle('window-close', () => {
+      if (mainWindow) mainWindow.close();
+    });
     
     // Handle IPC quit request
     ipcMain.handle('quit-app', async () => {

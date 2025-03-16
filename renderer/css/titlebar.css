@@ -1,0 +1,61 @@
+/* Custom Title Bar Styles */
+.titlebar {
+  height: 32px;
+  background-color: #1e1e1e;
+  color: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0;
+  user-select: none;
+  -webkit-app-region: drag; /* Makes the title bar draggable */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.titlebar-title {
+  margin-left: 12px;
+  font-size: 12px;
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.titlebar-controls {
+  display: flex;
+  -webkit-app-region: no-drag; /* Controls should not be draggable */
+}
+
+.titlebar-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 46px;
+  height: 32px;
+  background-color: transparent;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  font-size: 10px;
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+}
+
+.titlebar-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.titlebar-button.close:hover {
+  background-color: #e81123;
+}
+
+/* Adjust main content to account for title bar */
+.content {
+  margin-top: 32px;
+  height: calc(100vh - 32px);
+  overflow: auto;
+} 

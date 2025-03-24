@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Release Notes - VR Battle Royale</title>
+    <link rel="stylesheet" href="../styles.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .release-notes-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .release-version {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .release-version:last-child {
+            border-bottom: none;
+        }
+        
+        .version-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .version-number {
+            font-size: 1.6em;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        
+        .release-date {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+        
+        .release-tag {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+        
+        .release-tag.beta {
+            background-color: var(--warning-color);
+        }
+        
+        .release-tag.alpha {
+            background-color: var(--danger-color);
+        }
+        
+        .release-category {
+            margin-bottom: 15px;
+        }
+        
+        .release-category h3 {
+            font-size: 1.1em;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+        
+        .release-list {
+            list-style-type: none;
+            padding-left: 20px;
+        }
+        
+        .release-list li {
+            position: relative;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        .release-list li:before {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            left: -15px;
+            top: 8px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+        }
+        
+        .feature-item:before {
+            background-color: var(--success-color);
+        }
+        
+        .bugfix-item:before {
+            background-color: var(--danger-color);
+        }
+        
+        .improvement-item:before {
+            background-color: var(--info-color);
+        }
+        
+        .back-button {
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Page Content -->
+        <main class="main-content full-width">
+            <!-- Top Header Bar -->
+            <header class="top-bar">
+                <div class="back-button">
+                    <a href="../index.html" class="btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Settings
+                    </a>
+                </div>
+                <div class="page-title">
+                    <h1>Release Notes</h1>
+                </div>
+            </header>
+
+            <div class="release-notes-container">
+                <!-- Current Version -->
+                <div class="release-version" id="v2.0.1">
+                    <div class="version-header">
+                        <span class="version-number">v2.0.1</span>
+                        <span class="release-date">March 15, 2023</span>
+                        <span class="release-tag">Current</span>
+                    </div>
+                    
+                    <div class="release-category">
+                        <h3>New Features</h3>
+                        <ul class="release-list">
+                            <li class="feature-item">Added About and Special Thanks sections to the Settings page</li>
+                            <li class="feature-item">Implemented Release Notes page with version history</li>
+                            <li class="feature-item">Added ability for administrators to update release notes</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="release-category">
+                        <h3>Improvements</h3>
+                        <ul class="release-list">
+                            <li class="improvement-item">Enhanced UI responsiveness across all sections</li>
+                            <li class="improvement-item">Optimized performance for matchmaking algorithm</li>
+                            <li class="improvement-item">Updated user profile management system</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="release-category">
+                        <h3>Bug Fixes</h3>
+                        <ul class="release-list">
+                            <li class="bugfix-item">Fixed issue with tournament registration in certain timezones</li>
+                            <li class="bugfix-item">Resolved notification persistence issues</li>
+                            <li class="bugfix-item">Fixed navigation glitches when switching between sections</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Initial Release -->
+                <div class="release-version" id="v2.0.0">
+                    <div class="version-header">
+                        <span class="version-number">v2.0.0</span>
+                        <span class="release-date">March 1, 2023</span>
+                    </div>
+                    
+                    <div class="release-category">
+                        <h3>Initial Release Features</h3>
+                        <ul class="release-list">
+                            <li class="feature-item">Complete redesign of the VR Battle Royale platform</li>
+                            <li class="feature-item">New matchmaking system for quick and custom matches</li>
+                            <li class="feature-item">Integrated tournament management system</li>
+                            <li class="feature-item">Friend system with real-time status updates</li>
+                            <li class="feature-item">Games library with support for multiple VR titles</li>
+                            <li class="feature-item">User profiles with customization options</li>
+                            <li class="feature-item">Wallet system for tournament prizes and purchases</li>
+                            <li class="feature-item">XP and leveling system with achievements</li>
+                            <li class="feature-item">Store with merchandise, themes, and add-ons</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Beta Release -->
+                <div class="release-version" id="v1.5.0">
+                    <div class="version-header">
+                        <span class="version-number">v1.5.0</span>
+                        <span class="release-date">February 15, 2023</span>
+                        <span class="release-tag beta">Beta</span>
+                    </div>
+                    
+                    <div class="release-category">
+                        <h3>Beta Features</h3>
+                        <ul class="release-list">
+                            <li class="feature-item">Preview of new UI design</li>
+                            <li class="feature-item">Beta testing of matchmaking improvements</li>
+                            <li class="feature-item">Early access to tournament creation tools</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="release-category">
+                        <h3>Known Issues</h3>
+                        <ul class="release-list">
+                            <li class="bugfix-item">Performance issues on certain hardware configurations</li>
+                            <li class="bugfix-item">Intermittent connectivity problems with matchmaking</li>
+                            <li class="bugfix-item">Profile image uploading occasionally fails</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Back button functionality
+        document.querySelector('.back-button').addEventListener('click', function(e) {
+            if (e.target.tagName === 'A' || e.target.parentElement.tagName === 'A') {
+                return; // Let the link handle the navigation
+            }
+            window.history.back();
+        });
+    </script>
+</body>
+</html> 

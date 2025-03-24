@@ -31,3 +31,10 @@ yarn-error.log*
 # OS specific files
 .DS_Store
 Thumbs.db
+
+# Cursor specific files
+.cursor/
+.cursor-cache/
+.cursor-assets/
+cursor.config.json
+.cursor.config.json

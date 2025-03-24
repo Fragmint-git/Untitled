@@ -25,6 +25,7 @@
                     <li><a href="#" data-section="games" class="admin-menu-link">Manage Games</a></li>
                     <li><a href="#" data-section="tournaments" class="admin-menu-link">Manage Tournaments</a></li>
                     <li><a href="#" data-section="players" class="admin-menu-link">Manage Players</a></li>
+                    <li><a href="#" data-section="release-notes" class="admin-menu-link">Release Notes</a></li>
                     <li><a href="#" data-section="settings" class="admin-menu-link">Admin Settings</a></li>
                     <li><a href="../index.html" class="back-to-app">Back to Application</a></li>
                 </ul>
@@ -107,6 +108,91 @@
                 <div id="admin-players" class="admin-section">
                     <h2>Manage Players</h2>
                     <p class="placeholder-text">Player management interface will be implemented in a future update.</p>
+                </div>
+                
+                <!-- Release Notes Management Section -->
+                <div id="admin-release-notes" class="admin-section">
+                    <h2>Manage Release Notes</h2>
+                    <div class="admin-actions">
+                        <button id="add-release-btn" class="btn-primary">Add New Version</button>
+                    </div>
+                    
+                    <div class="release-notes-editor">
+                        <div class="release-versions-list">
+                            <h3>Version History</h3>
+                            <ul id="version-list">
+                                <!-- Versions will be populated by JavaScript -->
+                                <li class="version-item active" data-version="2.0.1">v2.0.1 <span class="version-tag current">Current</span></li>
+                                <li class="version-item" data-version="2.0.0">v2.0.0</li>
+                                <li class="version-item" data-version="1.5.0">v1.5.0 <span class="version-tag beta">Beta</span></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="release-editor">
+                            <div class="version-info-form">
+                                <div class="form-group">
+                                    <label for="version-number">Version Number</label>
+                                    <input type="text" id="version-number" placeholder="e.g., 2.0.1">
+                                </div>
+                                <div class="form-group">
+                                    <label for="release-date">Release Date</label>
+                                    <input type="date" id="release-date">
+                                </div>
+                                <div class="form-group">
+                                    <label for="release-status">Status</label>
+                                    <select id="release-status">
+                                        <option value="current">Current</option>
+                                        <option value="stable">Stable</option>
+                                        <option value="beta">Beta</option>
+                                        <option value="alpha">Alpha</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="release-content-editor">
+                                <h3>Release Content</h3>
+                                
+                                <div class="release-section">
+                                    <h4>New Features</h4>
+                                    <div class="release-entry-list" id="features-list">
+                                        <div class="release-entry">
+                                            <input type="text" class="release-entry-text" placeholder="Add feature description...">
+                                            <button class="remove-entry-btn"><i class="fas fa-times"></i></button>
+                                        </div>
+                                        <button class="add-entry-btn" data-section="features">Add Feature</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="release-section">
+                                    <h4>Improvements</h4>
+                                    <div class="release-entry-list" id="improvements-list">
+                                        <div class="release-entry">
+                                            <input type="text" class="release-entry-text" placeholder="Add improvement description...">
+                                            <button class="remove-entry-btn"><i class="fas fa-times"></i></button>
+                                        </div>
+                                        <button class="add-entry-btn" data-section="improvements">Add Improvement</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="release-section">
+                                    <h4>Bug Fixes</h4>
+                                    <div class="release-entry-list" id="bugfixes-list">
+                                        <div class="release-entry">
+                                            <input type="text" class="release-entry-text" placeholder="Add bug fix description...">
+                                            <button class="remove-entry-btn"><i class="fas fa-times"></i></button>
+                                        </div>
+                                        <button class="add-entry-btn" data-section="bugfixes">Add Bug Fix</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button id="save-release-btn" class="btn-primary">Save Changes</button>
+                                <button id="delete-release-btn" class="btn-danger">Delete Version</button>
+                                <button id="preview-release-btn" class="btn-secondary">Preview</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <div id="admin-settings" class="admin-section">
@@ -300,5 +386,13 @@
 
     <!-- Load the main admin script which will load all modules -->
     <script src="../js/admin.js"></script>
+    <!-- Game Modal Script -->
+    <script src="../js/modules/admin/games.js"></script>
+    <script src="../js/modules/admin/release-notes.js" type="module"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+// ... existing code ...
+        });
+    </script>
 </body>
 </html> 

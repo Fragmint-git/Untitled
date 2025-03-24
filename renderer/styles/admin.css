@@ -696,4 +696,222 @@ input:checked + .toggle-slider:before {
     justify-content: flex-end;
     gap: 10px;
     margin-top: 20px;
+}
+
+/* Add these styles for the release notes management section */
+
+/* Release Notes Management */
+.release-notes-editor {
+    display: flex;
+    margin-top: 20px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.release-versions-list {
+    width: 250px;
+    background-color: var(--bg-secondary);
+    padding: 15px;
+    border-right: 1px solid var(--border-color);
+}
+
+.release-versions-list h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+#version-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.version-item {
+    padding: 10px;
+    margin-bottom: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.version-item:hover {
+    background-color: rgba(var(--primary-rgb), 0.1);
+}
+
+.version-item.active {
+    background-color: rgba(var(--primary-rgb), 0.2);
+    font-weight: bold;
+}
+
+.version-tag {
+    font-size: 0.7em;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 5px;
+    color: white;
+    background-color: var(--primary-color);
+}
+
+.version-tag.beta {
+    background-color: var(--warning-color);
+}
+
+.version-tag.alpha {
+    background-color: var(--danger-color);
+}
+
+.release-editor {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    max-height: 700px;
+}
+
+.version-info-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.version-info-form .form-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.release-content-editor h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.release-section {
+    margin-bottom: 25px;
+}
+
+.release-section h4 {
+    margin-bottom: 10px;
+    color: var(--text-secondary);
+}
+
+.release-entry-list {
+    padding: 10px;
+    background-color: var(--bg-secondary);
+    border-radius: 4px;
+}
+
+.release-entry {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.release-entry-text {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--bg-primary);
+}
+
+.remove-entry-btn {
+    background: none;
+    border: none;
+    color: var(--danger-color);
+    cursor: pointer;
+    padding: 5px;
+    margin-left: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.remove-entry-btn:hover {
+    background-color: rgba(var(--danger-rgb), 0.1);
+}
+
+.add-entry-btn {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    padding: 8px 0;
+    font-size: 0.9em;
+    font-weight: 500;
+    text-align: left;
+    width: 100%;
+}
+
+.add-entry-btn:hover {
+    text-decoration: underline;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    justify-content: flex-end;
+}
+
+/* Toast notifications */
+.toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+.toast {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    padding: 12px 20px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    min-width: 250px;
+    border-left: 4px solid var(--primary-color);
+    animation: slideIn 0.3s ease;
+}
+
+.toast.success {
+    border-left-color: var(--success-color);
+}
+
+.toast.error {
+    border-left-color: var(--danger-color);
+}
+
+.toast.warning {
+    border-left-color: var(--warning-color);
+}
+
+.toast.fade-out {
+    animation: fadeOut 0.3s ease forwards;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
 } 

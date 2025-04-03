@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { app, BrowserWindow, ipcMain, Menu, protocol, net, nativeTheme } = require('electron');
 const { initBackendIntegration, cleanupBackendIntegration } = require('./backend-integration');
 const { sequelize } = require('./backend/database');
@@ -7,6 +8,11 @@ const url = require('url');
 //const { Player } = require('./backend/database');
 const { User } = require('./backend/database');
 const { Op } = require('sequelize');
+
+const apiUrl = process.env.API_URL;
+const serverKey = process.env.SERVER_KEY;
+const gameVersion = process.env.GAME_VERSION;
+
 // Keep a global reference of the window object
 let mainWindow;
 

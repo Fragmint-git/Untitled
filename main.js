@@ -4,6 +4,9 @@ const { sequelize } = require('./backend/database');
 const path = require('path');
 const url = require('url');
 
+//const { Player } = require('./backend/database');
+const { User } = require('./backend/database');
+const { Op } = require('sequelize');
 // Keep a global reference of the window object
 let mainWindow;
 
@@ -132,7 +135,7 @@ app.on('ready', async () => {
     // Initialize database with force: true to recreate tables
     // WARNING: This will drop existing tables and recreate them
     // Only use this during development or when you need to update schema
-    await sequelize.sync({ force: true });
+    await sequelize.sync({ force: false });
     console.log('Database synchronized');
     
     // Initialize backend integration
@@ -196,6 +199,130 @@ app.on('before-quit', async (event) => {
     await gracefulShutdown();
   }
 });
+
+ipcMain.handle('save-personal-info', async (event, formData) => {
+  try {
+    const user = await User.findByPk(formData.id);
+
+    if (user) {
+      await user.update({
+        displayName: formData.displayName,
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        bio: formData.bio
+      });
+
+      return { success: true, data: user };
+    } else {
+      return { success: false, error: 'User not found' };
+    }
+  } catch (err) {
+    console.error('Error saving personal info:', err);
+    return { success: false, error: err.message };
+  }
+});
+
+
+
+ipcMain.handle('login', async (event, username, password) => {
+  try {
+    const user = await User.findOne({
+      where: {
+        [Op.or]: [
+          { username: username },
+          { email: username }
+        ]
+      }
+    });
+
+    if (!user) {
+      return { success: false, message: 'User not found' };
+    }
+
+    if (user.password !== password) {
+      return { success: false, message: 'Incorrect password' };
+    }
+
+    return {
+      success: true,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        account_type: user.account_type
+      }
+    };
+  } catch (error) {
+    console.error('Login failed:', error);
+    return { success: false, message: 'Login failed due to server error' };
+  }
+});
+
+
+ipcMain.handle('register', async (event, formData) => {
+  try {
+    const { username, email, password } = formData;
+
+    const existing = await User.findOne({
+      where: {
+        [Op.or]: [{ username }, { email }]
+      }
+    });
+
+    if (existing) {
+      return { success: false, message: 'Username or email already exists.' };
+    }
+
+    const newUser = await User.create({
+      username,
+      email,
+      password,
+      account_type: 'user'
+    });
+
+    return {
+      success: true,
+      user: {
+        id: newUser.id,
+        username: newUser.username,
+        email: newUser.email,
+        account_type: newUser.account_type
+      }
+    };
+  } catch (err) {
+    console.error('Registration error:', err);
+    return { success: false, message: 'Registration failed on server.' };
+  }
+});
+
+ipcMain.handle('get-user-by-id', async (event, id) => {
+  try {
+    const user = await User.findByPk(id);
+
+    if (!user) {
+      return { success: false, message: 'User not found' };
+    }
+
+    return {
+      success: true,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        displayName: user.displayName || '',
+        fullName: user.fullName || '',
+        phone: user.phone || '',
+        bio: user.bio || '',
+        account_type: user.account_type
+      }
+    };
+  } catch (error) {
+    console.error('Error fetching user by ID:', error);
+    return { success: false, message: 'Error fetching user profile.' };
+  }
+});
+
 
 // In this file you can include the rest of your app's specific main process code
 // You can also put them in separate files and require them here.

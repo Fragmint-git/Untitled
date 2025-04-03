@@ -46,6 +46,17 @@ contextBridge.exposeInMainWorld(
         closeWindow: () => ipcRenderer.invoke('window-close'),
         
         // Add quit application function
-        quitApp: () => ipcRenderer.invoke('quit-app')
+        quitApp: () => ipcRenderer.invoke('quit-app'),
+
+        savePersonalInfo: (formData) => ipcRenderer.invoke('save-personal-info', formData),
+
+        register: (formData) => ipcRenderer.invoke('register', formData),
+
+        getUserById: (id) => ipcRenderer.invoke('get-user-by-id', id),
+
+        login: (username, password) => ipcRenderer.invoke('login', username, password),
+        clearSession: () => localStorage.removeItem('userSession'),
+        saveSession: (user) => localStorage.setItem('userSession', JSON.stringify(user)),
+        getSession: () => JSON.parse(localStorage.getItem('userSession'))
     }
 );

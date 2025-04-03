@@ -24,6 +24,7 @@ function handlePersonalInfoSubmit(e) {
     // Get form data
     const formData = new FormData(e.target);
     const personalInfo = {
+        username: formData.get('username'),
         displayName: formData.get('displayName'),
         fullName: formData.get('fullName'),
         email: formData.get('email'),
@@ -35,7 +36,7 @@ function handlePersonalInfoSubmit(e) {
     savePersonalInfo(personalInfo);
     
     // Show notification
-    window.uiModule.showNotification('Personal information saved successfully', 'success');
+    //window.uiModule.showNotification('Personal information saved successfully', 'success');
 }
 
 // Handle loading personal information
@@ -43,12 +44,14 @@ function handleLoadPersonalInfo(e) {
     const personalInfo = e.detail;
     
     // Populate form fields
+    const userNameField = document.getElementById('username');
     const displayNameField = document.getElementById('display-name');
     const fullNameField = document.getElementById('full-name');
     const emailField = document.getElementById('email');
     const phoneField = document.getElementById('phone');
     const bioField = document.getElementById('bio');
     
+    if (userNameField) userNameField.value = personalInfo.username || '';
     if (displayNameField) displayNameField.value = personalInfo.displayName || '';
     if (fullNameField) fullNameField.value = personalInfo.fullName || '';
     if (emailField) emailField.value = personalInfo.email || '';
@@ -57,17 +60,34 @@ function handleLoadPersonalInfo(e) {
 }
 
 // Save personal information to localStorage
-function savePersonalInfo(personalInfo) {
-    // Get current user data
-    const savedUserData = localStorage.getItem('userData');
-    const userData = savedUserData ? JSON.parse(savedUserData) : {};
-    
-    // Update personal information
-    userData.personalInfo = personalInfo;
-    
-    // Save to localStorage
-    localStorage.setItem('userData', JSON.stringify(userData));
+async function savePersonalInfo(personalInfo) {
+    try {
+        const session = window.api.getSession();
+        if (!session || !session.id) {
+            console.error('No user session found');
+            window.uiModule.showNotification('User session not found', 'error');
+            return;
+        }
+
+        const dataToSend = {
+            ...personalInfo,
+            id: session.id
+        };
+
+        const result = await window.api.savePersonalInfo(dataToSend);
+
+        if (result.success) {
+            console.log('Personal info saved to DB:', result.data);
+            window.uiModule.showNotification('Personal information saved successfully', 'success');
+        } else {
+            console.error('Failed to save:', result.error);
+            window.uiModule.showNotification(result.error || 'Failed to save personal info', 'error');
+        }
+    } catch (error) {
+        console.error('Error calling savePersonalInfo:', error);
+        window.uiModule.showNotification('An unexpected error occurred', 'error');
+    }
 }
 
-// Initialize module
+
 initPersonalInfo(); 

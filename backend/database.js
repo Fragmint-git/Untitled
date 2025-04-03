@@ -143,7 +143,15 @@ const Player = sequelize.define('Player', {
         type: DataTypes.STRING,
         allowNull: false,
         defaultValue: 'active'
-    }
+    },
+
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    username: { type: DataTypes.STRING },
+    displayName: { type: DataTypes.STRING },
+    fullName: { type: DataTypes.STRING },
+    email: { type: DataTypes.STRING, unique: true },
+    phone: { type: DataTypes.STRING },
+    bio: { type: DataTypes.TEXT }
 });
 
 // Define Match model
@@ -174,6 +182,22 @@ const Match = sequelize.define('Match', {
         }
     }
 });
+
+const User = sequelize.define('User', {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    username: { type: DataTypes.STRING, allowNull: false, unique: true },
+    email: { type: DataTypes.STRING, allowNull: false, unique: true },
+    password: { type: DataTypes.STRING, allowNull: false },
+    account_type: { type: DataTypes.STRING, allowNull: false, defaultValue: 'user' },
+    displayName: { type: DataTypes.STRING },
+    fullName: { type: DataTypes.STRING },
+    phone: { type: DataTypes.STRING },
+    bio: { type: DataTypes.TEXT }
+  }, {
+    timestamps: false
+  });
+  
+
 
 // Define relationships
 Game.hasMany(Tournament, {
@@ -366,6 +390,7 @@ module.exports = {
     Game,
     Tournament,
     Player,
+    User,
     Match,
     TournamentPlayer,
     MatchPlayer

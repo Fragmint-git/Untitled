@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Initialize quit button
-    const quitButton = document.getElementById('quit-button');
+    /*const quitButton = document.getElementById('quit-button');
     if (quitButton) {
         quitButton.addEventListener('click', async () => {
             // Show confirmation dialog
@@ -52,7 +52,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
-    }
+    }*/
+
+        const quitButton = document.getElementById('quit-button');
+        if (quitButton) {
+            quitButton.addEventListener('click', () => {
+                const confirmed = window.confirm('Log out and return to login screen?');
+                if (confirmed) {
+                    localStorage.removeItem('userSession');
+                    window.location.href = 'login.html';
+                }
+            });
+        }
+
+
     
     // Show welcome notification
     if (window.uiModule) {

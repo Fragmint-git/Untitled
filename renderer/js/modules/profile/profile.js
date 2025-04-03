@@ -125,7 +125,7 @@ window.profileModule = {
     },
     
     // Load user profile data
-    loadUserProfile: function() {
+    /*loadUserProfile: function() {
         console.log('Loading user profile data');
         
         // For this example, we'll use mock data
@@ -197,7 +197,44 @@ window.profileModule = {
         window.dispatchEvent(new CustomEvent('profile:load-notification-settings', { detail: userData.notificationSettings }));
         window.dispatchEvent(new CustomEvent('profile:load-appearance-settings', { detail: userData.appearanceSettings }));
         window.dispatchEvent(new CustomEvent('profile:load-privacy-settings', { detail: userData.privacySettings }));
+    },*/
+
+    loadUserProfile: async function () {
+        console.log('Loading user profile data');
+    
+        const session = window.api.getSession();
+        const userId = session?.id;
+    
+        if (!userId) {
+            console.error('No user session found');
+            return;
+        }
+    
+        const result = await window.api.getUserById(userId);
+    
+        if (!result.success) {
+            console.error(result.message);
+            return;
+        }
+    
+        const user = result.user;
+    
+        const personalInfo = {
+            username: user.username,
+            displayName: user.displayName,
+            fullName: user.fullName,
+            email: user.email,
+            phone: user.phone,
+            bio: user.bio
+        };
+    
+        window.dispatchEvent(new CustomEvent('profile:load-personal-info', { detail: personalInfo }));
+        window.dispatchEvent(new CustomEvent('profile:load-account-settings', { detail: { language: 'en' } }));
+        window.dispatchEvent(new CustomEvent('profile:load-notification-settings', { detail: { emailNotifications: true } }));
+        window.dispatchEvent(new CustomEvent('profile:load-appearance-settings', { detail: { theme: 'dark', fontSize: 16 } }));
+        window.dispatchEvent(new CustomEvent('profile:load-privacy-settings', { detail: { profileVisibility: true } }));
     },
+    
     
     // Save profile picture
     saveProfilePicture: function(dataUrl) {

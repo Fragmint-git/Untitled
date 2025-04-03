@@ -11,6 +11,12 @@
     
     <!-- Debug script for image loading -->
     <script>
+
+        const session = localStorage.getItem('userSession');
+        if (!session) {
+            window.location.href = 'login.html';
+        }
+
         // This will run after the page loads
         document.addEventListener('DOMContentLoaded', function() {
             // Add debug section if in development mode
@@ -128,6 +134,22 @@
                 });
             }
         });
+
+        document.getElementById('personal-info-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const personalInfo = {
+                username: document.getElementById('username').value,
+                displayName: document.getElementById('display-name').value,
+                fullName: document.getElementById('full-name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                bio: document.getElementById('bio').value
+            };
+
+            savePersonalInfo(personalInfo);
+        });
+
     </script>
 </head>
 <body>
@@ -977,6 +999,10 @@
                                 <section id="personal-info" class="profile-section active">
                                     <h3>Personal Information</h3>
                                     <form id="personal-info-form">
+                                        <div class="form-group">
+                                            <label for="username">Username</label>
+                                            <input type="text" id="username" name="username" placeholder="Your username">
+                                        </div>
                                         <div class="form-group">
                                             <label for="display-name">Display Name</label>
                                             <input type="text" id="display-name" name="displayName" placeholder="Your display name">

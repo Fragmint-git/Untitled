@@ -87,7 +87,8 @@ app.use('/assets', express.static(assetsPath, {
 async function initializeDatabase() {
     try {
         // Sync all models with database
-        await sequelize.sync({ alter: true });
+        //await sequelize.sync({ alter: true });
+        await sequelize.sync({ force: false, alter: false });
         console.log('Database synchronized successfully');
 
         // Check if we need to seed with initial data

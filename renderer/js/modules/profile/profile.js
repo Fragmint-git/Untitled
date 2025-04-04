@@ -221,19 +221,31 @@ window.profileModule = {
     
         const personalInfo = {
             username: user.username,
-            displayName: user.displayName,
-            fullName: user.fullName,
-            email: user.email,
-            phone: user.phone,
-            bio: user.bio
+            displayName: user.displayName || '',
+            fullName: user.fullName || '',
+            email: user.email || '',
+            phone: user.phone || '',
+            bio: user.bio || '',
+            avatar: user.avatar || '',
+            banner: user.player_banner || ''
         };
     
+        const accountSettings = {
+            language: 'en',
+            playerSessionId: user.player_session_id || '',
+            walletId: user.wallet_id || '',
+            isAdmin: user.is_admin || false
+        };
+
+    
         window.dispatchEvent(new CustomEvent('profile:load-personal-info', { detail: personalInfo }));
-        window.dispatchEvent(new CustomEvent('profile:load-account-settings', { detail: { language: 'en' } }));
-        window.dispatchEvent(new CustomEvent('profile:load-notification-settings', { detail: { emailNotifications: true } }));
+        window.dispatchEvent(new CustomEvent('profile:load-account-settings', { detail: accountSettings }));
         window.dispatchEvent(new CustomEvent('profile:load-appearance-settings', { detail: { theme: 'dark', fontSize: 16 } }));
+        window.dispatchEvent(new CustomEvent('profile:load-notification-settings', { detail: { emailNotifications: true } }));
         window.dispatchEvent(new CustomEvent('profile:load-privacy-settings', { detail: { profileVisibility: true } }));
+        window.dispatchEvent(new CustomEvent('profile:load-mmr', { detail: mmrInfo }));
     },
+    
     
     
     // Save profile picture

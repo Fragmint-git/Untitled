@@ -8,6 +8,8 @@ const url = require('url');
 //const { Player } = require('./backend/database');
 const { User } = require('./backend/database');
 const { Op } = require('sequelize');
+const axios = require('axios');
+const crypto = require('crypto');
 
 const apiUrl = process.env.API_URL;
 const serverKey = process.env.SERVER_KEY;
@@ -212,11 +214,9 @@ ipcMain.handle('save-personal-info', async (event, formData) => {
 
     if (user) {
       await user.update({
-        displayName: formData.displayName,
-        fullName: formData.fullName,
-        email: formData.email,
-        phone: formData.phone,
-        bio: formData.bio
+        username: formData.username,
+        ign: formData.ign,
+        email: formData.email
       });
 
       return { success: true, data: user };
@@ -231,7 +231,8 @@ ipcMain.handle('save-personal-info', async (event, formData) => {
 
 
 
-ipcMain.handle('login', async (event, username, password) => {
+
+/*ipcMain.handle('login', async (event, username, password) => {
   try {
     const user = await User.findOne({
       where: {
@@ -263,7 +264,83 @@ ipcMain.handle('login', async (event, username, password) => {
     console.error('Login failed:', error);
     return { success: false, message: 'Login failed due to server error' };
   }
+});*/
+
+ipcMain.handle('login', async (event, username, password) => {
+  try {
+    let resolvedEmail = username;
+
+    if (!username.includes('@')) {
+      const userInDb = await User.findOne({ where: { username } });
+      if (userInDb) {
+        resolvedEmail = userInDb.email;
+      } else {
+        return { success: false, message: 'User not found.' };
+      }
+    }
+
+    //hashing like in the main website
+    const hashedPassword = crypto.createHash('md5').update(password).digest('hex');
+
+    const lootlockerLogin = await axios.post('https://api.lootlocker.io/white-label-login/login', {
+      email: resolvedEmail,
+      password,
+      remember: true
+    }, {
+      headers: {
+        'Content-type': 'application/json',
+        'is-development': 'true',
+        'domain-key': process.env.LOOTLOCKER_DOMAIN_KEY
+      }
+    });
+
+    const { session_token, email } = lootlockerLogin.data;
+
+    let user = await User.findOne({
+      where: {
+        [Op.or]: [
+          { username },
+          { email: resolvedEmail }
+        ]
+      }
+    });
+
+    if (!user) {
+      const uniqueUsername = `fragmint-${Math.random().toString(36).substr(2, 8)}`;
+      user = await User.create({
+        username: uniqueUsername,
+        email,
+        password: hashedPassword,
+        date_registered: new Date(),
+        last_updated_timestamp: new Date(),
+        is_admin: 0,
+        is_delete: 0
+      });
+    }
+
+    await user.update({ last_login: new Date() });
+
+    return {
+      success: true,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        lootlocker_token: session_token,
+        player_session_id: user.player_session_id,
+        wallet_id: user.wallet_id,
+        profile_avatar: user.profile || null,
+        player_banner: user.player_banner || null
+      }
+    };
+  } catch (err) {
+    console.error('[Login] Failed:', err?.response?.data || err.message);
+    return { success: false, message: err?.response?.data?.message || 'Login failed.' };
+  }
 });
+
+
+
 
 
 ipcMain.handle('register', async (event, formData) => {
@@ -284,7 +361,6 @@ ipcMain.handle('register', async (event, formData) => {
       username,
       email,
       password,
-      account_type: 'user'
     });
 
     return {
@@ -293,7 +369,6 @@ ipcMain.handle('register', async (event, formData) => {
         id: newUser.id,
         username: newUser.username,
         email: newUser.email,
-        account_type: newUser.account_type
       }
     };
   } catch (err) {
@@ -309,6 +384,13 @@ ipcMain.handle('get-user-by-id', async (event, id) => {
     if (!user) {
       return { success: false, message: 'User not found' };
     }
+    
+    let parsedData = {};
+    try {
+      parsedData = user.player_data ? JSON.parse(user.player_data) : {};
+    } catch (e) {
+      console.warn('Failed to parse player_data:', e);
+    }
 
     return {
       success: true,
@@ -316,11 +398,17 @@ ipcMain.handle('get-user-by-id', async (event, id) => {
         id: user.id,
         username: user.username,
         email: user.email,
-        displayName: user.displayName || '',
-        fullName: user.fullName || '',
-        phone: user.phone || '',
-        bio: user.bio || '',
-        account_type: user.account_type
+        displayName: parsedData.username || '',
+        fullName: `${user.firstname || ''} ${user.lastname || ''}`.trim(),
+        phone: parsedData.phone || '',
+        bio: parsedData.profile?.bio || '',
+        avatar: user.profile || '',
+        player_banner: user.player_banner || '',
+        player_session_id: user.player_session_id,
+        wallet_id: user.wallet_id,
+        stats: parsedData.stats || {},
+        mmr: parsedData.player_mmr || {},
+        teams: parsedData.teams || {}
       }
     };
   } catch (error) {
@@ -328,6 +416,51 @@ ipcMain.handle('get-user-by-id', async (event, id) => {
     return { success: false, message: 'Error fetching user profile.' };
   }
 });
+
+
+//lootlocker
+ipcMain.handle('lootlocker-login', async (event, { email, password }) => {
+  try {
+    const response = await axios.post('https://api.lootlocker.io/white-label-login/login', {
+      email,
+      password,
+      remember: true
+    }, {
+      headers: {
+        'Content-type': 'application/json',
+        'is-development': 'true',
+        'domain-key': process.env.LOOTLOCKER_DOMAIN_KEY
+      }
+    });
+
+    return { success: true, data: response.data };
+  } catch (err) {
+    console.error('[LootLocker Login] Error:', err?.response?.data || err.message);
+    return { success: false, message: err?.response?.data?.message || 'Login failed' };
+  }
+});
+
+
+ipcMain.handle('lootlocker-start-session', async (event, { email, token }) => {
+  try {
+    const response = await axios.post('https://api.lootlocker.io/game/v2/session/white-label', {
+      game_key: process.env.LOOTLOCKER_GAME_KEY,
+      email,
+      token,
+      game_version: process.env.GAME_VERSION
+    }, {
+      headers: {
+        'Content-type': 'application/json'
+      }
+    });
+
+    return { success: true, data: response.data };
+  } catch (err) {
+    console.error('[LootLocker Session] Error:', err?.response?.data || err.message);
+    return { success: false, message: err?.response?.data?.message || 'Session failed' };
+  }
+});
+
 
 
 // In this file you can include the rest of your app's specific main process code

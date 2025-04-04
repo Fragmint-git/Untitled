@@ -54,16 +54,46 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }*/
 
-        const quitButton = document.getElementById('quit-button');
+        /*const quitButton = document.getElementById('quit-button');
         if (quitButton) {
             quitButton.addEventListener('click', () => {
-                const confirmed = window.confirm('Log out and return to login screen?');
+                const confirmed = window.confirm('Logout and return to login screen?');
                 if (confirmed) {
                     localStorage.removeItem('userSession');
                     window.location.href = 'login.html';
                 }
             });
-        }
+        }*/
+            const quitButton = document.getElementById('quit-button');
+            if (quitButton) {
+              quitButton.addEventListener('click', async () => {
+                const confirmed = window.confirm('Logout and return to login screen?');
+                if (!confirmed) return;
+            
+                try {
+                  const session = JSON.parse(localStorage.getItem('userSession'));
+                  const domainKey = window.env?.lootlockerDomainKey;
+            
+                  if (session?.lootlocker_token && domainKey) {
+                    await fetch('https://api.lootlocker.io/white-label-login/logout', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'is-development': 'true',
+                        'domain-key': process.env.LOOTLOCKER_DOMAIN_KEY,
+                        'authorization': `Bearer ${session.lootlocker_token}`
+                      }
+                    });
+                  }
+                } catch (err) {
+                  console.warn('Failed to logout from LootLocker:', err);
+                }
+            
+                localStorage.removeItem('userSession');
+                window.location.href = 'login.html';
+              });
+            }
+            
 
 
     

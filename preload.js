@@ -48,15 +48,18 @@ contextBridge.exposeInMainWorld(
         // Add quit application function
         quitApp: () => ipcRenderer.invoke('quit-app'),
 
-        savePersonalInfo: (formData) => ipcRenderer.invoke('save-personal-info', formData),
-
+        //register, login, fetch, update
         register: (formData) => ipcRenderer.invoke('register', formData),
-
-        getUserById: (id) => ipcRenderer.invoke('get-user-by-id', id),
 
         login: (username, password) => ipcRenderer.invoke('login', username, password),
         clearSession: () => localStorage.removeItem('userSession'),
         saveSession: (user) => localStorage.setItem('userSession', JSON.stringify(user)),
-        getSession: () => JSON.parse(localStorage.getItem('userSession'))
+        getSession: () => JSON.parse(localStorage.getItem('userSession')),
+        getUserById: (id) => ipcRenderer.invoke('get-user-by-id', id),
+        savePersonalInfo: (formData) => ipcRenderer.invoke('save-personal-info', formData),
+
+        //lootlocker
+        lootlockerLogin: (credentials) => ipcRenderer.invoke('lootlocker-login', credentials),
+        lootlockerStartSession: (data) => ipcRenderer.invoke('lootlocker-start-session', data),
     }
 );

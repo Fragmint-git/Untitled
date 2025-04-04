@@ -13,7 +13,7 @@ if (!fs.existsSync(dataDir)) {
 // Initialize Sequelize with SQLite
 const sequelize = new Sequelize({
     dialect: 'sqlite',
-    storage: path.join(dataDir, 'tournament.db'),
+    storage: path.join(dataDir, 'vr_battles.db'),
     logging: false
 });
 
@@ -183,19 +183,48 @@ const Match = sequelize.define('Match', {
     }
 });
 
+
+
 const User = sequelize.define('User', {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    username: { type: DataTypes.STRING, allowNull: false, unique: true },
-    email: { type: DataTypes.STRING, allowNull: false, unique: true },
-    password: { type: DataTypes.STRING, allowNull: false },
-    account_type: { type: DataTypes.STRING, allowNull: false, defaultValue: 'user' },
-    displayName: { type: DataTypes.STRING },
-    fullName: { type: DataTypes.STRING },
-    phone: { type: DataTypes.STRING },
-    bio: { type: DataTypes.TEXT }
-  }, {
-    timestamps: false
-  });
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+
+  date_registered: { type: DataTypes.DATE },
+  last_login: { type: DataTypes.DATE },
+  firstname: { type: DataTypes.STRING },
+  lastname: { type: DataTypes.STRING },
+  username: { type: DataTypes.STRING, allowNull: false, unique: true },
+
+  last_updated_timestamp: { type: DataTypes.DATE },
+  ign: { type: DataTypes.STRING },
+  platform: { type: DataTypes.STRING },
+
+  email: { type: DataTypes.STRING, allowNull: false, unique: true },
+  password: { type: DataTypes.STRING, allowNull: false },
+
+  birthdate: { type: DataTypes.STRING },
+  country: { type: DataTypes.STRING },
+  region: { type: DataTypes.STRING },
+  state: { type: DataTypes.STRING },
+
+  player_session_id: { type: DataTypes.STRING },
+  wallet_id: { type: DataTypes.STRING },
+  chat_id: { type: DataTypes.STRING },
+
+  tournament_wins: { type: DataTypes.INTEGER, defaultValue: 0 },
+  earnings: { type: DataTypes.INTEGER, defaultValue: 0 },
+
+  is_admin: { type: DataTypes.BOOLEAN, defaultValue: false },
+  is_delete: { type: DataTypes.BOOLEAN, defaultValue: false },
+
+  profile: { type: DataTypes.STRING },
+  player_banner: { type: DataTypes.STRING },
+
+  player_data: { type: DataTypes.TEXT }
+}, {
+  timestamps: false
+});
+
+
   
 
 

@@ -20,44 +20,31 @@ function initPersonalInfo() {
 // Handle form submission
 function handlePersonalInfoSubmit(e) {
     e.preventDefault();
-    
-    // Get form data
+
     const formData = new FormData(e.target);
+
     const personalInfo = {
         username: formData.get('username'),
-        displayName: formData.get('displayName'),
-        fullName: formData.get('fullName'),
-        email: formData.get('email'),
-        phone: formData.get('phone'),
-        bio: formData.get('bio')
+        ign: formData.get('ign'),
+        email: formData.get('email')
     };
-    
-    // Save to localStorage
     savePersonalInfo(personalInfo);
-    
-    // Show notification
-    //window.uiModule.showNotification('Personal information saved successfully', 'success');
 }
+
 
 // Handle loading personal information
 function handleLoadPersonalInfo(e) {
     const personalInfo = e.detail;
-    
-    // Populate form fields
-    const userNameField = document.getElementById('username');
-    const displayNameField = document.getElementById('display-name');
-    const fullNameField = document.getElementById('full-name');
+
+    const usernameField = document.getElementById('username');
+    const ignField = document.getElementById('ign');
     const emailField = document.getElementById('email');
-    const phoneField = document.getElementById('phone');
-    const bioField = document.getElementById('bio');
-    
-    if (userNameField) userNameField.value = personalInfo.username || '';
-    if (displayNameField) displayNameField.value = personalInfo.displayName || '';
-    if (fullNameField) fullNameField.value = personalInfo.fullName || '';
+
+    if (usernameField) usernameField.value = personalInfo.username || '';
+    if (ignField) ignField.value = personalInfo.ign || '';
     if (emailField) emailField.value = personalInfo.email || '';
-    if (phoneField) phoneField.value = personalInfo.phone || '';
-    if (bioField) bioField.value = personalInfo.bio || '';
 }
+
 
 // Save personal information to localStorage
 async function savePersonalInfo(personalInfo) {

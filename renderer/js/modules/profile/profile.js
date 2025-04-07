@@ -221,14 +221,18 @@ window.profileModule = {
     
         const personalInfo = {
             username: user.username,
+            ign: user.ign || '',
             displayName: user.displayName || '',
             fullName: user.fullName || '',
             email: user.email || '',
             phone: user.phone || '',
             bio: user.bio || '',
             avatar: user.avatar || '',
-            banner: user.player_banner || ''
-        };
+            banner: user.player_banner || '',
+            platform: user.platform || '',
+            timezone: user.timezone || ''
+          };
+          
     
         const accountSettings = {
             language: 'en',

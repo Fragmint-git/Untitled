@@ -4,7 +4,7 @@
  */
 
 // Load dashboard data
-async function loadDashboardData() {
+/*async function loadDashboardData() {
     try {
         // Fetch data for dashboard
         const tournaments = await window.api.getTournaments();
@@ -127,7 +127,7 @@ async function loadUpcomingMatches() {
         console.error('Error loading upcoming matches:', error);
         window.uiModule.showNotification('Failed to load upcoming matches', 'error');
     }
-}
+}*/
 
 // Function to load news items
 async function loadNewsItems() {

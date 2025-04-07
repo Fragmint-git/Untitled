@@ -20,104 +20,77 @@ const sequelize = new Sequelize({
 // Define Game model
 const Game = sequelize.define('Game', {
     id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
     },
     name: {
-        type: DataTypes.STRING,
-        allowNull: false
+      type: DataTypes.STRING,
+      allowNull: false
     },
-    developer: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    releaseDate: {
-        type: DataTypes.DATE,
-        allowNull: false
-    },
-    description: {
-        type: DataTypes.TEXT,
-        allowNull: false
-    },
-    platforms: {
-        type: DataTypes.TEXT, // Stored as JSON string
-        allowNull: false,
-        get() {
-            const rawValue = this.getDataValue('platforms');
-            return rawValue ? JSON.parse(rawValue) : [];
-        },
-        set(value) {
-            this.setDataValue('platforms', JSON.stringify(value));
-        }
-    },
-    genres: {
-        type: DataTypes.TEXT, // Stored as JSON string
-        allowNull: false,
-        get() {
-            const rawValue = this.getDataValue('genres');
-            return rawValue ? JSON.parse(rawValue) : [];
-        },
-        set(value) {
-            this.setDataValue('genres', JSON.stringify(value));
-        }
-    },
-    coverImage: {
-        type: DataTypes.STRING,
-        allowNull: true
+    logo: {
+      type: DataTypes.STRING,
+      allowNull: true
     },
     status: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        defaultValue: 'active'
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'active'
     }
-});
+  }, {
+    timestamps: false,  
+    tableName: 'games' 
+  });
+  
 
 // Define Tournament model
-const Tournament = sequelize.define('Tournament', {
+const Tournament = sequelize.define('Tournaments', {
     id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
     },
     name: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    description: {
-        type: DataTypes.TEXT,
-        allowNull: true
+      type: DataTypes.STRING,
+      allowNull: false
     },
     startDate: {
-        type: DataTypes.DATE,
-        allowNull: false
+      type: DataTypes.DATE,
+      allowNull: false
     },
     endDate: {
-        type: DataTypes.DATE,
-        allowNull: false
+      type: DataTypes.DATE,
+      allowNull: false
     },
     status: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        defaultValue: 'upcoming'
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'upcoming'
     },
     maxPlayers: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 32
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 32
     },
     prizePool: {
-        type: DataTypes.DECIMAL(10, 2),
-        allowNull: false,
-        defaultValue: 0
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+      defaultValue: 0
     },
     players: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 0
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
+    },
+    game_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true
     }
-});
-
+  }, {
+    tableName: 'tournaments',
+    timestamps: false
+  });
+  
 // Define Player model
 const Player = sequelize.define('Player', {
     id: {
@@ -224,19 +197,41 @@ const User = sequelize.define('User', {
   timestamps: false
 });
 
+const UserSetting = sequelize.define('UserSetting', {
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    time_zone: {
+      type: DataTypes.STRING,
+      allowNull: false
+    }
+  }, {
+    tableName: 'user_settings',
+    timestamps: false
+  });
+  
+  
 
   
 
 
 // Define relationships
+User.hasOne(UserSetting, { foreignKey: 'user_id' });
+UserSetting.belongsTo(User, { foreignKey: 'user_id' });
+
 Game.hasMany(Tournament, {
     foreignKey: {
-        name: 'GameId',
+        name: 'game_id',
         allowNull: false
     },
     onDelete: 'CASCADE'
 });
-Tournament.belongsTo(Game);
+Tournament.belongsTo(Game, {
+    foreignKey: 'game_id',
+    as: 'Game'
+  });
+  
 
 Tournament.hasMany(Match, {
     foreignKey: {
@@ -422,5 +417,6 @@ module.exports = {
     User,
     Match,
     TournamentPlayer,
-    MatchPlayer
+    MatchPlayer,
+    UserSetting
 };

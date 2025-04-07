@@ -49,8 +49,9 @@ contextBridge.exposeInMainWorld(
         quitApp: () => ipcRenderer.invoke('quit-app'),
 
         //register, login, fetch, update
-        register: (formData) => ipcRenderer.invoke('register', formData),
-
+        //register: (formData) => ipcRenderer.invoke('register', formData),
+        registerUser: (formData) => ipcRenderer.invoke('register-user', formData),
+        
         login: (username, password) => ipcRenderer.invoke('login', username, password),
         clearSession: () => localStorage.removeItem('userSession'),
         saveSession: (user) => localStorage.setItem('userSession', JSON.stringify(user)),

@@ -6,7 +6,7 @@ const path = require('path');
 const url = require('url');
 
 //const { Player } = require('./backend/database');
-const { User } = require('./backend/database');
+const { User, UserSetting } = require('./backend/database');
 const { Op } = require('sequelize');
 const axios = require('axios');
 const crypto = require('crypto');
@@ -216,8 +216,17 @@ ipcMain.handle('save-personal-info', async (event, formData) => {
       await user.update({
         username: formData.username,
         ign: formData.ign,
-        email: formData.email
+        email: formData.email,
+        platform: formData.platform
       });
+
+      const existingSetting = await UserSetting.findOne({ where: { user_id: formData.id } });
+
+      if (existingSetting) {
+        await existingSetting.update({ time_zone: formData.timezone });
+      } else {
+        await UserSetting.create({ user_id: formData.id, time_zone: formData.timezone });
+      }
 
       return { success: true, data: user };
     } else {
@@ -279,7 +288,6 @@ ipcMain.handle('login', async (event, username, password) => {
       }
     }
 
-    //hashing like in the main website
     const hashedPassword = crypto.createHash('md5').update(password).digest('hex');
 
     const lootlockerLogin = await axios.post('https://api.lootlocker.io/white-label-login/login', {
@@ -294,7 +302,20 @@ ipcMain.handle('login', async (event, username, password) => {
       }
     });
 
-    const { session_token, email } = lootlockerLogin.data;
+    const { session_token, email: lootEmail } = lootlockerLogin.data;
+
+    const gameSession = await axios.post('https://api.lootlocker.io/game/v2/session/white-label', {
+      game_key: process.env.LOOTLOCKER_GAME_KEY,
+      email: lootEmail,
+      token: session_token,
+      game_version: process.env.GAME_VERSION || '1.0'
+    }, {
+      headers: {
+        'Content-type': 'application/json'
+      }
+    });
+
+    const { session_token: gameSessionToken, player_id: playerSessionId, wallet_id: walletId } = gameSession.data;
 
     let user = await User.findOne({
       where: {
@@ -309,30 +330,50 @@ ipcMain.handle('login', async (event, username, password) => {
       const uniqueUsername = `fragmint-${Math.random().toString(36).substr(2, 8)}`;
       user = await User.create({
         username: uniqueUsername,
-        email,
+        firstname: uniqueUsername,
+        lastname: 'Fragmint',
+        email: resolvedEmail,
         password: hashedPassword,
+        last_login: new Date(),
         date_registered: new Date(),
         last_updated_timestamp: new Date(),
+        player_session_id: playerSessionId,
+        wallet_id: walletId,
         is_admin: 0,
         is_delete: 0
       });
+    } else {
+      await user.update({
+        last_login: new Date(),
+        player_session_id: playerSessionId,
+        wallet_id: walletId
+      });
     }
-
-    await user.update({ last_login: new Date() });
 
     return {
       success: true,
       user: {
         id: user.id,
         username: user.username,
+        ign: user.ign,
         email: user.email,
-        lootlocker_token: session_token,
+        lootlocker_token: gameSessionToken,
         player_session_id: user.player_session_id,
         wallet_id: user.wallet_id,
         profile_avatar: user.profile || null,
         player_banner: user.player_banner || null
+      },
+      userSession: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        platform: user.platform,
+        ign: user.ign,
+        player_session_id: user.player_session_id,
+        wallet_id: user.wallet_id
       }
     };
+
   } catch (err) {
     console.error('[Login] Failed:', err?.response?.data || err.message);
     return { success: false, message: err?.response?.data?.message || 'Login failed.' };
@@ -343,7 +384,9 @@ ipcMain.handle('login', async (event, username, password) => {
 
 
 
-ipcMain.handle('register', async (event, formData) => {
+
+
+/*ipcMain.handle('register', async (event, formData) => {
   try {
     const { username, email, password } = formData;
 
@@ -375,16 +418,216 @@ ipcMain.handle('register', async (event, formData) => {
     console.error('Registration error:', err);
     return { success: false, message: 'Registration failed on server.' };
   }
+});*/
+
+
+ipcMain.handle('register-user', async (event, formData, file) => {
+  try {
+    //console.log('[Register] Incoming data:', formData);
+
+    const {
+      firstname, lastname, username, ign, platform, email,
+      password, birthdate, country, region, state,
+      ['timezone-select']: timezoneRaw
+    } = formData;
+
+    const timezone = timezoneRaw || formData['timezone'] || null;
+
+    const usernameRegex = /^[A-Za-z0-9]+$/;
+    const emailRegex = /^[A-Za-z0-9@._-]+$/;
+
+    if (!usernameRegex.test(username)) return { success: false, message: 'Username should only contain letters and numbers.' };
+    if (username.length > 20) return { success: false, message: 'Username must not exceed 20 characters.' };
+    if (!emailRegex.test(email)) return { success: false, message: 'Invalid email format.' };
+
+    const existingUser = await User.findOne({ where: { email } });
+    const existingUsername = await User.findOne({ where: { username } });
+    if (existingUser || existingUsername) {
+      //console.log('[Register] User already exists');
+      return { success: false, message: 'User already exists.' };
+    }
+
+    let session_token = null;
+    //console.log('[LootLocker] Attempting sign-up...');
+    try {
+      const signupRes = await axios.post('https://api.lootlocker.io/white-label-login/sign-up', {
+        email,
+        password
+      }, {
+        headers: {
+          'Content-type': 'application/json',
+          'is-development': 'true',
+          'domain-key': process.env.LOOTLOCKER_DOMAIN_KEY
+        }
+      });
+      session_token = signupRes.data?.session_token;
+      //console.log('[LootLocker] Signup session token:', session_token);
+    } catch (signupErr) {
+      //console.warn('[LootLocker] Signup failed, attempting login...');
+    }
+
+    if (!session_token) {
+      try {
+        const loginRes = await axios.post('https://api.lootlocker.io/white-label-login/login', {
+          email,
+          password,
+          remember: true
+        }, {
+          headers: {
+            'Content-type': 'application/json',
+            'is-development': 'true',
+            'domain-key': process.env.LOOTLOCKER_DOMAIN_KEY
+          }
+        });
+        session_token = loginRes.data?.session_token;
+        //console.log('[LootLocker] Login session token:', session_token);
+      } catch (loginErr) {
+        //console.error('[LootLocker] Both sign-up and login failed.');
+        return { success: false, message: 'Failed to retrieve LootLocker session token.' };
+      }
+    }
+
+    //console.log('[LootLocker] Creating game session...');
+    const sessionRes = await axios.post('https://api.lootlocker.io/game/v2/session/white-label', {
+      game_key: process.env.LOOTLOCKER_GAME_KEY,
+      email,
+      token: session_token,
+      game_version: process.env.GAME_VERSION || '1.0'
+    }, {
+      headers: {
+        'Content-type': 'application/json'
+      }
+    });
+
+    //console.log('[LootLocker] Game session response:', sessionRes.data);
+
+    const gameSessionToken = sessionRes.data?.session_token;
+    const playerSessionId = sessionRes.data?.player_id;
+    const walletId = sessionRes.data?.wallet_id;
+
+    //console.log('[LootLocker] Game session token:', gameSessionToken);
+    //console.log('[LootLocker] Player session ID:', playerSessionId);
+
+    if (!playerSessionId) {
+      return { success: false, message: 'No player identifier returned from LootLocker.' };
+    }
+
+    let profileFilename = null;
+    if (file && typeof file === 'string' && file.startsWith('data:image')) {
+      //.log('[Profile Image] Processing upload...');
+      const matches = file.match(/^data:(image\/\w+);base64,(.+)$/);
+      if (matches) {
+        const ext = matches[1].split('/')[1];
+        const base64Data = matches[2];
+        if ((base64Data.length * 3) / 4 > 2097152) {
+          return { success: false, message: 'Profile photo must be less than 2MB.' };
+        }
+        profileFilename = `${Date.now()}.${ext}`;
+        const uploadPath = path.join(__dirname, 'assets', 'uploads', 'profile', profileFilename);
+        fs.writeFileSync(uploadPath, Buffer.from(base64Data, 'base64'));
+        //console.log('[Profile Image] Saved as:', profileFilename);
+      }
+    }
+
+    const hashedPassword = crypto.createHash('md5').update(password).digest('hex');
+
+    //console.log('[Database] Creating new user...');
+    const newUser = await User.create({
+      firstname,
+      lastname,
+      username,
+      ign,
+      platform,
+      email,
+      password: hashedPassword,
+      birthdate,
+      country,
+      region,
+      state,
+      date_registered: new Date(),
+      last_updated_timestamp: new Date(),
+      last_login: new Date(),
+      is_admin: 0,
+      is_delete: 0,
+      profile: profileFilename,
+      player_session_id: playerSessionId,
+      wallet_id: walletId
+    });
+
+    if (timezone) {
+      //console.log('[UserSetting] Saving timezone:', timezone);
+      await UserSetting.create({ user_id: newUser.id, time_zone: timezone });
+    } else {
+      //console.warn('[UserSetting] No timezone provided. Skipping insert.');
+    }
+
+    try {
+      //console.log('[LootLocker] Updating username...');
+      const updateRes = await axios.put('https://api.lootlocker.io/game/player/name', {
+        name: username
+      }, {
+        headers: {
+          'x-session-token': gameSessionToken,
+          'Content-type': 'application/json',
+          'LL-Version': '2021-03-01'
+        }
+      });
+
+      //console.log('[LootLocker] Update username response:', updateRes.data);
+
+      if (!updateRes.data || updateRes.data.success !== true) {
+        //console.warn('[LootLocker] Username update failed', updateRes.data);
+      } else {
+        //console.log('[LootLocker] Username updated successfully.');
+      }
+
+    } catch (err) {
+      //console.error('[LootLocker Username Update Error]', err.response?.data || err.message);
+    }
+
+    return {
+      success: true,
+      data: newUser,
+      lootlocker_session: {
+        token: gameSessionToken,
+        player_id: playerSessionId,
+        wallet_id: walletId
+      },
+      userSession: {
+        id: newUser.id,
+        email: newUser.email,
+        username: newUser.username,
+        ign: newUser.ign,
+        player_session_id: playerSessionId,
+        wallet_id: walletId
+      }
+    };
+    
+  } catch (err) {
+    //console.error('Final Registration Error:', err.response?.data || err.message);
+    return { success: false, message: 'Registration failed: ' + (err.response?.data?.message || err.message) };
+  }
 });
+
+
+
+
 
 ipcMain.handle('get-user-by-id', async (event, id) => {
   try {
-    const user = await User.findByPk(id);
-
-    if (!user) {
-      return { success: false, message: 'User not found' };
+    if (!id) {
+      const session = store.get('userSession');
+      if (!session || !session.id) {
+        return { success: false, message: 'No session or user ID found.' };
+      }
+      id = session.id;
     }
-    
+
+    const user = await User.findByPk(id);
+    if (!user) return { success: false, message: 'User not found' };
+
+    const userSetting = await UserSetting.findOne({ where: { user_id: id } });
+
     let parsedData = {};
     try {
       parsedData = user.player_data ? JSON.parse(user.player_data) : {};
@@ -397,7 +640,10 @@ ipcMain.handle('get-user-by-id', async (event, id) => {
       user: {
         id: user.id,
         username: user.username,
+        ign: user.ign,
         email: user.email,
+        platform: user.platform || '',
+        timezone: userSetting?.time_zone || '',
         displayName: parsedData.username || '',
         fullName: `${user.firstname || ''} ${user.lastname || ''}`.trim(),
         phone: parsedData.phone || '',
@@ -416,6 +662,8 @@ ipcMain.handle('get-user-by-id', async (event, id) => {
     return { success: false, message: 'Error fetching user profile.' };
   }
 });
+
+
 
 
 //lootlocker

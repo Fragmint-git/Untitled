@@ -182,7 +182,7 @@ function initBackendIntegration() {
     });
     
     // Game operations
-    ipcMain.handle('get-games', async () => {
+    /*ipcMain.handle('get-games', async () => {
         try {
             const games = await Game.findAll({
                 attributes: [
@@ -211,7 +211,37 @@ function initBackendIntegration() {
             console.error('Error fetching games:', error);
             throw error;
         }
-    });
+    });*/
+
+    ipcMain.handle('get-games', async () => {
+        try {
+          const games = await Game.findAll({
+            attributes: ['id', 'name', 'bio', 'status', 'logo', 'banner'],
+            order: [['name', 'ASC']]
+          });
+      
+          const transformedGames = games.map(game => {
+            const plainGame = game.get({ plain: true });
+      
+            if (plainGame.logo) {
+              plainGame.logo = getServerImageUrl(plainGame.logo);
+              console.log(`Game ${plainGame.name} logo processed`);
+            }
+      
+            if (plainGame.banner) {
+              plainGame.banner = getServerImageUrl(plainGame.banner);
+            }
+      
+            return plainGame;
+          });
+      
+          return transformedGames;
+        } catch (error) {
+          console.error('Error fetching games:', error);
+          throw error;
+        }
+      });
+      
 
     ipcMain.handle('get-game', async (event, id) => {
         try {
@@ -266,7 +296,7 @@ function initBackendIntegration() {
     });
 
     // Handle tournament-related IPC events
-    ipcMain.handle('get-tournaments', async () => {
+    /*ipcMain.handle('get-tournaments', async () => {
         try {
             const tournaments = await Tournament.findAll({
                 include: [{
@@ -305,7 +335,51 @@ function initBackendIntegration() {
             console.error('Error fetching tournaments:', error);
             throw error;
         }
-    });
+    });*/
+    ipcMain.handle('get-tournaments', async () => {
+        try {
+          const tournaments = await Tournament.findAll({
+            include: [{
+              model: Game,
+              as: 'Game',
+              attributes: ['id', 'name', 'logo']
+            }],
+            attributes: [
+              'id', 'name', 'tournament_name', 'date_start', 'date_expiration',
+              'status', 'max_teams', 'prize', 'team_size', 'logo', 'type',
+              'tournament_status', 'is_team_registration_open', 'number_of_rounds',
+              'current_round'
+            ],
+            order: [['date_start', 'DESC']]
+          });
+      
+          const transformed = tournaments.map(tournament => {
+            const t = tournament.get({ plain: true });
+      
+            if (t.Game && t.Game.logo) {
+              t.Game.logo = getServerImageUrl(t.Game.logo);
+              console.log(`Tournament ${t.name} logo processed`);
+            }
+      
+            return {
+              ...t,
+              prize: t.prize || '',
+              max_teams: parseInt(t.max_teams || 0),
+              team_size: t.team_size || '',
+              number_of_rounds: parseInt(t.number_of_rounds || 0),
+              current_round: parseInt(t.current_round || 0)
+            };
+          });
+      
+          console.log(`Fetched tournaments: ${transformed.length}`);
+          return transformed;
+      
+        } catch (error) {
+          console.error('Error fetching tournaments:', error);
+          throw error;
+        }
+      });
+      
 
     ipcMain.handle('get-tournament', async (event, id) => {
         try {

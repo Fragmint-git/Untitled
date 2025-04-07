@@ -125,9 +125,10 @@
             const result = await window.api.login(username, password);
 
             if (result.success) {
-                // Save session locally (or just keep it in memory)
-                window.api.saveSession(result.user);
+
+                window.api.saveSession(result.userSession);
                 window.location.href = 'index.html';
+                
             } else {
                 errorMessage.textContent = result.message || 'Login failed.';
             }

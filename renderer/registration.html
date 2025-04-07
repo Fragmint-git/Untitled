@@ -14,7 +14,7 @@
       overflow: hidden;
       height: 100%;
     }
-
+  
     body {
       font-family: sans-serif;
       background-color: #1e1e2f;
@@ -23,30 +23,33 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
-      overflow: hidden;
     }
-
+  
     .register-container {
       background-color: #2c2c3c;
       padding: 2rem;
       border-radius: 8px;
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
-      width: 320px;
+      width: 500px;
+      max-height: 95vh;
+      overflow-y: auto;
     }
-
+  
     .register-container h2 {
       text-align: center;
       margin-bottom: 1rem;
     }
-
-    .register-container input {
+  
+    .register-container input,
+    .register-container select {
       width: 100%;
       padding: 0.5rem;
-      margin: 0.5rem 0;
       border: none;
       border-radius: 4px;
+      margin-bottom: 0.5rem;
+      box-sizing: border-box;
     }
-
+  
     .register-container button {
       width: 100%;
       padding: 0.5rem;
@@ -58,8 +61,23 @@
       cursor: pointer;
       font-weight: bold;
     }
-
-    #toggle-password {
+  
+    .form-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 0.5rem;
+    }
+  
+    .form-row input,
+    .form-row select {
+      flex: 1;
+    }
+  
+    .password-group {
+      position: relative;
+    }
+  
+    .password-group i {
       position: absolute;
       top: 50%;
       right: 10px;
@@ -67,38 +85,40 @@
       cursor: pointer;
       color: #999;
     }
-
+  
+    .form-row .password-group {
+      flex: 1;
+      position: relative;
+    }
+  
     .error-message {
       color: #ff6b6b;
       font-size: 0.9rem;
       text-align: center;
     }
-
+  
     .back-link {
       text-align: center;
       margin-top: 1rem;
       font-size: 0.9rem;
     }
-
+  
     .back-link a {
       color: #4caf50;
       text-decoration: none;
     }
-
-    .password-group {
-    position: relative;
+  
+    /* Optional: Scrollbar style for overflowing form */
+    .register-container::-webkit-scrollbar {
+      width: 6px;
     }
-
-    .password-group i {
-    position: absolute;
-    top: 50%;
-    right: 10px;
-    transform: translateY(-50%);
-    cursor: pointer;
-    color: #999;
+  
+    .register-container::-webkit-scrollbar-thumb {
+      background-color: #4caf50;
+      border-radius: 4px;
     }
-
   </style>
+  
 </head>
 <body>
 
@@ -113,28 +133,72 @@
 
   <div class="register-container">
     <h2>Register</h2>
-    <input type="text" id="username" placeholder="Username" />
-    <input type="email" id="email" placeholder="Email" />
+    <form id="registration" enctype="multipart/form-data">
 
-    <div class="password-group">
-        <input type="password" id="password" placeholder="Password" />
-        <i id="toggle-password" class="fas fa-eye"></i>
+      <div class="form-row">
+        <input type="text" name="firstname" id="firstname" placeholder="Firstname" required />
+        <input type="text" name="lastname" id="lastname" placeholder="Lastname" required />
       </div>
-      
-      <div class="password-group">
-        <input type="password" id="confirm-password" placeholder="Confirm Password" />
-        <i id="toggle-confirm-password" class="fas fa-eye"></i>
+
+      <div class="form-row">
+        <input type="text" name="username" id="username" placeholder="Username (A-Z, 0-9)" maxlength="20" required />
+        <input type="text" name="ign" id="ign" placeholder="In-Game Name (IGN)" maxlength="20" required />
       </div>
-      
 
-    <div class="error-message" id="error-message"></div>
-    <button id="register-button">Register</button>
 
-    <div class="back-link">
-      Already have an account? <a href="login.html">Login</a>
-    </div>
+      <input type="email" name="email" id="email" placeholder="Email" required />
+
+      <div class="form-row">
+        <div class="password-group">
+          <input type="password" name="password" id="password" placeholder="Password" required />
+          <i id="toggle-password" class="fas fa-eye"></i>
+        </div>
+        <div class="password-group">
+          <input type="password" name="password-confirm" id="confirm-password" placeholder="Confirm Password" required />
+          <i id="toggle-confirm-password" class="fas fa-eye"></i>
+        </div>
+      </div>
+  
+      <select name="platform" id="platform" required>
+        <option value="">Select Platform</option>
+        <option value="psvr">PSVR</option>
+        <option value="steam">Steam</option>
+        <option value="meta">Meta</option>
+      </select>
+  
+      <input type="date" name="birthdate" id="birthdate" placeholder="Birthdate (YYYY-MM-DD)" required />
+  
+      <select name="country" id="country" required>
+        <option value="">Select Country</option>
+      </select>
+  
+      <select name="state" id="state" required>
+        <option value="">Select State/Province</option>
+      </select>
+  
+      <select name="region" id="region" required>
+        <option value="">Select Region</option>
+      </select>
+  
+      <select name="timezone-select" id="timezone-select" required>
+        <option value="">Select Timezone</option>
+      </select>
+  
+      <label for="profile">Profile Image (Max 2MB)</label>
+      <input type="file" name="profile" id="profile" accept="image/*" />
+  
+      <div class="error-message" id="error-message"></div>
+  
+      <button id="register-button">Register</button>
+  
+      <div class="back-link">
+        Already have an account? <a href="login.html">Login</a>
+      </div>
+    </form>
   </div>
-
+  
+  
+  <script src="country-state-region.js"></script>
   <script>
     const passwordInput = document.getElementById('password');
     const confirmPasswordInput = document.getElementById('confirm-password');
@@ -154,7 +218,7 @@
     });
 
 
-    document.getElementById('register-button').addEventListener('click', async () => {
+    /*document.getElementById('register-button').addEventListener('click', async () => {
       const username = document.getElementById('username').value.trim();
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
@@ -186,7 +250,156 @@
         console.error(err);
         errorMessage.textContent = 'Server error.';
       }
-    });
+    });*/
+
+    document.getElementById('register-button').addEventListener('click', async (e) => {
+  e.preventDefault();
+
+  const form = document.getElementById('registration');
+  const errorMessage = document.getElementById('error-message');
+  errorMessage.textContent = '';
+
+  const formData = new FormData(form);
+
+  const user = {
+    firstname: formData.get('firstname'),
+    lastname: formData.get('lastname'),
+    email: formData.get('email'),
+    password: formData.get('password'),
+    passwordConfirm: formData.get('password-confirm'),
+    username: formData.get('username'),
+    ign: formData.get('ign'),
+    platform: formData.get('platform'),
+    birthdate: formData.get('birthdate'),
+    country: formData.get('country'),
+    region: formData.get('region'),
+    state: formData.get('state'),
+    timezone: formData.get('timezone-select'),
+    profile: formData.get('profile')
+  };
+
+  for (const [key, value] of Object.entries(user)) {
+    if (!value && key !== 'profile') {
+      errorMessage.textContent = 'Please fill in all required fields.';
+      return;
+    }
+  }
+
+  if (user.password.length < 5) {
+    errorMessage.textContent = 'Password must be at least 5 characters long.';
+    return;
+  }
+
+  if (user.password !== user.passwordConfirm) {
+    errorMessage.textContent = 'Passwords do not match.';
+    return;
+  }
+
+  if (user.profile && user.profile.size > 0) {
+    if (user.profile.size > 2 * 1024 * 1024) {
+      errorMessage.textContent = 'Profile image must not exceed 2MB.';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const base64Image = reader.result;
+      user.profile = base64Image;
+
+      try {
+        const result = await window.api.registerUser(user);
+
+        if (result.success) {
+          window.api.saveSession(result.data);
+          window.location.href = 'index.html';
+        } else {
+          errorMessage.textContent = result.message || 'Registration failed.';
+        }
+      } catch (err) {
+        console.error(err);
+        errorMessage.textContent = 'Server error.';
+      }
+    };
+    reader.readAsDataURL(user.profile);
+  } else {
+
+    user.profile = null;
+
+    try {
+      const result = await window.api.registerUser(user);
+
+      if (result.success) {
+        window.api.saveSession(result.userSession);
+        window.location.href = 'index.html';
+      } else {
+        errorMessage.textContent = result.message || 'Registration failed.';
+      }
+    } catch (err) {
+      console.error(err);
+      errorMessage.textContent = 'Server error.';
+    }
+  }
+});
+
+const countries = {
+  "United States": {
+    regions: ["East", "West", "Central"],
+    states: ["California", "New York", "Texas", "Florida"]
+  },
+  "Canada": {
+    regions: ["Ontario", "Quebec", "British Columbia"],
+    states: ["Ontario", "Alberta", "Manitoba"]
+  },
+  "Philippines": {
+    regions: ["NCR", "Luzon", "Visayas", "Mindanao"],
+    states: ["Metro Manila", "Cebu", "Davao"]
+  }
+};
+
+function populateDropdowns() {
+  const countrySelect = document.getElementById('country');
+  const stateSelect = document.getElementById('state');
+  const regionSelect = document.getElementById('region');
+
+  countrySelect.innerHTML = '<option value="">Select Country</option>';
+  Object.keys(countries).forEach(country => {
+    countrySelect.innerHTML += `<option value="${country}">${country}</option>`;
+  });
+
+  countrySelect.addEventListener('change', () => {
+    const selectedCountry = countrySelect.value;
+    const countryData = countries[selectedCountry];
+
+    stateSelect.innerHTML = '<option value="">Select State/Province</option>';
+    regionSelect.innerHTML = '<option value="">Select Region</option>';
+
+    if (countryData) {
+      countryData.states.forEach(state => {
+        stateSelect.innerHTML += `<option value="${state}">${state}</option>`;
+      });
+      countryData.regions.forEach(region => {
+        regionSelect.innerHTML += `<option value="${region}">${region}</option>`;
+      });
+    }
+  });
+}
+
+window.addEventListener('DOMContentLoaded', populateDropdowns);
+
+
+
+const timezones = Intl.supportedValuesOf("timeZone") || [];
+
+function loadTimezones() {
+  const timezoneSelect = document.getElementById('timezone-select');
+  timezoneSelect.innerHTML = '<option value="">Select Timezone</option>';
+  timezones.forEach(tz => {
+    timezoneSelect.innerHTML += `<option value="${tz}">${tz}</option>`;
+  });
+}
+
+window.addEventListener('DOMContentLoaded', loadTimezones);
+
 
     document.getElementById('minimize-button').addEventListener('click', () => {
       window.api.minimizeWindow();
@@ -199,6 +412,8 @@
     document.getElementById('close-button').addEventListener('click', () => {
       window.api.closeWindow();
     });
+
+    loadTimezones();
   </script>
 </body>
 </html>

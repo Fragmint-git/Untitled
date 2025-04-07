@@ -84,7 +84,7 @@ app.use('/assets', express.static(assetsPath, {
 }));
 
 // Initialize database
-async function initializeDatabase() {
+/*async function initializeDatabase() {
     try {
         // Sync all models with database
         //await sequelize.sync({ alter: true });
@@ -165,7 +165,7 @@ async function initializeDatabase() {
 // Call initializeDatabase when the server starts
 initializeDatabase().catch(err => {
     console.error('Database initialization error:', err);
-});
+});*/
 
 // API Routes
 // Upload game image

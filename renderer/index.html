@@ -140,16 +140,15 @@
 
             const personalInfo = {
                 username: document.getElementById('username').value,
-                displayName: document.getElementById('display-name').value,
-                fullName: document.getElementById('full-name').value,
+                displayName: document.getElementById('ign').value,
                 email: document.getElementById('email').value,
-                phone: document.getElementById('phone').value,
+                platform: document.getElementById('platform').value,
+                timezone: document.getElementById('timezone').value,
                 bio: document.getElementById('bio').value
             };
 
             savePersonalInfo(personalInfo);
         });
-
     </script>
 </head>
 <body>
@@ -1043,6 +1042,24 @@
                                           <label for="email">Email</label>
                                           <input type="email" id="email" name="email" placeholder="Your email address" readonly>
                                         </div>
+
+                                        <div class="form-group">
+                                            <label for="platform">Platform</label>
+                                            <select id="platform" name="platform">
+                                              <option value="">Select Platform</option>
+                                              <option value="psvr">PSVR</option>
+                                              <option value="steam">Steam</option>
+                                              <option value="meta">Meta</option>
+                                            </select>
+                                          </div>
+                                        
+                                          <div class="form-group">
+                                            <label for="timezone">Timezone</label>
+                                            <select id="timezone" name="timezone">
+                                              <option value="">Select Timezone</option>
+                                            </select>
+                                          </div>
+
                                         <div class="form-actions">
                                             <button type="submit" class="btn-primary">Save Changes</button>
                                             <button type="reset" class="btn-secondary">Cancel</button>
@@ -1262,6 +1279,7 @@
     </div>
     
     <!-- Module Scripts -->
+    <script src="country-state-region.js"></script>
     <script src="js/modules/ui.js"></script>
     <script src="js/modules/navigation.js"></script>
     <script src="js/modules/dashboard.js"></script>

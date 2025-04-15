@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (closeButton) {
     closeButton.addEventListener('click', () => {
+      window.api.clearSession();
       window.api.closeWindow();
     });
   }

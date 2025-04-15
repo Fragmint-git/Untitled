@@ -53,7 +53,8 @@ contextBridge.exposeInMainWorld(
         //registerUser: (formData) => ipcRenderer.invoke('register-user', formData),
         
         //login: (username, password) => ipcRenderer.invoke('login', username, password),
-        clearSession: () => localStorage.removeItem('userSession'),
+        //clearSession: () => localStorage.removeItem('userSession'),
+        clearSession: () => {localStorage.removeItem('userSession'); ipcRenderer.invoke('session:clear'); },
         saveSession: (user) => localStorage.setItem('userSession', JSON.stringify(user)),
         getSession: () => JSON.parse(localStorage.getItem('userSession')),
         getUserById: (id) => ipcRenderer.invoke('get-user-by-id', id),

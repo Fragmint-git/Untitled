@@ -201,54 +201,55 @@ window.profileModule = {
 
     loadUserProfile: async function () {
         console.log('Loading user profile data');
-    
+      
         const session = window.api.getSession();
+        //console.log('Session:', session);
+      
         const userId = session?.id;
-    
         if (!userId) {
-            console.error('No user session found');
-            return;
+          //console.error('No user session found');
+          return;
         }
-    
+      
         const result = await window.api.getUserById(userId);
-    
+        //console.log('API result:', result);
+      
         if (!result.success) {
-            console.error(result.message);
-            return;
+          //console.error('Failed to load user:', result.message);
+          return;
         }
-    
+      
         const user = result.user;
-    
+        //console.log('User from API:', user);
+      
         const personalInfo = {
-            username: user.username,
-            ign: user.ign || '',
-            displayName: user.displayName || '',
-            fullName: user.fullName || '',
-            email: user.email || '',
-            phone: user.phone || '',
-            bio: user.bio || '',
-            avatar: user.avatar || '',
-            banner: user.player_banner || '',
-            platform: user.platform || '',
-            timezone: user.timezone || ''
-          };
-          
-    
-        const accountSettings = {
-            language: 'en',
-            playerSessionId: user.player_session_id || '',
-            walletId: user.wallet_id || '',
-            isAdmin: user.is_admin || false
+          username: user.username,
+          ign: user.ign || '',
+          displayName: user.displayName || '',
+          fullName: user.fullName || '',
+          email: user.email || '',
+          phone: user.phone || '',
+          bio: user.bio || '',
+          avatar: user.avatar || '',
+          banner: user.banner || '',
+          platform: user.platform || '',
+          timezone: user.timezone || ''
         };
-
-    
+      
+        const accountSettings = {
+          language: 'en',
+          playerSessionId: user.player_session_id || '',
+          walletId: user.wallet_id || '',
+          isAdmin: user.is_admin || false
+        };
+      
         window.dispatchEvent(new CustomEvent('profile:load-personal-info', { detail: personalInfo }));
         window.dispatchEvent(new CustomEvent('profile:load-account-settings', { detail: accountSettings }));
         window.dispatchEvent(new CustomEvent('profile:load-appearance-settings', { detail: { theme: 'dark', fontSize: 16 } }));
         window.dispatchEvent(new CustomEvent('profile:load-notification-settings', { detail: { emailNotifications: true } }));
         window.dispatchEvent(new CustomEvent('profile:load-privacy-settings', { detail: { profileVisibility: true } }));
-        window.dispatchEvent(new CustomEvent('profile:load-mmr', { detail: mmrInfo }));
-    },
+      },
+      
     
     
     

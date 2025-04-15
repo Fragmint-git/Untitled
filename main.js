@@ -10,6 +10,9 @@ const { User, UserSetting } = require('./backend/database');
 const { Op } = require('sequelize');
 const axios = require('axios');
 const crypto = require('crypto');
+const Store = require('electron-store');
+const store = new Store();
+
 
 const apiUrl = process.env.API_URL;
 const serverKey = process.env.SERVER_KEY;
@@ -208,7 +211,14 @@ app.on('before-quit', async (event) => {
   }
 });
 
-ipcMain.handle('save-personal-info', async (event, formData) => {
+//session clearing
+ipcMain.handle('session:clear', () => {
+  store.delete('userSession');
+  return true;
+});
+
+
+/*ipcMain.handle('save-personal-info', async (event, formData) => {
   try {
     const user = await User.findByPk(formData.id);
 
@@ -236,7 +246,58 @@ ipcMain.handle('save-personal-info', async (event, formData) => {
     console.error('Error saving personal info:', err);
     return { success: false, error: err.message };
   }
+});*/
+
+ipcMain.handle('save-personal-info', async (event, formData) => {
+  try {
+    const id = formData.id;
+
+    if (!id) {
+      return { success: false, error: 'Missing user ID.' };
+    }
+
+    //const response = await fetch('http://localhost/api/profile/my_profile_update', {
+    const response = await fetch('http://www.vrbattles.gg/api/profile/my_profile_update', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        edit: true, 
+        editid: id, 
+        username: formData.username,
+        ign: formData.ign,
+        platform: formData.platform,
+        timezone: formData.timezone,
+        bio: formData.bio
+      })
+    });
+
+    const text = await response.text();
+    let result;
+
+    try {
+      result = JSON.parse(text);
+    } catch (e) {
+      return { success: false, error: 'Invalid JSON from API', raw: text };
+    }
+
+    if (result.status === 'success') {
+      return { success: true, data: result.data || {} };
+    } else {
+      return { success: false, error: result.message || 'Update failed' };
+    }
+
+  } catch (err) {
+    console.error('API Error saving personal info:', err);
+    return { success: false, error: err.message };
+  }
 });
+
+
+
+
+
 
 
 
@@ -615,24 +676,34 @@ ipcMain.handle('register-user', async (event, formData, file) => {
 
 ipcMain.handle('get-user-by-id', async (event, id) => {
   try {
-    if (!id) {
-      const session = store.get('userSession');
-      if (!session || !session.id) {
-        return { success: false, message: 'No session or user ID found.' };
-      }
-      id = session.id;
+    const session = store.get('userSession');
+    if (!id && (!session || !session.id)) {
+      return { success: false, message: 'No session or user ID found.' };
     }
 
-    const user = await User.findByPk(id);
-    if (!user) return { success: false, message: 'User not found' };
+    id = id || session.id;
 
-    const userSetting = await UserSetting.findOne({ where: { user_id: id } });
+    //const response = await fetch('http://localhost/api/fetch/user', {
+    const response = await fetch('http://www.vrbattles.gg/api/fetch/user', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
+    });
 
-    let parsedData = {};
+    const text = await response.text();
+    let result;
+
     try {
-      parsedData = user.player_data ? JSON.parse(user.player_data) : {};
-    } catch (e) {
-      console.warn('Failed to parse player_data:', e);
+      result = JSON.parse(text);
+      //console.log('[Fetch User] API Raw Result:', result);
+    } catch (err) {
+      return { success: false, message: 'Invalid JSON response from API', raw: text };
+    }
+
+    const user = result.user || result.data?.[0];
+
+    if (result.status !== 'success' || !user) {
+      return { success: false, message: result.message || 'Failed to fetch user' };
     }
 
     return {
@@ -640,28 +711,30 @@ ipcMain.handle('get-user-by-id', async (event, id) => {
       user: {
         id: user.id,
         username: user.username,
-        ign: user.ign,
+        ign: user.ign || '',
         email: user.email,
         platform: user.platform || '',
-        timezone: userSetting?.time_zone || '',
-        displayName: parsedData.username || '',
+        timezone: user.timezone || '',
+        displayName: user.username || '',
         fullName: `${user.firstname || ''} ${user.lastname || ''}`.trim(),
-        phone: parsedData.phone || '',
-        bio: parsedData.profile?.bio || '',
+        phone: '',
+        bio: '',
         avatar: user.profile || '',
-        player_banner: user.player_banner || '',
+        banner: user.player_banner || '',
         player_session_id: user.player_session_id,
         wallet_id: user.wallet_id,
-        stats: parsedData.stats || {},
-        mmr: parsedData.player_mmr || {},
-        teams: parsedData.teams || {}
+        stats: {},
+        mmr: {},
+        teams: {}
       }
     };
   } catch (error) {
-    console.error('Error fetching user by ID:', error);
-    return { success: false, message: 'Error fetching user profile.' };
+    //console.error('[Electron] API fetch error:', error);
+    return { success: false, message: 'Error fetching user profile from API' };
   }
 });
+
+
 
 
 

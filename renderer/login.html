@@ -94,7 +94,7 @@
   
     <div class="login-container">
         <h2>Login</h2>
-        <input type="text" id="username" placeholder="Username or Email">
+        <input type="text" id="username" placeholder="Email">
         <div style="position: relative;">
             <input type="password" id="password" placeholder="Password">
             <i id="toggle-password" class="fas fa-eye"></i>
@@ -110,29 +110,42 @@
     </div>
 
     <script>
-        document.getElementById('login-button').addEventListener('click', async () => {
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value;
+    document.getElementById('login-button').addEventListener('click', async () => {
+        const email = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
 
-            const errorMessage = document.getElementById('error-message');
-            errorMessage.textContent = '';
+        const errorMessage = document.getElementById('error-message');
+        errorMessage.textContent = '';
 
-            if (!username || !password) {
-                errorMessage.textContent = 'Please fill in both fields.';
-                return;
-            }
+        if (!email || !password) {
+            errorMessage.textContent = 'Please fill in both fields.';
+            return;
+        }
 
-            const result = await window.api.login(username, password);
+        try {
+            //const response = await fetch('http://localhost/api/players/login', {
+            const response = await fetch('http://www.vrbattles.gg/api/players/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            });
 
-            if (result.success) {
+            const result = await response.json();
 
+            if (response.ok && result.status === 'success') {
                 window.api.saveSession(result.userSession);
                 window.location.href = 'index.html';
-                
             } else {
                 errorMessage.textContent = result.message || 'Login failed.';
             }
-        });
+        } catch (err) {
+            console.error(err);
+            errorMessage.textContent = 'Server error.';
+        }
+    });
+
 
 
         document.getElementById('minimize-button').addEventListener('click', () => {

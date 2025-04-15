@@ -273,7 +273,7 @@ ipcMain.handle('save-personal-info', async (event, formData) => {
     console.error('Login failed:', error);
     return { success: false, message: 'Login failed due to server error' };
   }
-});*/
+});
 
 ipcMain.handle('login', async (event, username, password) => {
   try {
@@ -378,7 +378,7 @@ ipcMain.handle('login', async (event, username, password) => {
     console.error('[Login] Failed:', err?.response?.data || err.message);
     return { success: false, message: err?.response?.data?.message || 'Login failed.' };
   }
-});
+});*/
 
 
 

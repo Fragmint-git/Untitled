@@ -266,7 +266,7 @@
     lastname: formData.get('lastname'),
     email: formData.get('email'),
     password: formData.get('password'),
-    passwordConfirm: formData.get('password-confirm'),
+    'password-confirm': formData.get('password-confirm'),
     username: formData.get('username'),
     ign: formData.get('ign'),
     platform: formData.get('platform'),
@@ -274,12 +274,11 @@
     country: formData.get('country'),
     region: formData.get('region'),
     state: formData.get('state'),
-    timezone: formData.get('timezone-select'),
-    profile: formData.get('profile')
+    'timezone-select': formData.get('timezone-select')
   };
 
   for (const [key, value] of Object.entries(user)) {
-    if (!value && key !== 'profile') {
+    if (!value) {
       errorMessage.textContent = 'Please fill in all required fields.';
       return;
     }
@@ -290,56 +289,37 @@
     return;
   }
 
-  if (user.password !== user.passwordConfirm) {
+  if (user.password !== user['password-confirm']) {
     errorMessage.textContent = 'Passwords do not match.';
     return;
   }
 
-  if (user.profile && user.profile.size > 0) {
-    if (user.profile.size > 2 * 1024 * 1024) {
-      errorMessage.textContent = 'Profile image must not exceed 2MB.';
-      return;
+  try {
+    const formDataToSend = new FormData();
+    for (const [key, value] of Object.entries(user)) {
+      formDataToSend.append(key, value);
     }
 
-    const reader = new FileReader();
-    reader.onload = async () => {
-      const base64Image = reader.result;
-      user.profile = base64Image;
+    //const response = await fetch('http://localhost/api/players/register', {
+    const response = await fetch('http://www.vrbattles.gg/api/players/register', {
+      method: 'POST',
+      body: formDataToSend
+    });
 
-      try {
-        const result = await window.api.registerUser(user);
+    const result = await response.json();
 
-        if (result.success) {
-          window.api.saveSession(result.data);
-          window.location.href = 'index.html';
-        } else {
-          errorMessage.textContent = result.message || 'Registration failed.';
-        }
-      } catch (err) {
-        console.error(err);
-        errorMessage.textContent = 'Server error.';
-      }
-    };
-    reader.readAsDataURL(user.profile);
-  } else {
-
-    user.profile = null;
-
-    try {
-      const result = await window.api.registerUser(user);
-
-      if (result.success) {
-        window.api.saveSession(result.userSession);
-        window.location.href = 'index.html';
-      } else {
-        errorMessage.textContent = result.message || 'Registration failed.';
-      }
-    } catch (err) {
-      console.error(err);
-      errorMessage.textContent = 'Server error.';
+    if (response.ok && result.status === 'success') {
+      console.log('Registered:', result);
+      window.location.href = 'login.html';
+    } else {
+      errorMessage.textContent = result.message || 'Registration failed.';
     }
+  } catch (err) {
+    console.error(err);
+    errorMessage.textContent = 'Server error.';
   }
 });
+
 
 const countries = {
   "United States": {

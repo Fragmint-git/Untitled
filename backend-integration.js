@@ -211,7 +211,7 @@ function initBackendIntegration() {
             console.error('Error fetching games:', error);
             throw error;
         }
-    });*/
+    });
 
     ipcMain.handle('get-games', async () => {
         try {
@@ -239,6 +239,38 @@ function initBackendIntegration() {
         } catch (error) {
           console.error('Error fetching games:', error);
           throw error;
+        }
+      });*/
+
+      ipcMain.handle('get-games', async () => {
+        try {
+          //const response = await fetch('http://localhost/api/fetch/games');
+          const response = await fetch('https://www.vrbattles.gg/api/fetch/games');
+          const result = await response.json();
+      
+          if (result.status !== 'success') {
+            throw new Error(result.message || 'Failed to fetch games from API');
+          }
+      
+          const games = result.data.map(game => {
+            if (game.logo && !game.logo.startsWith('http')) {
+              game.logo = `http://localhost/uploads/games/${game.logo}`;
+            }
+          
+            if (game.banner && !game.banner.startsWith('http')) {
+              game.banner = `http://localhost/uploads/games/${game.banner}`;
+            }
+          
+            game.coverImage = game.logo || game.banner || '/assets/default-game-cover.png';
+          
+            return game;
+          });
+          
+      
+          return games;
+        } catch (error) {
+          console.error('Error fetching games:', error);
+          return [];
         }
       });
       
@@ -335,7 +367,7 @@ function initBackendIntegration() {
             console.error('Error fetching tournaments:', error);
             throw error;
         }
-    });*/
+    });
     ipcMain.handle('get-tournaments', async () => {
         try {
           const tournaments = await Tournament.findAll({
@@ -378,7 +410,53 @@ function initBackendIntegration() {
           console.error('Error fetching tournaments:', error);
           throw error;
         }
+      });*/
+      ipcMain.handle('get-tournaments', async () => {
+        try {
+          const response = await fetch('https://www.vrbattles.gg/api/fetch/tournaments');
+          const result = await response.json();
+      
+          if (result.status !== 'success') {
+            throw new Error(result.message || 'Failed to fetch tournaments');
+          }
+      
+          const transformed = result.data.map(t => {
+            const Game = {
+              id: t.game_id || null,
+              name: t.game_name || '',
+              logo: t.game_logo || '',
+              coverImage: t.game_logo
+                ? `http://www.vrbattles.gg/uploads/games/${t.game_logo}`
+                : '/assets/default-game-cover.png'
+            };
+      
+            return {
+              id: t.id,
+              name: t.tournament_name || t.name || 'Unnamed Tournament',
+              Game,
+              game: Game,
+              status: t.status_text || 'draft',
+              startDate: t.date_start || '',
+              endDate: t.date_expiration || '',
+              prizePool: parseFloat(t.prize || 0),
+              players: parseInt(t.total_teams || 0),
+              maxPlayers: parseInt(t.max_teams || 0),
+              description: t.tournament_status || 'No description provided.',
+              team_size: t.team_size || '',
+              number_of_rounds: parseInt(t.number_of_rounds || 0),
+              current_round: parseInt(t.current_round || 0)
+            };
+          });
+      
+          //console.log(`Transformed tournaments: ${transformed.length}`);
+          return transformed;
+      
+        } catch (error) {
+          //console.error('Error fetching tournaments:', error);
+          return [];
+        }
       });
+      
       
 
     ipcMain.handle('get-tournament', async (event, id) => {

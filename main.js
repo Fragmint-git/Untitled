@@ -257,7 +257,7 @@ ipcMain.handle('save-personal-info', async (event, formData) => {
     }
 
     //const response = await fetch('http://localhost/api/profile/my_profile_update', {
-    const response = await fetch('http://www.vrbattles.gg/api/profile/my_profile_update', {
+    const response = await fetch('https://www.vrbattles.gg/api/profile/my_profile_update', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -684,7 +684,7 @@ ipcMain.handle('get-user-by-id', async (event, id) => {
     id = id || session.id;
 
     //const response = await fetch('http://localhost/api/fetch/user', {
-    const response = await fetch('http://www.vrbattles.gg/api/fetch/user', {
+    const response = await fetch('https://www.vrbattles.gg/api/fetch/user', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id })

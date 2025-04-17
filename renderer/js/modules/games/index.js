@@ -116,17 +116,23 @@ async function loadGames() {
                     </div>
                     <div class="game-info">
                         <h3>${game.name}</h3>
-                        <p class="game-developer">${game.developer || 'Unknown Developer'}</p>
-                        <div class="game-meta">
+
+                        <p class="game-developer">${
+                            game.bio ? (game.bio.length > 100 ? game.bio.substring(0, 100) + '...' : game.bio)
+                            : 'No details available'
+                        }</p>
+
+                        <!--<div class="game-meta">
                             <span class="platforms">${Array.isArray(game.platforms) ? game.platforms.join(', ') : game.platforms}</span>
                             <span class="release-date">${new Date(game.releaseDate).getFullYear()}</span>
                         </div>
+                        
                         <div class="platform-badges">
                             ${platformBadges}
                         </div>
                         <div class="genre-tags">
                             ${genreTags}
-                        </div>
+                        </div>-->
                     </div>
                     <div class="game-actions">
                         <button class="btn view-game" data-id="${game.id}">View Details</button>

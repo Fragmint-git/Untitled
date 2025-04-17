@@ -190,6 +190,20 @@ window.tournamentsModule = {
 
     // Get tournament action buttons based on status
     getTournamentActions: function(tournament) {
+        const session = window.api.getSession();
+        const isAdmin = session && session.is_admin == 1;
+    
+        if (!isAdmin) {
+            return `
+                <button class="btn-primary join-tournament" data-id="${tournament.id}">
+                    Join
+                </button>
+                <button class="btn-secondary view-details" data-id="${tournament.id}">
+                    View
+                </button>
+            `;
+        }
+    
         switch (tournament.status.toLowerCase()) {
             case 'upcoming':
                 return `
@@ -234,7 +248,6 @@ window.tournamentsModule = {
                     </button>
                 `;
         }
-    },
 
     // Setup tournament card event listeners
     setupTournamentCardListeners: function() {

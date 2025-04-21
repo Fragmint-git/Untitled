@@ -248,6 +248,7 @@ window.tournamentsModule = {
                     </button>
                 `;
         }
+    },
 
     // Setup tournament card event listeners
     setupTournamentCardListeners: function() {

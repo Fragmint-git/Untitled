@@ -8,47 +8,52 @@ function initUI() {
     // Initialize dark mode toggle
     const darkModeToggle = document.getElementById('dark-mode-toggle');
     if (darkModeToggle) {
-        darkModeToggle.addEventListener('change', function() {
+        // Load saved preference
+        const savedTheme = localStorage.getItem('theme');
+        const savedDarkMode = localStorage.getItem('darkMode');
+
+        let isDarkMode = true;
+
+        if (savedTheme) {
+            isDarkMode = savedTheme === 'dark';
+        } else if (savedDarkMode) {
+            isDarkMode = savedDarkMode === 'enabled';
+        }
+
+        // Apply theme immediately based on saved preference
+        applyTheme(isDarkMode);
+        darkModeToggle.checked = isDarkMode;
+
+        darkModeToggle.addEventListener('change', function () {
             // When checked, apply dark mode (remove light-mode class)
             // When unchecked, apply light mode (add light-mode class)
             const isDarkMode = this.checked;
             applyTheme(isDarkMode);
-            
+
             // Save preference to localStorage
             localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
-            
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+
             // Show notification
             showNotification(`${isDarkMode ? 'Dark' : 'Light'} mode enabled`, 'info');
         });
-        
-        // Load saved preference
-        const savedDarkMode = localStorage.getItem('darkMode');
-        if (savedDarkMode !== null) {
-            const isDarkMode = savedDarkMode === 'enabled';
-            darkModeToggle.checked = isDarkMode;
-            applyTheme(isDarkMode);
-        } else {
-            // Default to dark mode if no preference is saved
-            darkModeToggle.checked = true;
-            applyTheme(true);
-        }
     }
-    
+
     // Initialize notifications toggle
     const notificationsToggle = document.getElementById('notifications-toggle');
     if (notificationsToggle) {
-        notificationsToggle.addEventListener('change', function() {
+        notificationsToggle.addEventListener('change', function () {
             const notificationsEnabled = this.checked;
-            
+
             // Save preference to localStorage
             localStorage.setItem('notifications', notificationsEnabled ? 'enabled' : 'disabled');
-            
+
             // Show notification if notifications are enabled
             if (notificationsEnabled) {
                 showNotification('Notifications enabled', 'info');
             }
         });
-        
+
         // Load saved preference
         const savedNotifications = localStorage.getItem('notifications');
         if (savedNotifications !== null) {
@@ -57,8 +62,9 @@ function initUI() {
     }
 }
 
+
 // Apply theme based on dark mode preference
-function applyTheme(isDarkMode) {
+/*function applyTheme(isDarkMode) {
     if (isDarkMode) {
         document.body.classList.add('dark-mode');
         document.body.classList.remove('light-mode');
@@ -69,7 +75,32 @@ function applyTheme(isDarkMode) {
     
     // Save theme preference
     localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+}*/
+
+function applyTheme(isDarkMode) {
+    if (isDarkMode) {
+        document.body.classList.add('dark-mode');
+        document.body.classList.remove('light-mode');
+    } else {
+        document.body.classList.add('light-mode');
+        document.body.classList.remove('dark-mode');
+    }
+
+    document.querySelectorAll('select, option').forEach(el => {
+        if (isDarkMode) {
+            el.style.backgroundColor = '#2c2c3c';
+            el.style.color = '#fff';
+            el.style.border = '1px solid #555';
+        } else {
+            el.style.backgroundColor = '';
+            el.style.color = '';
+            el.style.border = '';
+        }
+    });
+
+    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
 }
+
 
 // Show notification toast
 function showNotification(message, type = 'info') {

@@ -1687,10 +1687,10 @@ body.light-mode .profile-menu ul li a.active {
     gap: 12px;
 }
 
-.quick-match h3:before {
+/*.quick-match h3:before {
     content: "⚡";
     font-size: 24px;
-}
+}*/
 
 .custom-match h3:before {
     content: "🎮";
@@ -2548,4 +2548,28 @@ body.light-mode .profile-menu ul li a.active {
     .banner-content h2 {
         font-size: 24px;
     }
+}
+
+body.dark-mode select,
+body.dark-mode option {
+    background-color: #141414 !important;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+body.dark-mode select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+body.light-mode select,
+body.light-mode option {
+    background-color: var(--darker-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+body.light-mode select:focus {
+    outline: none;
+    border-color: var(--primary-color);
 }

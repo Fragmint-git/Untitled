@@ -121,10 +121,10 @@ function handleLoadPersonalInfo(e) {
     document.getElementById('email').value = personalInfo.email || '';
     document.getElementById('platform').value = personalInfo.platform || '';
     document.getElementById('timezone').value = personalInfo.timezone || '';
-    document.getElementById('bio').value = personalInfo.bio || '';
+    //document.getElementById('bio').value = personalInfo.bio || '';
 
-    document.getElementById('full-name').textContent = personalInfo.fullName || '';
-    document.getElementById('display-name').textContent = personalInfo.displayName || '';
+    ///document.getElementById('full-name').textContent = personalInfo.fullName || '';
+    //document.getElementById('display-name').textContent = personalInfo.displayName || '';
 
     if (personalInfo.avatar) {
         document.getElementById('profile-picture').src = `assets/uploads/profile/${personalInfo.avatar}`;

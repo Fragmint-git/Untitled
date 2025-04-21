@@ -17,6 +17,21 @@
             window.location.href = 'login.html';
         }
 
+        document.addEventListener('DOMContentLoaded', async () => {
+            const session = await window.api.getSession();
+            const isAdmin = session && Number(session.is_admin) === 1;
+
+            if (isAdmin) {
+                const adminCard = document.getElementById('admin-access-card');
+                if (adminCard) {
+                    adminCard.style.display = 'block';
+                } else {
+                    console.warn('admin-access-card not found in DOM');
+                }
+            }
+        });
+
+
         // This will run after the page loads
         document.addEventListener('DOMContentLoaded', function() {
             // Add debug section if in development mode
@@ -230,18 +245,8 @@
                         </div>
                     </div>
                 </header>
+                            
 
-<<<<<<< Updated upstream
-                <!-- Content Sections -->
-                <div class="content-container">
-                    <!-- Store Section -->
-                    <section id="store" class="content-section">
-                        <div class="section-header">
-                            <h2>Store</h2>
-                            <div class="store-actions">
-                                <button class="btn-secondary">
-                                    <i class="fas fa-shopping-cart"></i> Cart
-=======
             <!-- Content Sections -->
             <div class="content-container">
                 <!-- Store Section -->
@@ -602,7 +607,6 @@
                                 <p>Find the fastest available match based on your skill level and preferences. Get into the game instantly!</p>
                                 <button id="quick-match-btn" class="btn-primary">
                                     <i class="fas fa-bolt"></i> Quick Match
->>>>>>> Stashed changes
                                 </button>
                                 <button class="btn-primary">
                                     <i class="fas fa-wallet"></i> Add Funds
@@ -1182,7 +1186,7 @@
                             </div>
                         </div>
                     </div>
-                </section>
+                
 
                 <!-- Settings Section -->
                 <section id="settings" class="content-section">
@@ -1224,7 +1228,7 @@
                             </div>
                         </div>
                         
-                        <div class="settings-card">
+                        <div class="settings-card" id="admin-access-card" style="display: none;">
                             <h3>Administrator Access</h3>
                             <div class="settings-group">
                                 <div class="setting-item">
@@ -1232,7 +1236,7 @@
                                     <a href="pages/admin.html" class="btn-primary">Access Admin Panel</a>
                                 </div>
                             </div>
-                        </div>
+                        </div>                        
                         
                         <div class="settings-card">
                             <h3>About</h3>
@@ -1267,7 +1271,7 @@
                         </div>
                 </div>
                 </section>
-            </div>
+            
         </main>
     </div>
 

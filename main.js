@@ -24,6 +24,12 @@ let mainWindow;
 // Keep track of the server process
 let serverProcess = null;
 
+// Register custom protocol for serving local files EARLY
+// Must be done before the app is ready or early in the ready event
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'local-file', privileges: { secure: true, standard: true, supportFetchAPI: true } }
+]);
+
 function createWindow() {
   // Force dark mode
   nativeTheme.themeSource = 'dark';
@@ -64,12 +70,6 @@ function createWindow() {
     });
   });
 
-  // Register protocol for serving local files
-  protocol.handle('local-file', (request) => {
-    const url = request.url.slice('local-file://'.length);
-    return net.fetch('file://' + path.normalize(`${__dirname}/${url}`));
-  });
-
   // Load the index.html of the app
   mainWindow.loadURL(url.format({
     pathname: path.join(__dirname, 'renderer/index.html'),
@@ -93,10 +93,13 @@ async function gracefulShutdown() {
   console.log('Initiating graceful shutdown...');
   
   try {
-    // First, cleanup backend integration (Express server)
+    // First, cleanup backend integration (Express server and its DB connection)
     console.log('Cleaning up backend integration...');
     await cleanupBackendIntegration();
     
+    // The database connection is now closed by cleanupBackendIntegration/server.shutdown
+    // We no longer need to close it here.
+    /* 
     // Close database connection with a timeout
     if (sequelize) {
       console.log('Closing database connection...');
@@ -113,6 +116,7 @@ async function gracefulShutdown() {
         // Continue shutdown even if database close has issues
       }
     }
+    */
     
     // Close the main window if it exists
     if (mainWindow) {
@@ -142,11 +146,23 @@ function forceQuitAfterTimeout() {
 }
 
 // This method will be called when Electron has finished initialization
-app.on('ready', async () => {
+app.whenReady().then(async () => {
+  // Register the actual handler for the protocol now that app is ready
+  protocol.handle('local-file', (request) => {
+    const urlPath = request.url.slice('local-file://'.length);
+    const decodedPath = decodeURI(urlPath); // Decode URL-encoded characters
+    const absolutePath = path.join(__dirname, decodedPath);
+    console.log(`[Protocol] Handling local-file request for: ${absolutePath}`);
+    // Ensure path doesn't try to escape the project directory (basic security)
+    if (!absolutePath.startsWith(__dirname)) {
+        console.error(`[Protocol] Invalid path request: ${absolutePath}`);
+        return new Response(null, { status: 400 });
+    }
+    return net.fetch(url.pathToFileURL(absolutePath).toString());
+  });
+
   try {
-    // Initialize database with force: true to recreate tables
-    // WARNING: This will drop existing tables and recreate them
-    // Only use this during development or when you need to update schema
+    // Initialize database 
     await sequelize.sync({ force: false });
     console.log('Database synchronized');
     

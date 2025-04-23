@@ -620,665 +620,329 @@
                                 </button>
                             </div>
                         </div>
-                        <div id="store-container" class="content-container-inner">
-                            <div class="store-categories">
-                                <button class="category-btn active">Featured</button>
-                                <button class="category-btn">Merch</button>
-                                <button class="category-btn">Discord Bot</button>
-                                <button class="category-btn">Themes</button>
-                                <button class="category-btn">Special Offers</button>
-                            </div>
-                            
-                            <div class="featured-section">
-                                <div class="featured-banner">
-                                    <!-- Featured content carousel will be here -->
-                                    <div class="featured-placeholder">
-                                        <i class="fas fa-image"></i>
-                                        <p>Featured Content</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="store-grid">
-                                <div class="store-section">
-                                    <h3>Featured Merch</h3>
-                                    <div class="items-grid">
-                                        <!-- Merchandise items will be loaded here -->
-                                        <div class="store-item">
-                                            <div class="item-image">
-                                                <img src="../assets/merch/vr-hoodie.png" alt="VR Battles Hoodie">
-                                                <span class="discount-badge">-20%</span>
-                                            </div>
-                                            <div class="item-info">
-                                                <h4>VR Battles Hoodie</h4>
-                                                <p class="item-description">Premium quality hoodie with embroidered logo</p>
-                                                <div class="item-variants">
-                                                    <span class="variant">S</span>
-                                                    <span class="variant">M</span>
-                                                    <span class="variant">L</span>
-                                                    <span class="variant">XL</span>
-                                                </div>
-                                                <div class="item-price">
-                                                    <span class="original-price">$59.99</span>
-                                                    <span class="discounted-price">$47.99</span>
-                                                </div>
-                                            </div>
-                                            <button class="btn-primary btn-sm add-to-cart">Add to Cart</button>
+                        <div class="match-suggestions">
+                            <h3>Suggested Matches</h3>
+                            <div id="match-suggestions-list" class="suggestions-list">
+                                <!-- Example suggestion (will be replaced by dynamic content) -->
+                                <div class="match-suggestion">
+                                    <div class="players">
+                                        <div class="player">
+                                            <img src="../assets/images/default-avatar.png" alt="Player 1" onerror="this.src='../assets/images/default-avatar.png'">
+                                            <span>Player 1</span>
+                                        </div>
+                                        <div class="vs">VS</div>
+                                        <div class="player">
+                                            <img src="../assets/images/default-avatar.png" alt="Player 2" onerror="this.src='../assets/images/default-avatar.png'">
+                                            <span>Player 2</span>
                                         </div>
                                     </div>
-                                </div>
-                                
-                                <div class="store-section">
-                                    <h3>Discord Bot Features</h3>
-                                    <div class="items-grid">
-                                        <!-- Discord bot features will be loaded here -->
-                                        <div class="store-item">
-                                            <div class="item-image">
-                                                <img src="../assets/bot/premium.png" alt="Discord Bot Premium">
-                                                <span class="feature-badge">Premium</span>
-                                            </div>
-                                            <div class="item-info">
-                                                <h4>VR Battles Bot Premium</h4>
-                                                <p class="item-description">Advanced tournament management and statistics</p>
-                                                <ul class="feature-list">
-                                                    <li><i class="fas fa-check"></i> Custom Tournament Templates</li>
-                                                    <li><i class="fas fa-check"></i> Advanced Statistics</li>
-                                                    <li><i class="fas fa-check"></i> Priority Support</li>
-                                                </ul>
-                                                <div class="item-price">
-                                                    <span class="price">$9.99/month</span>
-                                                </div>
-                                            </div>
-                                            <button class="btn-primary btn-sm subscribe">Subscribe</button>
-                                        </div>
+                                    <div class="match-details">
+                                        <span class="compatibility">Match Score: 95%</span>
+                                        <button class="btn-primary join-match">Join Match</button>
                                     </div>
                                 </div>
-                                
-                                <div class="store-section">
-                                    <h3>App Themes</h3>
-                                    <div class="items-grid">
-                                        <!-- Theme items will be loaded here -->
-                                        <div class="store-item">
-                                            <div class="item-image">
-                                                <img src="../assets/themes/neon.png" alt="Neon Theme">
-                                                <span class="theme-badge">New</span>
-                                            </div>
-                                            <div class="item-info">
-                                                <h4>Neon Cyberpunk Theme</h4>
-                                                <p class="item-description">Vibrant neon colors with cyberpunk aesthetic</p>
-                                                <div class="theme-preview">
-                                                    <span class="color-swatch" style="background: #ff00ff"></span>
-                                                    <span class="color-swatch" style="background: #00ffff"></span>
-                                                    <span class="color-swatch" style="background: #ff8800"></span>
-                                                </div>
-                                                <div class="item-price">
-                                                    <span class="price">$4.99</span>
-                                                </div>
-                                            </div>
-                                            <button class="btn-primary btn-sm purchase">Purchase</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="store-section">
-                                    <h3>Special Offers</h3>
-                                    <div class="items-grid">
-                                        <!-- Special offers will be loaded here -->
-                                        <div class="store-item">
-                                            <div class="item-image">
-                                                <img src="../assets/bundles/starter.png" alt="Starter Bundle">
-                                                <span class="bundle-badge">Bundle</span>
-                                            </div>
-                                            <div class="item-info">
-                                                <h4>Starter Bundle</h4>
-                                                <p class="item-description">Get started with VR Battles in style</p>
-                                                <ul class="bundle-items">
-                                                    <li>VR Battles T-Shirt</li>
-                                                    <li>1 Month Bot Premium</li>
-                                                    <li>2 Theme Packs</li>
-                                                </ul>
-                                                <div class="item-price">
-                                                    <span class="original-price">$79.99</span>
-                                                    <span class="discounted-price">$49.99</span>
-                                                </div>
-                                            </div>
-                                            <button class="btn-primary btn-sm add-to-cart">Add to Cart</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Dashboard Section -->
-                    <section id="dashboard" class="content-section active">
-                        <div class="section-header">
-                            <h2>Statistics</h2>
-                            <button class="btn-secondary">See all <i class="fas fa-chevron-right"></i></button>
-                        </div>
-
-                        <div class="stats-cards">
-                            <div class="stats-card primary">
-                                <div class="stats-info">
-                                    <h3 id="total-tournaments">0</h3>
-                                    <p>Total Tournaments</p>
-                                </div>
-                            </div>
-                            <div class="stats-card secondary">
-                                <div class="stats-info">
-                                    <h3 id="total-teams">0</h3>
-                                    <p>My Teams</p>
-                                </div>
-                            </div>
-                            <div class="stats-card success">
-                                <div class="stats-info">
-                                    <h3 id="wallet-balance">$0.00</h3>
-                                    <p>Wallet Balance</p>
-                                </div>
-                            </div>
-                            <div class="stats-card warning">
-                                <div class="stats-info">
-                                    <h3 id="player-xp">0 XP</h3>
-                                    <p>Experience Points</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="dashboard-grid">
-                            <div class="dashboard-card">
-                                <div class="card-header">
-                                    <h3>Recent Matches</h3>
-                                    <button class="btn-text">View All</button>
-                                </div>
-                                <div class="card-content" id="recent-matches">
-                                    <div class="match-history">
-                                        <!-- Match history will be loaded here -->
-                                        <p>No recent matches found.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="dashboard-card">
-                                <div class="card-header">
-                                    <h3>My Teams</h3>
-                                    <button class="btn-text">View All</button>
-                                </div>
-                                <div class="card-content" id="my-teams">
-                                    <div class="teams-list">
-                                        <!-- Teams will be loaded here -->
-                                        <p>No teams found.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="dashboard-card">
-                                <div class="card-header">
-                                    <h3>Recent Tournaments</h3>
-                                    <button class="btn-text">View All</button>
-                                </div>
-                                <div class="card-content" id="recent-tournaments">
-                                    <div class="tournaments-list">
-                                        <!-- Recent tournaments will be loaded here -->
-                                        <p>No tournaments found.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="dashboard-card">
-                                <div class="card-header">
-                                    <h3>Wallet Activity</h3>
-                                    <button class="btn-text">View All</button>
-                                </div>
-                                <div class="card-content" id="wallet-activity">
-                                    <div class="wallet-info">
-                                        <div class="balance-section">
-                                            <span class="label">Current Balance:</span>
-                                            <span class="value" id="current-balance">$0.00</span>
-                                            <button class="btn-primary btn-sm">
-                                                <i class="fas fa-plus"></i> Add Funds
-                                            </button>
-                                        </div>
-                                        <div class="transactions">
-                                            <h4>Recent Transactions</h4>
-                                            <div id="recent-transactions">
-                                                <!-- Transactions will be loaded here -->
-                                                <p>No recent transactions.</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="dashboard-card">
-                                <div class="card-header">
-                                    <h3>Experience & Level</h3>
-                                    <span class="level-badge" id="current-level">Level 1</span>
-                                </div>
-                                <div class="card-content" id="xp-progress">
-                                    <div class="xp-info">
-                                        <div class="level-progress">
-                                            <div class="progress-bar">
-                                                <div class="progress" style="width: 0%"></div>
-                                            </div>
-                                            <div class="xp-stats">
-                                                <span id="current-xp">0</span> / <span id="next-level-xp">1000</span> XP
-                                            </div>
-                                        </div>
-                                        <div class="recent-achievements">
-                                            <h4>Recent Achievements</h4>
-                                            <div id="achievements-list">
-                                                <!-- Achievements will be loaded here -->
-                                                <p>No achievements yet.</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Tournaments Section -->
-                    <section id="tournaments" class="content-section">
-                        <div class="section-header">
-                        <h2>Tournaments</h2>
-                        </div>
-                        <div id="tournaments-container" class="content-container-inner">
-                            <!-- Tournament content will be loaded here -->
-                    </div>
-                    </section>
-
-                    <!-- Friends Section -->
-                    <section id="friends" class="content-section">
-                        <div class="section-header">
-                            <h2>Friends</h2>
-                        </div>
-                        <div id="friends-container" class="content-container-inner">
-                            <!-- Friends content will be loaded here -->
-                        </div>
-                    </section>
-
-                    <!-- Games Section -->
-                    <section id="games" class="content-section">
-                        <div class="section-header">
-                            <h2>Games</h2>
-                        </div>
-                        <div id="games-container" class="content-container-inner">
-                            <!-- Games content will be loaded here -->
-                        </div>
-                    </section>
-
-                    <!-- Find Match Section -->
-                    <section id="findmatch" class="content-section">
-                        <div class="section-header">
-                            <h2>Find Match</h2>
-                        </div>
-                        <div id="findmatch-container" class="content-container-inner">
-                            <div class="matchmaking-options">
-                                <div class="quick-match">
-                                    <h3>Quick Match</h3>
-                                    <p>Find the fastest available match based on your skill level and preferences. Get into the game instantly!</p>
-                                    <button id="quick-match-btn" class="btn-primary">
-                                        <i class="fas fa-bolt"></i> Quick Match
-                                    </button>
-                                </div>
-                                
-                                <div class="custom-match">
-                                    <h3>Custom Match</h3>
-                                    <p>Set your own match preferences and find players that match your criteria.</p>
-                                    <div class="match-filters">
-                                        <div class="filter-group">
-                                            <label for="game-select">Game</label>
-                                            <select id="game-select" required>
-                                                <option value="">Select a game...</option>
-                                            </select>
-                                        </div>
-                                        <div class="filter-group">
-                                            <label for="skill-range">Skill Range</label>
-                                            <select id="skill-range">
-                                                <option value="any">Any Skill Level</option>
-                                                <option value="beginner">Beginner</option>
-                                                <option value="intermediate">Intermediate</option>
-                                                <option value="advanced">Advanced</option>
-                                                <option value="expert">Expert</option>
-                                            </select>
-                                        </div>
-                                        <div class="filter-group">
-                                            <label for="region-select">Region</label>
-                                            <select id="region-select">
-                                                <option value="any">Any Region</option>
-                                                <option value="na">North America</option>
-                                                <option value="eu">Europe</option>
-                                                <option value="asia">Asia</option>
-                                                <option value="sa">South America</option>
-                                                <option value="oc">Oceania</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <button id="find-match-btn" class="btn-primary">
-                                        <i class="fas fa-search"></i> Find Match
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <div class="match-suggestions">
-                                <h3>Suggested Matches</h3>
-                                <div id="match-suggestions-list" class="suggestions-list">
-                                    <!-- Example suggestion (will be replaced by dynamic content) -->
-                                    <div class="match-suggestion">
-                                        <div class="players">
-                                            <div class="player">
-                                                <img src="../assets/images/default-avatar.png" alt="Player 1" onerror="this.src='../assets/images/default-avatar.png'">
-                                                <span>Player 1</span>
-                                            </div>
-                                            <div class="vs">VS</div>
-                                            <div class="player">
-                                                <img src="../assets/images/default-avatar.png" alt="Player 2" onerror="this.src='../assets/images/default-avatar.png'">
-                                                <span>Player 2</span>
-                                            </div>
-                                        </div>
-                                        <div class="match-details">
-                                            <span class="compatibility">Match Score: 95%</span>
-                                            <button class="btn-primary join-match">Join Match</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Profile Section -->
-                    <section id="profile" class="content-section">
-                        <div class="section-header">
-                            <h2>User Profile</h2>
-                        </div>
-                        <div class="profile-container">
-                            <div class="profile-sidebar">
-                                <div class="profile-picture-container">
-                                    <img id="profile-picture" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile Picture">
-                                    <button id="change-picture-btn" class="btn-secondary">Change Picture</button>
-                                </div>
-                                <div class="profile-menu">
-                                    <ul>
-                                        <li><a href="#" data-profile-section="personal-info" class="active">Personal Information</a></li>
-                                        <li><a href="#" data-profile-section="account-settings">Account Settings</a></li>
-                                        <li><a href="#" data-profile-section="notification-settings">Notification Settings</a></li>
-                                        <li><a href="#" data-profile-section="appearance-settings">Appearance</a></li>
-                                        <li><a href="#" data-profile-section="privacy-settings">Privacy</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-
-                            <div class="profile-content">
-                                <!-- Personal Information Section -->
-                                <section id="personal-info" class="profile-section active">
-                                    <h3>Personal Information</h3>
-                                    <!--<form id="personal-info-form">
-                                        <div class="form-group">
-                                            <label for="username">Username</label>
-                                            <input type="text" id="username" name="username" placeholder="Your username">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="display-name">Display Name</label>
-                                            <input type="text" id="display-name" name="displayName" placeholder="Your display name">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="full-name">Full Name</label>
-                                            <input type="text" id="full-name" name="fullName" placeholder="Your full name">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="email">Email</label>
-                                            <input type="email" id="email" name="email" placeholder="Your email address">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="phone">Phone Number</label>
-                                            <input type="tel" id="phone" name="phone" placeholder="Your phone number">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="bio">Bio</label>
-                                            <textarea id="bio" name="bio" placeholder="Tell us about yourself" rows="4"></textarea>
-                                        </div>
-                                        <div class="form-actions">
-                                            <button type="submit" class="btn-primary">Save Changes</button>
-                                            <button type="reset" class="btn-secondary">Cancel</button>
-                                        </div>
-                                    </form>-->
-                                    <form id="personal-info-form">
-                                        <div class="form-group">
-                                          <label for="username">Username</label>
-                                          <input type="text" id="username" name="username" placeholder="Your username">
-                                        </div>
-                                      
-                                        <div class="form-group">
-                                          <label for="ign">In-Game Name (IGN)</label>
-                                          <input type="text" id="ign" name="ign" placeholder="Your in-game name">
-                                        </div>
-                                      
-                                        <div class="form-group">
-                                          <label for="email">Email</label>
-                                          <input type="email" id="email" name="email" placeholder="Your email address" readonly>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label for="platform">Platform</label>
-                                            <select id="platform" name="platform">
-                                              <option value="">Select Platform</option>
-                                              <option value="psvr">PSVR</option>
-                                              <option value="steam">Steam</option>
-                                              <option value="meta">Meta</option>
-                                            </select>
-                                          </div>
-                                        
-                                          <div class="form-group">
-                                            <label for="timezone">Timezone</label>
-                                            <select id="timezone" name="timezone">
-                                              <option value="">Select Timezone</option>
-                                            </select>
-                                          </div>
-
-                                        <div class="form-actions">
-                                            <button type="submit" class="btn-primary">Save Changes</button>
-                                            <button type="reset" class="btn-secondary">Cancel</button>
-                                        </div>
-                                      </form>                                      
-                                </section>
-
-                                <!-- Account Settings Section -->
-                                <section id="account-settings" class="profile-section">
-                                    <h3>Account Settings</h3>
-                                    <form id="account-settings-form">
-                                        <div class="form-group">
-                                            <label for="current-password">Current Password</label>
-                                            <input type="password" id="current-password" name="currentPassword" placeholder="Enter current password">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="new-password">New Password</label>
-                                            <input type="password" id="new-password" name="newPassword" placeholder="Enter new password">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="confirm-password">Confirm New Password</label>
-                                            <input type="password" id="confirm-password" name="confirmPassword" placeholder="Confirm new password">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="language-select">Language</label>
-                                            <select id="language-select" name="language">
-                                                <option value="en">English</option>
-                                                <option value="es">Spanish</option>
-                                                <option value="fr">French</option>
-                                                <option value="de">German</option>
-                                                <option value="ja">Japanese</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-actions">
-                                            <button type="submit" class="btn-primary">Save Changes</button>
-                                            <button type="reset" class="btn-secondary">Cancel</button>
-                                        </div>
-                                    </form>
-                                </section>
-
-                                <!-- Notification Settings Section -->
-                                <section id="notification-settings" class="profile-section">
-                                    <h3>Notification Settings</h3>
-                                    <form id="notification-settings-form">
-                                        <div class="form-group checkbox-group">
-                                            <input type="checkbox" id="email-notifications" name="emailNotifications" checked>
-                                            <label for="email-notifications">Email Notifications</label>
-                                        </div>
-                                        <div class="form-group checkbox-group">
-                                            <input type="checkbox" id="tournament-updates" name="tournamentUpdates" checked>
-                                            <label for="tournament-updates">Tournament Updates</label>
-                                        </div>
-                                        <div class="form-group checkbox-group">
-                                            <input type="checkbox" id="match-reminders" name="matchReminders" checked>
-                                            <label for="match-reminders">Match Reminders</label>
-                                        </div>
-                                        <div class="form-group checkbox-group">
-                                            <input type="checkbox" id="result-notifications" name="resultNotifications" checked>
-                                            <label for="result-notifications">Result Notifications</label>
-                                        </div>
-                                        <div class="form-group checkbox-group">
-                                            <input type="checkbox" id="desktop-notifications" name="desktopNotifications" checked>
-                                            <label for="desktop-notifications">Desktop Notifications</label>
-                                        </div>
-                                        <div class="form-actions">
-                                            <button type="submit" class="btn-primary">Save Changes</button>
-                                            <button type="reset" class="btn-secondary">Cancel</button>
-                                        </div>
-                                    </form>
-                                </section>
-
-                                <!-- Appearance Settings Section -->
-                                <section id="appearance-settings" class="profile-section">
-                                    <h3>Appearance Settings</h3>
-                                    <form id="appearance-settings-form">
-                                        <div class="form-group">
-                                            <label for="theme-select">Theme</label>
-                                            <select id="theme-select" name="theme">
-                                                <option value="dark">Dark</option>
-                                                <option value="light">Light</option>
-                                                <option value="system">System Default</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="font-size">Font Size</label>
-                                            <div class="range-slider">
-                                                <input type="range" id="font-size" name="fontSize" min="12" max="24" step="1" value="16">
-                                                <span id="font-size-value">16px</span>
-                                            </div>
-                                        </div>
-                                        <div class="form-actions">
-                                            <button type="submit" class="btn-primary">Save Changes</button>
-                                            <button type="reset" class="btn-secondary">Cancel</button>
-                                        </div>
-                                    </form>
-                                </section>
-
-                                <!-- Privacy Settings Section -->
-                                <section id="privacy-settings" class="profile-section">
-                                    <h3>Privacy Settings</h3>
-                                    <form id="privacy-settings-form">
-                                        <div class="form-group checkbox-group">
-                                            <input type="checkbox" id="profile-visibility" name="profileVisibility" checked>
-                                            <label for="profile-visibility">Make my profile visible to other players</label>
-                                        </div>
-                                        <div class="form-group checkbox-group">
-                                            <input type="checkbox" id="show-real-name" name="showRealName">
-                                            <label for="show-real-name">Show my real name instead of display name</label>
-                                        </div>
-                                        <div class="form-group checkbox-group">
-                                            <input type="checkbox" id="share-statistics" name="shareStatistics" checked>
-                                            <label for="share-statistics">Share my tournament statistics publicly</label>
-                                        </div>
-                                        <div class="form-actions">
-                                            <button type="submit" class="btn-primary">Save Changes</button>
-                                            <button type="reset" class="btn-secondary">Cancel</button>
-                                        </div>
-                                    </form>
-                                </section>
                             </div>
                         </div>
                     </div>
+                </section>
+
+                <!-- Profile Section -->
+                <section id="profile" class="content-section">
+                    <div class="section-header">
+                        <h2>User Profile</h2>
+                    </div>
+                    <div class="profile-container">
+                        <div class="profile-sidebar">
+                            <div class="profile-picture-container">
+                                <img id="profile-picture" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile Picture">
+                                <button id="change-picture-btn" class="btn-secondary">Change Picture</button>
+                            </div>
+                            <div class="profile-menu">
+                                <ul>
+                                    <li><a href="#" data-profile-section="personal-info" class="active">Personal Information</a></li>
+                                    <li><a href="#" data-profile-section="account-settings">Account Settings</a></li>
+                                    <li><a href="#" data-profile-section="notification-settings">Notification Settings</a></li>
+                                    <li><a href="#" data-profile-section="appearance-settings">Appearance</a></li>
+                                    <li><a href="#" data-profile-section="privacy-settings">Privacy</a></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="profile-content">
+                            <!-- Personal Information Section -->
+                            <section id="personal-info" class="profile-section active">
+                                <h3>Personal Information</h3>
+                                <!--<form id="personal-info-form">
+                                    <div class="form-group">
+                                        <label for="username">Username</label>
+                                        <input type="text" id="username" name="username" placeholder="Your username">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="display-name">Display Name</label>
+                                        <input type="text" id="display-name" name="displayName" placeholder="Your display name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="full-name">Full Name</label>
+                                        <input type="text" id="full-name" name="fullName" placeholder="Your full name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="email">Email</label>
+                                        <input type="email" id="email" name="email" placeholder="Your email address">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="phone">Phone Number</label>
+                                        <input type="tel" id="phone" name="phone" placeholder="Your phone number">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="bio">Bio</label>
+                                        <textarea id="bio" name="bio" placeholder="Tell us about yourself" rows="4"></textarea>
+                                    </div>
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn-primary">Save Changes</button>
+                                        <button type="reset" class="btn-secondary">Cancel</button>
+                                    </div>
+                                </form>-->
+                                <form id="personal-info-form">
+                                    <div class="form-group">
+                                      <label for="username">Username</label>
+                                      <input type="text" id="username" name="username" placeholder="Your username">
+                                    </div>
+                                  
+                                    <div class="form-group">
+                                      <label for="ign">In-Game Name (IGN)</label>
+                                      <input type="text" id="ign" name="ign" placeholder="Your in-game name">
+                                    </div>
+                                  
+                                    <div class="form-group">
+                                      <label for="email">Email</label>
+                                      <input type="email" id="email" name="email" placeholder="Your email address" readonly>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="platform">Platform</label>
+                                        <select id="platform" name="platform">
+                                          <option value="">Select Platform</option>
+                                          <option value="psvr">PSVR</option>
+                                          <option value="steam">Steam</option>
+                                          <option value="meta">Meta</option>
+                                        </select>
+                                      </div>
+                                    
+                                      <div class="form-group">
+                                        <label for="timezone">Timezone</label>
+                                        <select id="timezone" name="timezone">
+                                          <option value="">Select Timezone</option>
+                                        </select>
+                                      </div>
+
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn-primary">Save Changes</button>
+                                        <button type="reset" class="btn-secondary">Cancel</button>
+                                    </div>
+                                  </form>                                      
+                            </section>
+
+                            <!-- Account Settings Section -->
+                            <section id="account-settings" class="profile-section">
+                                <h3>Account Settings</h3>
+                                <form id="account-settings-form">
+                                    <div class="form-group">
+                                        <label for="current-password">Current Password</label>
+                                        <input type="password" id="current-password" name="currentPassword" placeholder="Enter current password">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="new-password">New Password</label>
+                                        <input type="password" id="new-password" name="newPassword" placeholder="Enter new password">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="confirm-password">Confirm New Password</label>
+                                        <input type="password" id="confirm-password" name="confirmPassword" placeholder="Confirm new password">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="language-select">Language</label>
+                                        <select id="language-select" name="language">
+                                            <option value="en">English</option>
+                                            <option value="es">Spanish</option>
+                                            <option value="fr">French</option>
+                                            <option value="de">German</option>
+                                            <option value="ja">Japanese</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn-primary">Save Changes</button>
+                                        <button type="reset" class="btn-secondary">Cancel</button>
+                                    </div>
+                                </form>
+                            </section>
+
+                            <!-- Notification Settings Section -->
+                            <section id="notification-settings" class="profile-section">
+                                <h3>Notification Settings</h3>
+                                <form id="notification-settings-form">
+                                    <div class="form-group checkbox-group">
+                                        <input type="checkbox" id="email-notifications" name="emailNotifications" checked>
+                                        <label for="email-notifications">Email Notifications</label>
+                                    </div>
+                                    <div class="form-group checkbox-group">
+                                        <input type="checkbox" id="tournament-updates" name="tournamentUpdates" checked>
+                                        <label for="tournament-updates">Tournament Updates</label>
+                                    </div>
+                                    <div class="form-group checkbox-group">
+                                        <input type="checkbox" id="match-reminders" name="matchReminders" checked>
+                                        <label for="match-reminders">Match Reminders</label>
+                                    </div>
+                                    <div class="form-group checkbox-group">
+                                        <input type="checkbox" id="result-notifications" name="resultNotifications" checked>
+                                        <label for="result-notifications">Result Notifications</label>
+                                    </div>
+                                    <div class="form-group checkbox-group">
+                                        <input type="checkbox" id="desktop-notifications" name="desktopNotifications" checked>
+                                        <label for="desktop-notifications">Desktop Notifications</label>
+                                    </div>
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn-primary">Save Changes</button>
+                                        <button type="reset" class="btn-secondary">Cancel</button>
+                                    </div>
+                                </form>
+                            </section>
+
+                            <!-- Appearance Settings Section -->
+                            <section id="appearance-settings" class="profile-section">
+                                <h3>Appearance Settings</h3>
+                                <form id="appearance-settings-form">
+                                    <div class="form-group">
+                                        <label for="theme-select">Theme</label>
+                                        <select id="theme-select" name="theme">
+                                            <option value="dark">Dark</option>
+                                            <option value="light">Light</option>
+                                            <option value="system">System Default</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="font-size">Font Size</label>
+                                        <div class="range-slider">
+                                            <input type="range" id="font-size" name="fontSize" min="12" max="24" step="1" value="16">
+                                            <span id="font-size-value">16px</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn-primary">Save Changes</button>
+                                        <button type="reset" class="btn-secondary">Cancel</button>
+                                    </div>
+                                </form>
+                            </section>
+
+                            <!-- Privacy Settings Section -->
+                            <section id="privacy-settings" class="profile-section">
+                                <h3>Privacy Settings</h3>
+                                <form id="privacy-settings-form">
+                                    <div class="form-group checkbox-group">
+                                        <input type="checkbox" id="profile-visibility" name="profileVisibility" checked>
+                                        <label for="profile-visibility">Make my profile visible to other players</label>
+                                    </div>
+                                    <div class="form-group checkbox-group">
+                                        <input type="checkbox" id="show-real-name" name="showRealName">
+                                        <label for="show-real-name">Show my real name instead of display name</label>
+                                    </div>
+                                    <div class="form-group checkbox-group">
+                                        <input type="checkbox" id="share-statistics" name="shareStatistics" checked>
+                                        <label for="share-statistics">Share my tournament statistics publicly</label>
+                                    </div>
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn-primary">Save Changes</button>
+                                        <button type="reset" class="btn-secondary">Cancel</button>
+                                    </div>
+                                </form>
+                            </section>
+                        </div>
+                    </div>
+                </div>
                 
 
-                <!-- Settings Section -->
-                <section id="settings" class="content-section">
-                    <div class="section-header">
-                    <h2>Settings</h2>
-                    </div>
-                    <div class="settings-container">
-                        <div class="settings-card">
-                            <h3>Application Settings</h3>
-                            <div class="settings-group">
-                                <div class="setting-item">
-                                    <span>Dark Mode</span>
-                                    <label class="switch">
-                                        <input type="checkbox" id="dark-mode-toggle" checked>
-                                        <span class="slider round"></span>
-                                    </label>
-                                </div>
-                                <div class="setting-item">
-                                    <span>Notifications</span>
-                                    <label class="switch">
-                                        <input type="checkbox" id="notifications-toggle" checked>
-                                        <span class="slider round"></span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="settings-card">
-                            <h3>User Settings</h3>
-                            <div class="settings-group">
-                                <div class="setting-item">
-                                    <span>Profile</span>
-                                    <button class="btn-secondary">Edit Profile</button>
-                                </div>
-                                <div class="setting-item">
-                                    <span>Password</span>
-                                    <button class="btn-secondary">Change Password</button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="settings-card" id="admin-access-card" style="display: none;">
-                            <h3>Administrator Access</h3>
-                            <div class="settings-group">
-                                <div class="setting-item">
-                                    <span>Admin Panel</span>
-                                    <a href="pages/admin.html" class="btn-primary">Access Admin Panel</a>
-                                </div>
-                            </div>
-                        </div>                        
-                        
-                        <div class="settings-card">
-                            <h3>About</h3>
-                            <div class="settings-group">
-                                <div class="setting-item about-info">
-                                    <h4>VR Battle Royale</h4>
-                                    <p>Version 2.0.1</p>
-                                    <p>The ultimate platform for VR gaming tournaments and matchmaking</p>
-                                    <div class="app-logos">
-                                        <i class="fas fa-bolt"></i>
-                                    </div>
-                                    <a href="pages/release-notes.html" class="btn-secondary">Release Notes</a>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="settings-card">
-                            <h3>Special Thanks</h3>
-                            <div class="settings-group">
-                                <div class="setting-item thanks-info">
-                                    <p>We would like to thank the following contributors, partners, and community members:</p>
-                                    <ul class="thanks-list">
-                                        <li>All our beta testers and early adopters</li>
-                                        <li>Our VR gaming partners and developers</li>
-                                        <li>The amazing community moderators</li>
-                                        <li>Our dedicated tournament organizers</li>
-                                        <li>Everyone who provided feedback and suggestions</li>
-                                    </ul>
-                                    <button class="btn-secondary">View Full Credits</button>
-                                </div>
-                            </div>
-                        </div>
+            <!-- Settings Section -->
+            <section id="settings" class="content-section">
+                <div class="section-header">
+                <h2>Settings</h2>
                 </div>
-                </section>
-            
+                <div class="settings-container">
+                    <div class="settings-card">
+                        <h3>Application Settings</h3>
+                        <div class="settings-group">
+                            <div class="setting-item">
+                                <span>Dark Mode</span>
+                                <label class="switch">
+                                    <input type="checkbox" id="dark-mode-toggle" checked>
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <span>Notifications</span>
+                                <label class="switch">
+                                    <input type="checkbox" id="notifications-toggle" checked>
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-card">
+                        <h3>User Settings</h3>
+                        <div class="settings-group">
+                            <div class="setting-item">
+                                <span>Profile</span>
+                                <button class="btn-secondary">Edit Profile</button>
+                            </div>
+                            <div class="setting-item">
+                                <span>Password</span>
+                                <button class="btn-secondary">Change Password</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-card" id="admin-access-card" style="display: none;">
+                        <h3>Administrator Access</h3>
+                        <div class="settings-group">
+                            <div class="setting-item">
+                                <span>Admin Panel</span>
+                                <a href="pages/admin.html" class="btn-primary">Access Admin Panel</a>
+                            </div>
+                        </div>
+                    </div>                    
+                    
+                    <div class="settings-card">
+                        <h3>About</h3>
+                        <div class="settings-group">
+                            <div class="setting-item about-info">
+                                <h4>VR Battle Royale</h4>
+                                <p>Version 2.0.1</p>
+                                <p>The ultimate platform for VR gaming tournaments and matchmaking</p>
+                                <div class="app-logos">
+                                    <i class="fas fa-bolt"></i>
+                                </div>
+                                <a href="pages/release-notes.html" class="btn-secondary">Release Notes</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-card">
+                        <h3>Special Thanks</h3>
+                        <div class="settings-group">
+                            <div class="setting-item thanks-info">
+                                <p>We would like to thank the following contributors, partners, and community members:</p>
+                                <ul class="thanks-list">
+                                    <li>All our beta testers and early adopters</li>
+                                    <li>Our VR gaming partners and developers</li>
+                                    <li>The amazing community moderators</li>
+                                    <li>Our dedicated tournament organizers</li>
+                                    <li>Everyone who provided feedback and suggestions</li>
+                                </ul>
+                                <button class="btn-secondary">View Full Credits</button>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+            </section>
+        
         </main>
     </div>
 

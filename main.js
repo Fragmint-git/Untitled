@@ -56,7 +56,8 @@ function createWindow() {
           "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com;",
           "img-src 'self' data: file: http://localhost:* https://randomuser.me local-file://*;",
           "font-src 'self' https: https://cdnjs.cloudflare.com;",
-          "connect-src 'self' http://localhost:*;",
+          //"connect-src 'self' http://localhost:*;",
+          "connect-src 'self' http://localhost:* https://www.vrbattles.gg;",
           "media-src 'self';"
         ].join(' ')
       }
@@ -209,6 +210,16 @@ app.on('before-quit', async (event) => {
     forceQuitAfterTimeout(); // Set up force quit timer
     await gracefulShutdown();
   }
+});
+
+
+ipcMain.handle('session:save', (event, user) => {
+  store.set('userSession', user);
+  return true;
+});
+
+ipcMain.handle('session:get', () => {
+  return store.get('userSession');
 });
 
 //session clearing
@@ -781,6 +792,8 @@ ipcMain.handle('lootlocker-start-session', async (event, { email, token }) => {
     return { success: false, message: err?.response?.data?.message || 'Session failed' };
   }
 });
+
+
 
 
 

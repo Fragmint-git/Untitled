@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!confirmed) return;
             
                 try {
-                  const session = JSON.parse(localStorage.getItem('userSession'));
+                  const session = await window.api.getSession();
                   const domainKey = window.env?.lootlockerDomainKey;
             
                   if (session?.lootlocker_token && domainKey) {
@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   console.warn('Failed to logout from LootLocker:', err);
                 }
             
-                localStorage.removeItem('userSession');
+                await window.api.clearSession();
                 window.location.href = 'login.html';
               });
             }

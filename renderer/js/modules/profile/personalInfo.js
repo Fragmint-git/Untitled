@@ -137,12 +137,12 @@ function handleLoadPersonalInfo(e) {
 
 async function savePersonalInfo(personalInfo) {
     try {
-        const session = window.api.getSession();
+        const session = await window.api.getSession();
         if (!session || !session.id) {
             window.uiModule.showNotification('User session not found', 'error');
             return;
         }
-
+        
         const dataToSend = {
             ...personalInfo,
             id: session.id

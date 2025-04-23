@@ -202,7 +202,7 @@ window.profileModule = {
     loadUserProfile: async function () {
         console.log('Loading user profile data');
       
-        const session = window.api.getSession();
+        const session = await window.api.getSession();
         //console.log('Session:', session);
       
         const userId = session?.id;

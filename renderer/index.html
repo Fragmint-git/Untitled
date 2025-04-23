@@ -12,10 +12,17 @@
     <!-- Debug script for image loading -->
     <script>
 
-        const session = localStorage.getItem('userSession');
+        /*const session = localStorage.getItem('userSession');
         if (!session) {
             window.location.href = 'login.html';
-        }
+        }*/
+
+        window.api.getSession().then((session) => {
+            if (!session) {
+                window.location.href = 'login.html';
+            }
+        });
+
 
         document.addEventListener('DOMContentLoaded', async () => {
             const session = await window.api.getSession();

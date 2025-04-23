@@ -18,10 +18,37 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  if (closeButton) {
+  /*if (closeButton) {
     closeButton.addEventListener('click', () => {
       window.api.clearSession();
       window.api.closeWindow();
     });
-  }
+  }*/
+
+    if (closeButton) {
+      closeButton.addEventListener('click', async () => {
+        try {
+          const session = await window.api.getSession();
+          const domainKey = window.env?.lootlockerDomainKey;
+    
+          if (session?.lootlocker_token && domainKey) {
+            await fetch('https://api.lootlocker.io/white-label-login/logout', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'is-development': 'true',
+                'domain-key': domainKey,
+                'authorization': `Bearer ${session.lootlocker_token}`
+              }
+            });
+          }
+        } catch (err) {
+          console.warn('[CloseButton] Failed to logout from LootLocker:', err);
+        }
+    
+        await window.api.clearSession();
+        window.api.closeWindow();
+      });
+    }
+    
 }); 

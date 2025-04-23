@@ -41,7 +41,7 @@ window.tournamentsModule = {
     // Load tournaments
     loadTournaments: async function() {
         try {
-            console.log('Starting to load tournaments...');
+            //console.log('Starting to load tournaments...');
             const container = document.getElementById('tournaments-container');
             if (!container) {
                 console.error('Tournaments container not found');
@@ -85,13 +85,13 @@ window.tournamentsModule = {
                 </div>
             `;
 
-            console.log('Fetching tournaments via IPC...');
+            //console.log('Fetching tournaments via IPC...');
             // Fetch tournaments using IPC - use the correct method from preload
             const tournaments = await window.api.getTournaments();
-            console.log('Received tournaments:', tournaments);
+            //console.log('Received tournaments:', tournaments);
             
             // Render the tournaments
-            this.renderTournaments(tournaments);
+            await this.renderTournaments(tournaments);
             this.setupEventListeners();
 
         } catch (error) {
@@ -103,16 +103,15 @@ window.tournamentsModule = {
     },
 
     // Render tournaments
-    renderTournaments: function(tournaments) {
-        console.log('Starting to render tournaments:', tournaments);
+    renderTournaments: async function(tournaments) {
+        //console.log('Starting to render tournaments:', tournaments);
         const grid = document.getElementById('tournaments-grid');
         if (!grid) {
             console.error('Tournament grid element not found');
             return;
         }
-
+    
         if (!tournaments || tournaments.length === 0) {
-            console.log('No tournaments to display');
             grid.innerHTML = `
                 <div class="empty-state">
                     <i class="fas fa-trophy"></i>
@@ -125,73 +124,56 @@ window.tournamentsModule = {
             `;
             return;
         }
-
-        console.log('Rendering tournament cards...');
-        grid.innerHTML = tournaments.map(tournament => {
-            // Get proper image path for tournament game
-            let imagePath = '/assets/default-game-cover.png'; // Default fallback
-            if (tournament.Game && tournament.Game.coverImage) {
-                console.log(`Raw coverImage for ${tournament.Game.name}:`, tournament.Game.coverImage);
-                
-                // Check if coverImage already has a full path
-                if (tournament.Game.coverImage.startsWith('http://') || tournament.Game.coverImage.startsWith('https://')) {
+    
+        const cardsHtml = await Promise.all(tournaments.map(async tournament => {
+            let imagePath = '/assets/default-game-cover.png';
+            if (tournament.Game?.coverImage) {
+                if (/^https?:\/\//.test(tournament.Game.coverImage)) {
                     imagePath = tournament.Game.coverImage;
-                    console.log(`Using server-provided URL: ${imagePath}`);
                 } else if (tournament.Game.coverImage.startsWith('/assets/')) {
                     imagePath = tournament.Game.coverImage;
-                    console.log(`Using asset path: ${imagePath}`);
                 } else {
-                    // Otherwise construct the full path - try direct asset path first rather than server
                     imagePath = `/assets/images/games/GameLogos/${tournament.Game.coverImage}`;
-                    console.log(`Using direct asset path: ${imagePath}`);
                 }
-                // Log the image path for debugging
-                console.log(`Final image path for game ${tournament.Game.name}:`, imagePath);
-            } else {
-                console.warn('No cover image found for tournament game, using default');
             }
-            
+    
+            const actions = await this.getTournamentActions(tournament);
+    
             return `
                 <div class="tournament-card" data-id="${tournament.id}">
                     <div class="tournament-header">
-                        <img src="${imagePath}" alt="${tournament.Game?.name || 'Game Image'}" 
-                             onerror="this.onerror=null; console.error('Failed to load image:', this.src); this.src='/assets/default-game-cover.png'; console.log('Fallback image loaded');">
+                        <img src="${imagePath}" alt="${tournament.Game?.name || 'Game Image'}"
+                             onerror="this.onerror=null; this.src='/assets/default-game-cover.png';">
                         <span class="status-badge ${tournament.status.toLowerCase()}">${tournament.status}</span>
                     </div>
                     <div class="tournament-content">
                         <h3>${tournament.name}</h3>
                         <p class="game-name"><i class="fas fa-gamepad"></i> ${tournament.Game?.name || 'Unknown Game'}</p>
                         <div class="tournament-info">
-                            <div class="info-item">
-                                <i class="fas fa-users"></i>
-                                <span>${tournament.players}/${tournament.maxPlayers} Players</span>
-                            </div>
-                            <div class="info-item">
-                                <i class="fas fa-calendar"></i>
-                                <span>${new Date(tournament.startDate).toLocaleDateString()}</span>
-                            </div>
-                            <div class="info-item">
-                                <i class="fas fa-trophy"></i>
-                                <span>$${tournament.prizePool.toLocaleString()}</span>
-                            </div>
+                            <div class="info-item"><i class="fas fa-users"></i> <span>${tournament.players}/${tournament.maxPlayers} Players</span></div>
+                            <div class="info-item"><i class="fas fa-calendar"></i> <span>${new Date(tournament.startDate).toLocaleDateString()}</span></div>
+                            <div class="info-item"><i class="fas fa-trophy"></i> <span>$${tournament.prizePool.toLocaleString()}</span></div>
                         </div>
                         <p class="description">${tournament.description}</p>
                     </div>
                     <div class="tournament-actions">
-                        ${this.getTournamentActions(tournament)}
+                        ${actions}
                     </div>
                 </div>
             `;
-        }).join('');
-
-        // Add event listeners to action buttons
+        }));
+    
+        grid.innerHTML = cardsHtml.join('');
         this.setupTournamentCardListeners();
     },
+    
 
     // Get tournament action buttons based on status
-    getTournamentActions: function(tournament) {
-        const session = window.api.getSession();
-        const isAdmin = session && session.is_admin == 1;
+    getTournamentActions: async function(tournament) {
+        const session = await window.api.getSession();
+        //console.log('[getTournamentActions] session:', session);
+
+        const isAdmin = session && Number(session.is_admin) === 1;
     
         if (!isAdmin) {
             return `
@@ -249,6 +231,7 @@ window.tournamentsModule = {
                 `;
         }
     },
+    
 
     // Setup tournament card event listeners
     setupTournamentCardListeners: function() {

@@ -41,6 +41,8 @@ function createWindow() {
     frame: false,
     darkTheme: true,
     backgroundColor: '#1e1e1e',
+    icon: __dirname + '/assets/icons/renamed/vrb-logo-' + (process.platform === 'darwin' ? '512.png' : 
+            process.platform === 'win32' ? '512.ico' : '256.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
@@ -147,6 +149,18 @@ function forceQuitAfterTimeout() {
 
 // This method will be called when Electron has finished initialization
 app.whenReady().then(async () => {
+  // Set custom dock icon for macOS
+  if (process.platform === 'darwin') {
+    try {
+      // Use path.resolve to get absolute path and handle spaces in filenames
+      // Try PNG instead of ICNS for macOS - more reliable 
+      const iconPath = __dirname + '/assets/icons/renamed/vrb-logo-512.png';
+      app.dock.setIcon(iconPath);
+      console.log('Set dock icon:', iconPath);
+    } catch (iconError) {
+      console.error('Failed to set dock icon:', iconError);
+    }
+  }
   // Register the actual handler for the protocol now that app is ready
   protocol.handle('local-file', (request) => {
     const urlPath = request.url.slice('local-file://'.length);

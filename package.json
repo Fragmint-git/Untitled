@@ -32,6 +32,7 @@
   "build": {
     "appId": "com.fragmint.vrtournament",
     "productName": "VR Tournament App",
+    "icon": "assets/icons/renamed/vrb-logo-512",
     "mac": {
       "category": "public.app-category.games"
     },

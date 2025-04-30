@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Untitled</title>
+    <title>VR Battles Nexus</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="css/titlebar.css">
     <!-- Font Awesome for icons -->
@@ -18,23 +18,40 @@
         }*/
 
         window.api.getSession().then((session) => {
-            if (!session) {
+            // Check if session exists AND has required properties (like id)
+            if (!session || !session.id || Object.keys(session).length === 0) {
+                console.log('Invalid or missing session, redirecting to welcome page');
                 window.location.href = 'welcome.html';
             }
+        }).catch(error => {
+            console.error('Error retrieving session:', error);
+            window.location.href = 'welcome.html';
         });
 
 
         document.addEventListener('DOMContentLoaded', async () => {
-            const session = await window.api.getSession();
-            const isAdmin = session && Number(session.is_admin) === 1;
+            try {
+                const session = await window.api.getSession();
+                
+                // Only check for admin if we have a valid session
+                if (session && session.id && Object.keys(session).length > 0) {
+                    const isAdmin = Number(session.is_admin) === 1;
 
-            if (isAdmin) {
-                const adminCard = document.getElementById('admin-access-card');
-                if (adminCard) {
-                    adminCard.style.display = 'block';
+                    if (isAdmin) {
+                        const adminCard = document.getElementById('admin-access-card');
+                        if (adminCard) {
+                            adminCard.style.display = 'block';
+                        } else {
+                            console.warn('admin-access-card not found in DOM');
+                        }
+                    }
                 } else {
-                    console.warn('admin-access-card not found in DOM');
+                    console.log('Invalid session detected in admin check, redirecting to welcome page');
+                    window.location.href = 'welcome.html';
                 }
+            } catch (error) {
+                console.error('Error in session/admin check:', error);
+                window.location.href = 'welcome.html';
             }
         });
 
@@ -176,7 +193,7 @@
 <body>
     <!-- Custom Title Bar -->
     <div class="titlebar">
-        <div class="titlebar-title">VR Tournament Platform</div>
+        <div class="titlebar-title">VR Battles Nexus</div>
         <div class="titlebar-controls">
             <button id="minimize-button" class="titlebar-button">
                 <i class="fas fa-window-minimize"></i>
@@ -199,7 +216,7 @@
                     <div class="app-logo">
                         <i class="fas fa-bolt"></i>
                     </div>
-                    <h1 class="app-name">Untitled</h1>
+                    <h1 class="app-name">VR Battles Nexus</h1>
                 </div>
                 <nav class="main-nav">
                     <ul>
@@ -913,8 +930,8 @@
                         <h3>About</h3>
                         <div class="settings-group">
                             <div class="setting-item about-info">
-                                <h4>VR Battle Royale</h4>
-                                <p>Version 2.0.1</p>
+                                <h4 id="app-product-name">VR Battles Nexus</h4>
+                                <p>Version <span id="app-version">-.-.-</span></p>
                                 <p>The ultimate platform for VR gaming tournaments and matchmaking</p>
                                 <div class="app-logos">
                                     <i class="fas fa-bolt"></i>

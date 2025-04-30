@@ -5,6 +5,9 @@ const { sequelize } = require('./backend/database');
 const path = require('path');
 const url = require('url');
 
+// Set the application name for macOS menu bar
+app.name = 'VR Battles Nexus';
+
 //const { Player } = require('./backend/database');
 const { User, UserSetting } = require('./backend/database');
 const { Op } = require('sequelize');
@@ -74,7 +77,7 @@ function createWindow() {
 
   // Load the index.html of the app
   mainWindow.loadURL(url.format({
-    pathname: path.join(__dirname, 'renderer/index.html'),
+    pathname: path.join(__dirname, 'renderer/welcome.html'),
     protocol: 'file:',
     slashes: true
   }));

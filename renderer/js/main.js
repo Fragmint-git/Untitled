@@ -4,8 +4,31 @@
  */
 
 // Wait for DOM to be fully loaded
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     console.log('Initializing application...');
+    
+    // Set app version and product name from package.json
+    try {
+        const appInfo = window.api.getAppInfo();
+        const versionElement = document.getElementById('app-version');
+        const productNameElement = document.getElementById('app-product-name');
+        
+        if (versionElement) {
+            versionElement.textContent = appInfo.version;
+        }
+        
+        if (productNameElement) {
+            productNameElement.textContent = appInfo.productName;
+        }
+        
+        // Set the app version in the title bar as well
+        const titlebarTitle = document.querySelector('.titlebar-title span');
+        if (titlebarTitle) {
+            titlebarTitle.textContent = appInfo.productName;
+        }
+    } catch (error) {
+        console.error('Failed to load app information:', error);
+    }
     
     // Initialize UI module
     if (window.uiModule) {

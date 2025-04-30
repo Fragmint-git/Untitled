@@ -1,7 +1,7 @@
 {
-  "name": "vr-tournament-app",
-  "version": "1.0.0",
-  "description": "VR Tournament Desktop Application",
+  "name": "vr-battles-nexus",
+  "version": "1.0.1",
+  "description": "The official desktop application for VR Battles",
   "main": "main.js",
   "scripts": {
     "start": "node start.js",
@@ -30,8 +30,8 @@
     "uuid": "^11.1.0"
   },
   "build": {
-    "appId": "com.fragmint.vrtournament",
-    "productName": "VR Tournament App",
+    "appId": "com.fragmint.vrbattles",
+    "productName": "VR Battles Nexus",
     "icon": "assets/icons/renamed/vrb-logo-512",
     "mac": {
       "category": "public.app-category.games"

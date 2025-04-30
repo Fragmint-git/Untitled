@@ -1,17 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Welcome - VR Tournament</title>
+    <meta charset="UTF-8
+    <title>VR Battles Nexus</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="css/titlebar.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
-        window.api.getSession().then((session) => {
-            if (session) {
-                window.location.href = 'index.html';
-            }
-        });
+        // Only check session if API is available
+        if (window.api && window.api.getSession) {
+            window.api.getSession().then((session) => {
+                if (session) {
+                    window.location.href = 'index.html';
+                }
+            }).catch(error => {
+                console.error('Error retrieving session:', error);
+                // Stay on welcome page if there's an error with the session
+            });
+        }
     </script>
     <style>
         html, body {
@@ -35,36 +41,46 @@
             text-align: center;
             margin-bottom: 2rem;
         }
+        .banner-content {
+            text-align: center;
+        }
         .banner-content h2 {
             margin: 0;
             font-size: 2.5rem;
+            text-align: center;
         }
         .banner-content p {
             margin-top: 1rem;
             font-size: 1.2rem;
+            text-align: center;
         }
         .btn-primary {
-            margin-top: 1.5rem;
+            margin-top: 0;
             padding: 0.75rem 2rem;
-            background-color: #4caf50;
-            border: none;
+            background-color: #ff7f00;
+            border: 2px solid #ff7f00;
             border-radius: 6px;
             color: #fff;
             font-weight: bold;
             cursor: pointer;
             font-size: 1rem;
             text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        .btn-primary:hover {
+            background-color: #e67300;
         }
         .section-header {
             margin-top: 3rem;
             margin-bottom: 1rem;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
         }
         .section-header h2 {
             margin: 0;
             font-size: 1.8rem;
+            text-align: center;
         }
         .news-grid {
             display: grid;
@@ -127,37 +143,6 @@
             text-align: center;
             text-decoration: none;
         }
-        .navbar {
-            background-color: #2c2c3c;
-            padding: 0.8rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 32px;
-            z-index: 1500;
-        }
-        .navbar .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #4caf50;
-        }
-        .navbar .nav-links {
-            display: flex;
-            gap: 1rem;
-        }
-        .navbar .nav-links a {
-            background-color: #4caf50;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            text-decoration: none;
-            color: white;
-            font-weight: bold;
-            transition: background-color 0.3s;
-        }
-        .navbar .nav-links a:hover {
-            background-color: #45a049;
-        }
         .titlebar {
             position: fixed;
             top: 0;
@@ -171,20 +156,272 @@
             padding: 0 1rem;
             z-index: 2000;
         }
+        
+        /* Added styles to match index.html */
+        .app-container {
+            display: flex;
+            height: calc(100vh - 32px);
+            margin-top: 32px;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: #1a1a1a;
+            border-right: 1px solid #333;
+            height: 100%;
+            overflow-y: auto;
+            flex-shrink: 0;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+        
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .sidebar-title {
+            color: white;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+        
+        .sidebar-toggle {
+            background: transparent;
+            border: none;
+            color: #a9a9c8;
+            cursor: pointer;
+            padding: 0;
+        }
+        
+        .nav-item {
+            margin: 0;
+        }
+        
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: #e1e1e1;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            line-height: 1;
+        }
+        
+        .nav-item.active a {
+            background-color: #ff7f00;
+            color: white;
+        }
+        
+        .nav-item a:hover:not(.active) {
+            background-color: rgba(255,255,255,0.1);
+        }
+        
+        .nav-item a svg {
+            margin-right: 12px;
+            min-width: 20px;
+        }
+        
+        .main-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 0;
+            background-color: #1e1e2f;
+        }
+        
+        .welcome-actions {
+            display: flex;
+            margin-top: 2rem;
+            justify-content: center;
+            gap: 1.5rem;
+        }
+        
+        .welcome-actions .btn-secondary,
+        .welcome-actions .btn-primary {
+            padding: 1rem 3rem;
+            font-size: 1.2rem;
+            min-width: 150px;
+        }
+        
+        .btn-secondary {
+            padding: 0.75rem 2rem;
+            background-color: transparent;
+            border: 2px solid #ff7f00;
+            border-radius: 6px;
+            color: #ff7f00;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-secondary:hover {
+            background-color: rgba(255, 127, 0, 0.1);
+        }
+        
+        .top-bar {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: #252540;
+            border-bottom: 1px solid #3a3a5a;
+        }
+        
+        .top-bar-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .top-bar-actions .btn-secondary,
+        .top-bar-actions .btn-primary {
+            padding: 0.5rem 1.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .search-container {
+            display: flex;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+        }
+        
+        .search-icon {
+            color: #a9a9c8;
+            margin-right: 0.5rem;
+        }
+        
+        .search-input {
+            background: transparent;
+            border: none;
+            color: white;
+            outline: none;
+            width: 200px;
+        }
+        
+        .search-input::placeholder {
+            color: #a9a9c8;
+        }
+        
+        .main-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar.collapsed {
+            width: 60px;
+        }
+        
+        .sidebar.collapsed .sidebar-title {
+            display: none;
+        }
+        
+        .sidebar.collapsed .nav-item a span {
+            display: none;
+        }
+        
+        .sidebar.collapsed .nav-item a {
+            justify-content: center;
+            padding: 12px;
+        }
+        
+        .sidebar.collapsed .nav-item a svg {
+            margin-right: 0;
+        }
+        
+        .nav-divider {
+            height: 1px;
+            background-color: #333;
+            margin: 8px 16px;
+        }
+        
+        .vs:after {
+            right: -23px;
+        }
+        
+        /* Dropdown Menu Styles */
+        .nav-item.has-dropdown {
+            position: relative;
+        }
+        
+        .dropdown-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #a9a9c8;
+            transition: transform 0.3s ease;
+        }
+        
+        .nav-item.has-dropdown.active .dropdown-toggle {
+            transform: translateY(-50%) rotate(180deg);
+        }
+        
+        .dropdown-menu {
+            display: none;
+            padding-left: 30px;
+            margin-top: 5px;
+            list-style: none;
+        }
+        
+        .dropdown-menu li {
+            margin: 5px 0;
+        }
+        
+        .dropdown-menu a {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            color: #a9a9c8;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+        
+        .dropdown-menu a:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+        
+        .nav-item.has-dropdown.open .dropdown-menu {
+            display: block;
+        }
+        
+        .sidebar.collapsed .dropdown-toggle,
+        .sidebar.collapsed .dropdown-menu {
+            display: none;
+        }
     </style>
 
     <script>
-        window.api.getSession().then((session) => {
-            if (session) {
-                window.location.href = 'index.html';
-            }
-        });
+        // Only check session if API is available
+        if (window.api && window.api.getSession) {
+            window.api.getSession().then((session) => {
+                if (session) {
+                    window.location.href = 'index.html';
+                }
+            }).catch(error => {
+                console.error('Error retrieving session:', error);
+                // Stay on welcome page if there's an error with the session
+            });
+        }
     </script>
 </head>
 <body>
     <!-- Title Bar -->
     <div class="titlebar">
-        <div class="titlebar-title">VR Battles App</div>
+        <div class="titlebar-title">
+            <img src="../assets/icons/renamed/vrb-logo-256.png" alt="VR Battles Logo" style="max-height: 24px; vertical-align: middle;">
+            <span id="app-title" style="margin-left: 8px;">VR Battles Nexus</span>
+        </div>
         <div class="titlebar-controls">
             <button id="minimize-button" class="titlebar-button"><i class="fas fa-window-minimize"></i></button>
             <button id="maximize-button" class="titlebar-button"><i class="fas fa-window-maximize"></i></button>
@@ -192,99 +429,784 @@
         </div>
     </div>
 
-    <div class="navbar">
-        <div class="logo">Logo</div>
-        <div class="nav-links">
-            <a href="login.html">Login</a>
-            <a href="registration.html">Register</a>
-        </div>
-    </div>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-title">Nexus</span>
+                <button class="sidebar-toggle" id="sidebar-toggle">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="5" width="18" height="14" rx="2" ry="2"></rect>
+                    </svg>
+                </button>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li class="nav-item has-dropdown" data-section="featured">
+                        <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> <span>Featured</span></a>
+                        <div class="dropdown-toggle">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <ul class="dropdown-menu">
+                            <li><a href="#" data-submenu-section="news">News</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item" data-section="spark">
+                        <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> <span>Spark</span></a>
+                    </li>
+                    <li class="nav-item" data-section="vrwear">
+                        <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.47a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.47a2 2 0 00-1.34-2.23z"></path></svg> <span>Merch</span></a>
+                    </li>
+                    <li class="nav-item" data-section="ignite">
+                        <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="8" width="20" height="12" rx="2"></rect><circle cx="7" cy="16" r="2"></circle><circle cx="17" cy="16" r="2"></circle><path d="M2 8l4-4h12l4 4"></path></svg> <span>Ignite Drift Club</span></a>
+                    </li>
+                    <li class="nav-item" data-section="social">
+                        <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> <span>Social</span></a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
 
-    <div class="content-container">
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Header Bar -->
+            <header class="top-bar">
+                <div class="top-bar-actions">
+                    <a href="login.html" class="btn-secondary">Login</a>
+                    <a href="registration.html" class="btn-primary">Register</a>
+                </div>
+            </header>
 
-        <!-- new bannre -->
-        <div class="dashboard-banner">
-            <div class="banner-content">
-                <h2>Welcome to VR Battle Royale</h2>
-                <p>Get ready for the upcoming Spring Tournament Series!</p>
-                <a href="#" class="btn-primary">Learn More</a>
+            <!-- Content Container -->
+            <div class="content-container" id="main-content">
+                <!-- Content will be loaded dynamically by modules -->
             </div>
-        </div>
-
-        <!-- recent news -->
-        <div class="section-header">
-            <h2>Recent News</h2>
-        </div>
-        <div class="news-grid">
-            <div class="news-card">
-                <div class="news-image">
-                    <img src="assets/images/news/update1.jpg" alt="Major Update">
-                </div>
-                <div class="news-content">
-                    <div class="news-date">March 15, 2023</div>
-                    <h3>Major Platform Update</h3>
-                    <p>We've redesigned the tournament experience with new features and improvements.</p>
-                </div>
-            </div>
-            <div class="news-card">
-                <div class="news-image">
-                    <img src="assets/images/news/tournament.jpg" alt="Tournament">
-                </div>
-                <div class="news-content">
-                    <div class="news-date">March 10, 2023</div>
-                    <h3>Spring Tournament Series</h3>
-                    <p>Join us for the biggest VR tournament series with over $10,000 in prizes!</p>
-                </div>
-            </div>
-            <div class="news-card">
-                <div class="news-image">
-                    <img src="assets/images/news/partnership.jpg" alt="Partnership">
-                </div>
-                <div class="news-content">
-                    <div class="news-date">March 5, 2023</div>
-                    <h3>New Hardware Partnership</h3>
-                    <p>We're excited to announce our partnership with a leading VR hardware manufacturer.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- stats 
-        <div class="section-header">
-            <h2>Statistics</h2>
-        </div>
-        <div class="stats-cards">
-            <div class="stats-card primary">
-                <div class="stats-info">
-                    <h3>0</h3>
-                    <p>Total Tournaments</p>
-                </div>
-            </div>
-            <div class="stats-card secondary">
-                <div class="stats-info">
-                    <h3>0</h3>
-                    <p>My Teams</p>
-                </div>
-            </div>
-            <div class="stats-card success">
-                <div class="stats-info">
-                    <h3>$0.00</h3>
-                    <p>Wallet Balance</p>
-                </div>
-            </div>
-            <div class="stats-card warning">
-                <div class="stats-info">
-                    <h3>0 XP</h3>
-                    <p>Experience Points</p>
-                </div>
-            </div>
-        </div>-->
-
+        </main>
     </div>
 
     <script>
-        document.getElementById('minimize-button').addEventListener('click', () => window.api.minimizeWindow());
-        document.getElementById('maximize-button').addEventListener('click', () => window.api.maximizeWindow());
-        document.getElementById('close-button').addEventListener('click', () => window.api.closeWindow());
+        // Check for window.api before using it
+        const minimizeWindow = () => {
+            if (window.api && window.api.minimizeWindow) {
+                window.api.minimizeWindow();
+            } else {
+                console.warn('window.api.minimizeWindow not available');
+            }
+        };
+        
+        const maximizeWindow = () => {
+            if (window.api && window.api.maximizeWindow) {
+                window.api.maximizeWindow();
+            } else {
+                console.warn('window.api.maximizeWindow not available');
+            }
+        };
+        
+        const closeWindow = () => {
+            if (window.api && window.api.closeWindow) {
+                window.api.closeWindow();
+            } else {
+                console.warn('window.api.closeWindow not available');
+                // Fallback for browser testing
+                window.close();
+            }
+        };
+        
+        // Add event listeners with error handling
+        document.getElementById('minimize-button').addEventListener('click', minimizeWindow);
+        document.getElementById('maximize-button').addEventListener('click', maximizeWindow);
+        document.getElementById('close-button').addEventListener('click', closeWindow);
+        
+        // Toggle sidebar
+        document.getElementById('sidebar-toggle').addEventListener('click', () => {
+            document.querySelector('.sidebar').classList.toggle('collapsed');
+        });
+        
+        // Close sidebar when clicking on sidebar links on mobile
+        const mediaQuery = window.matchMedia('(max-width: 768px)');
+        if (mediaQuery.matches) {
+            document.querySelectorAll('.nav-item a').forEach(link => {
+                link.addEventListener('click', () => {
+                    document.querySelector('.sidebar').classList.add('collapsed');
+                });
+            });
+        }
+        
+        // Handle dropdown menu toggle
+        document.querySelectorAll('.nav-item.has-dropdown').forEach(dropdown => {
+            const toggle = dropdown.querySelector('.dropdown-toggle');
+            
+            toggle.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent event bubbling
+                dropdown.classList.toggle('open');
+            });
+            
+            // Close other dropdowns when opening a new one
+            dropdown.addEventListener('click', () => {
+                document.querySelectorAll('.nav-item.has-dropdown.open').forEach(openDropdown => {
+                    if (openDropdown !== dropdown) {
+                        openDropdown.classList.remove('open');
+                    }
+                });
+            });
+        });
+        
+        // Handle submenu navigation
+        document.querySelectorAll('.dropdown-menu a').forEach(submenuItem => {
+            submenuItem.addEventListener('click', function(e) {
+                e.stopPropagation(); // Prevent event bubbling
+                const targetSection = this.getAttribute('data-submenu-section');
+                if (targetSection && typeof loadNewsContent === 'function') {
+                    loadNewsContent();
+                }
+            });
+        });
+        
+        // Try to set app name, with safe fallback
+        try {
+            if (window.api && window.api.getAppInfo) {
+                const appInfo = window.api.getAppInfo();
+                const appTitleElement = document.getElementById('app-title');
+                if (appTitleElement && appInfo) {
+                    appTitleElement.textContent = appInfo.productName;
+                }
+            }
+        } catch (error) {
+            console.error('Failed to load app information:', error);
+        }
+
+        // Module loading functionality with browser-compatible approach
+        const contentContainer = document.getElementById('main-content');
+        let currentModule = null;
+
+        // Map of section IDs to module content loading functions
+        const moduleMap = {
+            'featured': loadFeaturedContent,
+            'spark': loadSparkContent,
+            'vrwear': loadMerchContent,
+            'ignite': loadIgniteContent,
+            'news': loadNewsContent,
+            'social': loadSocialContent
+        };
+        
+        // Load the Featured content
+        function loadFeaturedContent() {
+            const content = `
+                <!-- Banner Section -->
+                <div class="dashboard-banner">
+                    <div class="banner-content">
+                        <h2>Welcome to VR Battles Nexus</h2>
+                        <p>The ultimate platform for VR gaming tournaments and matchmaking</p>
+                        <div class="welcome-actions">
+                            <a href="login.html" class="btn-secondary">Login</a>
+                            <a href="registration.html" class="btn-primary">Register</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent News Section -->
+                <div class="section-header">
+                    <h2>Recent News</h2>
+                </div>
+                <div class="news-grid">
+                    <div class="news-card">
+                        <div class="news-image">
+                            <img src="assets/images/news/update1.jpg" alt="Major Update">
+                        </div>
+                        <div class="news-content">
+                            <div class="news-date">March 15, 2023</div>
+                            <h3>Major Platform Update</h3>
+                            <p>We've redesigned the tournament experience with new features and improvements.</p>
+                        </div>
+                    </div>
+                    <div class="news-card">
+                        <div class="news-image">
+                            <img src="assets/images/news/tournament.jpg" alt="Tournament">
+                        </div>
+                        <div class="news-content">
+                            <div class="news-date">March 10, 2023</div>
+                            <h3>Spring Tournament Series</h3>
+                            <p>Join us for the biggest VR tournament series with over $10,000 in prizes!</p>
+                        </div>
+                    </div>
+                    <div class="news-card">
+                        <div class="news-image">
+                            <img src="assets/images/news/partnership.jpg" alt="Partnership">
+                        </div>
+                        <div class="news-content">
+                            <div class="news-date">March 5, 2023</div>
+                            <h3>New Hardware Partnership</h3>
+                            <p>We're excited to announce our partnership with a leading VR hardware manufacturer.</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            contentContainer.innerHTML = content;
+        }
+        
+        // Placeholder functions for other modules - to be implemented later
+        function loadSparkContent() {
+            const content = `
+                <div class="spark-container">
+                    <div class="spark-header">
+                        <div class="user-info">
+                            <div class="user-avatar"></div>
+                            <div class="user-name">NtsFranz</div>
+                            <div class="connection-status">
+                                <span class="status-dot connected"></span>
+                                Connected
+                            </div>
+                        </div>
+                        
+                        <div class="join-info">
+                            <div class="join-link">
+                                Join Link: <span class="link-value">&lt;spark://c/7C35F7CC-F8</span>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <div class="server-location">
+                                Server Location: <span>Dallas, Texas</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="spark-content">
+                        <div class="left-panel">
+                            <div class="teams-panel">
+                                <div class="team blue-team">
+                                    <div class="team-header">Blue Team</div>
+                                    <div class="team-members">
+                                        <div class="member">Azumx</div>
+                                        <div class="member">parah-</div>
+                                        <div class="member">Feels_</div>
+                                        <div class="member">lulu-</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="team orange-team">
+                                    <div class="team-header">Orange Team</div>
+                                    <div class="team-members">
+                                        <div class="member">perc60</div>
+                                        <div class="member">Yabaii</div>
+                                        <div class="member">righty-</div>
+                                        <div class="member">perc60</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="spectators">
+                                    <div class="spectators-header">Spectators</div>
+                                    <div class="spectators-list">
+                                        <div class="spectator">anonymous</div>
+                                        <div class="spectator">6475616c67616d650a</div>
+                                        <div class="spectator">robertmillhouse</div>
+                                        <div class="spectator">www.ignitevr.gg</div>
+                                        <div class="spectator">shehulk23</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="main-panel">
+                            <div class="tabs-row">
+                                <button class="tab-btn active">Dashboard</button>
+                                <button class="tab-btn">Links</button>
+                                <button class="tab-btn">Event Log</button>
+                                <button class="tab-btn">Speaker System</button>
+                                <button class="tab-btn">Playercards</button>
+                                <button class="tab-btn">Server Info</button>
+                                <button class="tab-btn">Camera Write</button>
+                            </div>
+                            
+                            <div class="data-panels">
+                                <div class="data-panel">
+                                    <div class="panel-header">Last Throw</div>
+                                    <div class="panel-content">
+                                        <div class="data-row">
+                                            <div class="data-label">Total Speed:</div>
+                                            <div class="data-value">0.00 m/s</div>
+                                        </div>
+                                        <div class="data-row">
+                                            <div class="data-label">Arm:</div>
+                                            <div class="data-value">0.00 m/s</div>
+                                        </div>
+                                        <div class="data-row">
+                                            <div class="data-label">Wrist:</div>
+                                            <div class="data-value">0.00 m/s</div>
+                                        </div>
+                                        <div class="data-row">
+                                            <div class="data-label">Movement:</div>
+                                            <div class="data-value">0.00 m/s</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="data-panel">
+                                    <div class="panel-header">Disc Speed (m/s)</div>
+                                    <div class="panel-content center">
+                                        <div class="big-value">0.00</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="data-panel">
+                                    <div class="panel-header">Player Pings &nbsp;&nbsp; Score: 92.3</div>
+                                    <div class="panel-content">
+                                        <div class="ping-row">
+                                            <div class="ping-value">71</div>
+                                            <div class="ping-name">Azumx</div>
+                                        </div>
+                                        <div class="ping-row">
+                                            <div class="ping-value">83</div>
+                                            <div class="ping-name">parah-</div>
+                                        </div>
+                                        <div class="ping-row">
+                                            <div class="ping-value">67</div>
+                                            <div class="ping-name">Feels_</div>
+                                        </div>
+                                        <div class="ping-row">
+                                            <div class="ping-value">56</div>
+                                            <div class="ping-name">lulu-</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="data-panels">
+                                <div class="data-panel">
+                                    <div class="panel-header">Touch Data</div>
+                                    <div class="panel-content">
+                                        <div class="data-row">
+                                            <div class="data-label">Arm Speed:</div>
+                                            <div class="data-value">0.00 m/s</div>
+                                        </div>
+                                        <div class="data-row">
+                                            <div class="data-label">Rots/second:</div>
+                                            <div class="data-value">0.00 r/s</div>
+                                        </div>
+                                        <div class="data-row">
+                                            <div class="data-label">Pot spd from rot:</div>
+                                            <div class="data-value">0.00 m/s</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="data-panel">
+                                    <div class="panel-header">Joust Times</div>
+                                    <div class="panel-content">
+                                        <div class="time-row">
+                                            <div class="time-name">Pandaboi-Time-</div>
+                                            <div class="time-value">2.29 s</div>
+                                        </div>
+                                        <div class="time-row">
+                                            <div class="time-name">FaZeShrekk</div>
+                                            <div class="time-value">2.35 s</div>
+                                        </div>
+                                        <div class="time-row">
+                                            <div class="time-name">Yabaii</div>
+                                            <div class="time-value">2.69 s</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="data-panel">
+                                    <div class="panel-header">Tools</div>
+                                    <div class="panel-content">
+                                        <button class="tool-btn">Open Spectatorstream</button>
+                                        <button class="tool-btn">Choose Server Region</button>
+                                        <button class="tool-btn">Lone Echo Subtitles</button>
+                                        <button class="tool-btn">Overlays</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="data-panels">
+                                <div class="data-panel">
+                                    <div class="panel-header">Alignment Analysis</div>
+                                    <div class="panel-content">
+                                        <div class="data-row">
+                                            <div class="data-label">Off Axis Spin:</div>
+                                            <div class="data-value">0.0 deg</div>
+                                        </div>
+                                        <div class="data-row">
+                                            <div class="data-label">Wrist align:</div>
+                                            <div class="data-value">0.0 deg</div>
+                                        </div>
+                                        <div class="data-row">
+                                            <div class="data-label">Movement align:</div>
+                                            <div class="data-value">0.0 deg</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="data-panel">
+                                    <div class="panel-header">Previous Rounds</div>
+                                    <div class="panel-content">
+                                        <div class="round-row">
+                                            <div class="round-info">game_time ORANGE: 7  BLUE: 11</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="data-panel">
+                                    <div class="panel-header">Previous Goals</div>
+                                    <div class="panel-content">
+                                        <div class="goal-row">
+                                            <div class="goal-info">7s  2 pts  Zipp182  0.0 m/s  0.1 m</div>
+                                        </div>
+                                        <div class="goal-row">
+                                            <div class="goal-info">27s  2 pts  Time-  12.5 m/s  5.9 m</div>
+                                        </div>
+                                        <div class="goal-row">
+                                            <div class="goal-info">75s  3 pts  Time-  17.7 m/s  37.9 m</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bottom-controls">
+                                <div class="mode-selector">
+                                    Mode: 
+                                    <select>
+                                        <option>Personal</option>
+                                    </select>
+                                </div>
+                                <div class="version">v2.4.7</div>
+                                <div class="buttons">
+                                    <button class="bottom-btn">Settings</button>
+                                    <button class="bottom-btn">Exit</button>
+                                    <button class="bottom-btn">Hide</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            contentContainer.innerHTML = content;
+            
+            // Add CSS for Spark UI
+            const sparkStylesheet = document.createElement('style');
+            sparkStylesheet.textContent = `
+                .spark-container {
+                    color: #e1e1e1;
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                }
+                
+                .spark-header {
+                    display: flex;
+                    justify-content: space-between;
+                    padding: 15px;
+                    background-color: #1e1e1e;
+                    border-bottom: 1px solid #333;
+                }
+                
+                .user-info {
+                    display: flex;
+                    align-items: center;
+                }
+                
+                .status-dot {
+                    display: inline-block;
+                    width: 10px;
+                    height: 10px;
+                    border-radius: 50%;
+                    margin-right: 5px;
+                }
+                
+                .status-dot.connected {
+                    background-color: #4CAF50;
+                }
+                
+                .connection-status {
+                    margin-left: 10px;
+                    display: flex;
+                    align-items: center;
+                }
+                
+                .join-info {
+                    text-align: right;
+                }
+                
+                .copy-btn {
+                    background-color: #ff7f00;
+                    color: white;
+                    border: none;
+                    padding: 2px 8px;
+                    border-radius: 3px;
+                    cursor: pointer;
+                    margin-left: 5px;
+                }
+                
+                .spark-content {
+                    display: flex;
+                }
+                
+                .left-panel {
+                    width: 200px;
+                    background-color: #1e1e1e;
+                    border-right: 1px solid #333;
+                    padding: 10px 0;
+                }
+                
+                .teams-panel {
+                    height: 100%;
+                }
+                
+                .team {
+                    margin-bottom: 15px;
+                    padding: 5px;
+                }
+                
+                .team-header {
+                    padding: 5px 10px;
+                    font-weight: bold;
+                }
+                
+                .blue-team .team-header {
+                    background-color: #1a3a5a;
+                }
+                
+                .orange-team .team-header {
+                    background-color: #8b4513;
+                }
+                
+                .team-members, .spectators-list {
+                    padding: 5px 15px;
+                }
+                
+                .member, .spectator {
+                    padding: 3px 0;
+                }
+                
+                .main-panel {
+                    flex: 1;
+                    padding: 10px;
+                    background-color: #222;
+                }
+                
+                .tabs-row {
+                    display: flex;
+                    margin-bottom: 15px;
+                    border-bottom: 1px solid #333;
+                    padding-bottom: 10px;
+                }
+                
+                .tab-btn {
+                    background: none;
+                    border: none;
+                    color: #e1e1e1;
+                    padding: 5px 10px;
+                    cursor: pointer;
+                    margin-right: 5px;
+                }
+                
+                .tab-btn.active {
+                    color: #ff7f00;
+                    border-bottom: 2px solid #ff7f00;
+                }
+                
+                .data-panels {
+                    display: flex;
+                    margin-bottom: 15px;
+                    flex-wrap: wrap;
+                }
+                
+                .data-panel {
+                    flex: 1;
+                    min-width: 200px;
+                    margin: 0 5px 10px;
+                    background-color: #2a2a2a;
+                    border: 1px solid #333;
+                    border-radius: 3px;
+                }
+                
+                .panel-header {
+                    background-color: #333;
+                    padding: 7px 10px;
+                    font-weight: bold;
+                    border-bottom: 1px solid #444;
+                }
+                
+                .panel-content {
+                    padding: 10px;
+                }
+                
+                .panel-content.center {
+                    text-align: center;
+                }
+                
+                .data-row, .ping-row, .time-row, .round-row, .goal-row {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-bottom: 5px;
+                }
+                
+                .data-label {
+                    color: #aaa;
+                }
+                
+                .big-value {
+                    font-size: 24px;
+                    font-weight: bold;
+                    color: #4c9ed9;
+                }
+                
+                .tool-btn {
+                    display: block;
+                    width: 100%;
+                    margin-bottom: 8px;
+                    padding: 8px;
+                    background-color: #333;
+                    border: 1px solid #444;
+                    color: #e1e1e1;
+                    text-align: left;
+                    cursor: pointer;
+                }
+                
+                .bottom-controls {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-top: 20px;
+                    padding-top: 10px;
+                    border-top: 1px solid #333;
+                }
+                
+                .mode-selector select {
+                    background-color: #333;
+                    color: #e1e1e1;
+                    border: 1px solid #444;
+                    padding: 5px;
+                }
+                
+                .version {
+                    color: #777;
+                }
+                
+                .buttons {
+                    display: flex;
+                }
+                
+                .bottom-btn {
+                    background-color: #333;
+                    color: #e1e1e1;
+                    border: 1px solid #444;
+                    padding: 7px 20px;
+                    margin-left: 10px;
+                    cursor: pointer;
+                }
+            `;
+            document.head.appendChild(sparkStylesheet);
+        }
+        
+        function loadMerchContent() {
+            contentContainer.innerHTML = '<div class="section-header"><h2>Merch</h2></div><p>Merchandise content coming soon!</p>';
+        }
+        
+        function loadIgniteContent() {
+            contentContainer.innerHTML = '<div class="section-header"><h2>Ignite Drift Club</h2></div><p>Ignite Drift Club content coming soon!</p>';
+        }
+        
+        function loadNewsContent() {
+            contentContainer.innerHTML = '<div class="section-header"><h2>News</h2></div><p>News content coming soon!</p>';
+        }
+
+        // Load Social content
+        function loadSocialContent() {
+            // First try to load from module
+            try {
+                if (window.require) {
+                    const socialModule = require('./js/modules/social/social.js');
+                    socialModule.init(contentContainer);
+                    return;
+                }
+            } catch (err) {
+                console.warn('Could not load social module via require:', err);
+            }
+            
+            // Try to use global SocialModule if it exists
+            if (window.SocialModule) {
+                window.SocialModule.init(contentContainer);
+                return;
+            }
+            
+            // Show loading state
+            contentContainer.innerHTML = '<div class="section-header"><h2>Social Features</h2></div><p class="loading-text">Loading social features...</p>';
+            
+            // Load the script dynamically
+            const scriptElement = document.createElement('script');
+            scriptElement.src = './js/modules/social/social.js';
+            scriptElement.async = true;
+            
+            scriptElement.onload = function() {
+                // Once loaded, initialize if global SocialModule is available
+                if (window.SocialModule) {
+                    window.SocialModule.init(contentContainer);
+                } else {
+                    // Fallback if module loading failed completely
+                    contentContainer.innerHTML = '<div class="section-header"><h2>Social Features</h2></div><p>Unable to load social features. Please try again later.</p>';
+                }
+            };
+            
+            scriptElement.onerror = function() {
+                console.error('Error loading social.js script');
+                contentContainer.innerHTML = '<div class="section-header"><h2>Social Features</h2></div><p>Unable to load social features. Please try again later.</p>';
+            };
+            
+            document.head.appendChild(scriptElement);
+        }
+
+        // Load a module based on section ID
+        function loadModule(sectionId) {
+            try {
+                // Clear active class from all nav items
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                // Add active class to clicked item
+                const navItem = document.querySelector(`.nav-item[data-section="${sectionId}"]`);
+                if (navItem) {
+                    navItem.classList.add('active');
+                }
+
+                // Get module content loading function
+                const moduleFn = moduleMap[sectionId];
+                if (!moduleFn) {
+                    console.error(`No module found for section: ${sectionId}`);
+                    contentContainer.innerHTML = '<div class="error-message">Section not found</div>';
+                    return;
+                }
+
+                // Call the content loading function
+                moduleFn();
+                
+            } catch (error) {
+                console.error('Error loading module:', error);
+                contentContainer.innerHTML = '<div class="error-message">Error loading content</div>';
+            }
+        }
+
+        // Add click event listeners to nav items
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const sectionId = item.dataset.section;
+                loadModule(sectionId);
+            });
+        });
+
+        // Load featured module by default on DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Find the featured item and make it active by default
+            const featuredItem = document.querySelector('.nav-item[data-section="featured"]');
+            if (featuredItem) {
+                featuredItem.classList.add('active');
+            }
+            
+            // Load the featured content
+            loadFeaturedContent();
+        });
     </script>
 
 </body>

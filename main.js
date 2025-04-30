@@ -4,6 +4,7 @@ const { initBackendIntegration, cleanupBackendIntegration } = require('./backend
 const { sequelize } = require('./backend/database');
 const path = require('path');
 const url = require('url');
+const packageJson = require('./package.json');
 
 // Set the application name for macOS menu bar
 app.name = 'VR Battles Nexus';
@@ -779,8 +780,36 @@ ipcMain.handle('get-user-by-id', async (event, id) => {
 });
 
 
+ipcMain.handle('teams-fetch', async (event, id) => {
+  try {
+    const response = await fetch('http://localhost/api/fetch/teams', {
+    //const response = await fetch('https://www.vrbattles.gg/api/fetch/teams', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
+    });
+
+    const text = await response.text();
+    try {
+      return JSON.parse(text);
+    } catch (e) {
+      return { status: 'error', message: 'Invalid JSON', raw: text };
+    }
+  } catch (err) {
+    console.error('teams-fetch failed:', err);
+    return { status: 'error', message: err.message };
+  }
+});
 
 
+ipcMain.handle('get-app-info', () => {
+  return {
+    name: packageJson.name,
+    version: packageJson.version,
+    description: packageJson.description,
+    productName: packageJson.build?.productName || 'VR Tournament App'
+  };
+});
 
 
 //lootlocker

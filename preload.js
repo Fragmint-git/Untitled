@@ -1,20 +1,20 @@
 const { contextBridge, ipcRenderer } = require('electron');
-const path = require('path');
-const packageInfo = require(path.join(__dirname, 'package.json'));
+//const path = require('path');
+//const packageInfo = require(path.join(__dirname, 'package.json'));
 
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld(
     'api', {
         // App information
-        getAppInfo: () => {
+        /*getAppInfo: () => {
             return {
                 name: packageInfo.name,
                 version: packageInfo.version,
                 description: packageInfo.description,
                 productName: packageInfo.build?.productName || 'VR Tournament App'
             };
-        },
+        },*/
         
         // Store operations
         getFeaturedItems: () => ipcRenderer.invoke('get-featured-items'),
@@ -74,6 +74,10 @@ contextBridge.exposeInMainWorld(
         getSession: () => ipcRenderer.invoke('session:get'),
         getUserById: (id) => ipcRenderer.invoke('get-user-by-id', id),
         savePersonalInfo: (formData) => ipcRenderer.invoke('save-personal-info', formData),
+
+        fetchTeams: (id) => ipcRenderer.invoke('teams-fetch', id),
+
+        getAppInfo: () => ipcRenderer.invoke('get-app-info'),
 
         //lootlocker
         lootlockerLogin: (credentials) => ipcRenderer.invoke('lootlocker-login', credentials),

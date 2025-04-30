@@ -566,13 +566,20 @@
         
         // Try to set app name, with safe fallback
         try {
-            if (window.api && window.api.getAppInfo) {
+            /*if (window.api && window.api.getAppInfo) {
                 const appInfo = window.api.getAppInfo();
                 const appTitleElement = document.getElementById('app-title');
                 if (appTitleElement && appInfo) {
                     appTitleElement.textContent = appInfo.productName;
                 }
+            }*/
+
+            if (window.api && window.api.getAppInfo) {
+                window.api.getAppInfo().then(appInfo => {
+                    document.getElementById('app-title').textContent = appInfo.productName;
+                }).catch(console.error);
             }
+            
         } catch (error) {
             console.error('Failed to load app information:', error);
         }

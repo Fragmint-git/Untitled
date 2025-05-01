@@ -204,7 +204,7 @@
         .nav-item a {
             display: flex;
             align-items: center;
-            padding: 12px 16px;
+            padding: 14px 16px;
             color: #e1e1e1;
             text-decoration: none;
             font-weight: 500;
@@ -214,6 +214,24 @@
         
         .nav-item.active a {
             background-color: #ff7f00;
+            color: white;
+        }
+        
+        /* New styling for dropdown open state */
+        .nav-item.has-dropdown.open > a {
+            background-color: rgba(100, 100, 150, 0.3);
+            color: #e1e1e1;
+        }
+        
+        /* Ensure active state takes precedence */
+        .nav-item.has-dropdown.active > a {
+            background-color: #ff7f00;
+            color: white;
+        }
+        
+        /* Style for active dropdown items */
+        .dropdown-menu a.active {
+            background-color: rgba(255, 127, 0, 0.7);
             color: white;
         }
         
@@ -384,6 +402,7 @@
             border-radius: 4px;
             transition: all 0.3s ease;
             font-size: 0.9em;
+            background-color: transparent;
         }
         
         .dropdown-menu a:hover {
@@ -398,6 +417,30 @@
         .sidebar.collapsed .dropdown-toggle,
         .sidebar.collapsed .dropdown-menu {
             display: none;
+        }
+        
+        .dropdown-menu a.not-selected {
+            background-color: transparent;
+            color: #a9a9c8;
+        }
+        
+        /* Style for non-clickable submenu labels */
+        .submenu-label {
+            display: block;
+            padding: 8px 12px;
+            color: #888;
+            font-size: 0.9em;
+            cursor: default;
+        }
+        
+        /* Add tab separator styles */
+        .nav-item {
+            border-bottom: 1px solid #333;
+            margin: 0;
+        }
+        
+        .nav-item:last-child {
+            border-bottom: none;
         }
     </style>
 
@@ -456,14 +499,18 @@
                     <li class="nav-item" data-section="spark">
                         <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> <span>Spark</span></a>
                     </li>
-                    <li class="nav-item" data-section="vrwear">
-                        <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.47a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.47a2 2 0 00-1.34-2.23z"></path></svg> <span>Merch</span></a>
-                    </li>
-                    <li class="nav-item" data-section="competitive">
-                        <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15l3 3m0 0l3-3m-3 3V9"></path><path d="M6 9l3-3m0 0l3 3m-3-3v9"></path><path d="M2 12h20"></path></svg> <span>Competitive Play</span></a>
-                    </li>
-                    <li class="nav-item" data-section="social">
-                        <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> <span>Social</span></a>
+                    <li class="nav-item has-dropdown" data-section="vrbattles">
+                        <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg> <span>VR Battles</span></a>
+                        <div class="dropdown-toggle">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <ul class="dropdown-menu">
+                            <li><span class="submenu-label">Competitive Play</span></li>
+                            <li><span class="submenu-label">Social</span></li>
+                            <li><span class="submenu-label">Merch</span></li>
+                        </ul>
                     </li>
                 </ul>
             </nav>
@@ -540,11 +587,27 @@
             
             toggle.addEventListener('click', (e) => {
                 e.stopPropagation(); // Prevent event bubbling
+                
+                // Toggle open class, not active class
                 dropdown.classList.toggle('open');
+                
+                // Clear active class from all dropdown menu items when toggling dropdown
+                if (dropdown.classList.contains('open')) {
+                    dropdown.querySelectorAll('.dropdown-menu a').forEach(item => {
+                        item.classList.remove('active');
+                        // Add a class to clearly indicate this item is not selected
+                        item.classList.add('not-selected');
+                    });
+                }
             });
             
             // Close other dropdowns when opening a new one
-            dropdown.addEventListener('click', () => {
+            dropdown.addEventListener('click', (e) => {
+                // Only handle clicks directly on the main dropdown link, not child elements
+                if (e.target.closest('.dropdown-toggle') || e.target.closest('.dropdown-menu')) {
+                    return;
+                }
+                
                 document.querySelectorAll('.nav-item.has-dropdown.open').forEach(openDropdown => {
                     if (openDropdown !== dropdown) {
                         openDropdown.classList.remove('open');
@@ -558,8 +621,29 @@
             submenuItem.addEventListener('click', function(e) {
                 e.stopPropagation(); // Prevent event bubbling
                 const targetSection = this.getAttribute('data-submenu-section');
-                if (targetSection && typeof loadNewsContent === 'function') {
-                    loadNewsContent();
+                
+                // Remove active class from all nav items and dropdown items
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                document.querySelectorAll('.dropdown-menu a').forEach(item => {
+                    item.classList.remove('active');
+                    item.classList.add('not-selected');
+                });
+                
+                // Add active class to parent dropdown
+                const parentDropdown = this.closest('.nav-item.has-dropdown');
+                if (parentDropdown) {
+                    parentDropdown.classList.add('active', 'open');
+                }
+                
+                // Add active class to this dropdown item and remove not-selected
+                this.classList.add('active');
+                this.classList.remove('not-selected');
+                
+                if (targetSection && moduleMap[targetSection]) {
+                    // Load the specific module content
+                    moduleMap[targetSection]();
                 }
             });
         });
@@ -592,6 +676,7 @@
         const moduleMap = {
             'featured': loadFeaturedContent,
             'spark': loadSparkContent,
+            'vrbattles': loadVRBattlesContent,
             'vrwear': loadMerchContent,
             'news': loadNewsContent,
             'competitive': loadCompetitiveContent,
@@ -1107,7 +1192,47 @@
         }
         
         function loadMerchContent() {
-            contentContainer.innerHTML = '<div class="section-header"><h2>Merch</h2></div><p>Merchandise content coming soon!</p>';
+            // First try to load from module
+            try {
+                if (window.require) {
+                    const socialModule = require('./js/modules/social/social.js');
+                    socialModule.init(contentContainer);
+                    return;
+                }
+            } catch (err) {
+                console.warn('Could not load social module via require:', err);
+            }
+            
+            // Try to use global SocialModule if it exists
+            if (window.SocialModule) {
+                window.SocialModule.init(contentContainer);
+                return;
+            }
+            
+            // Show loading state
+            contentContainer.innerHTML = '<div class="section-header"><h2>Merchandise</h2></div><p class="loading-text">Loading merchandise features...</p>';
+            
+            // Load the script dynamically
+            const scriptElement = document.createElement('script');
+            scriptElement.src = './js/modules/social/social.js';
+            scriptElement.async = true;
+            
+            scriptElement.onload = function() {
+                // Once loaded, initialize if global SocialModule is available
+                if (window.SocialModule) {
+                    window.SocialModule.init(contentContainer);
+                } else {
+                    // Fallback if module loading failed completely
+                    contentContainer.innerHTML = '<div class="section-header"><h2>Merchandise</h2></div><p>Unable to load merchandise features. Please try again later.</p>';
+                }
+            };
+            
+            scriptElement.onerror = function() {
+                console.error('Error loading social.js script');
+                contentContainer.innerHTML = '<div class="section-header"><h2>Merchandise</h2></div><p>Unable to load merchandise features. Please try again later.</p>';
+            };
+            
+            document.head.appendChild(scriptElement);
         }
         
         function loadNewsContent() {
@@ -1115,247 +1240,47 @@
         }
         
         function loadCompetitiveContent() {
-            const content = `
-                <div class="section-header">
-                    <h2>Competitive Play</h2>
-                </div>
-                
-                <div class="competitive-container">
-                    <div class="competitive-banner">
-                        <h3>Join the VR Battles Competitive Scene</h3>
-                        <p>Participate in tournaments, track your stats, and climb the ranks!</p>
-                    </div>
-                    
-                    <div class="competitive-sections">
-                        <div class="competitive-section">
-                            <div class="section-icon">
-                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ff7f00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
-                                </svg>
-                            </div>
-                            <h3>Upcoming Tournaments</h3>
-                            <p>Register for official tournaments and community events.</p>
-                            <button class="comp-btn">View Tournaments</button>
-                        </div>
-                        
-                        <div class="competitive-section">
-                            <div class="section-icon">
-                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ff7f00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M18 8l-2-2H8L6 8H2v10h20V8h-4z"></path>
-                                    <circle cx="12" cy="14" r="3"></circle>
-                                </svg>
-                            </div>
-                            <h3>Player Stats</h3>
-                            <p>Track your performance metrics and improvement over time.</p>
-                            <button class="comp-btn">View Stats</button>
-                        </div>
-                        
-                        <div class="competitive-section">
-                            <div class="section-icon">
-                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ff7f00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
-                                </svg>
-                            </div>
-                            <h3>Leaderboards</h3>
-                            <p>View the top players and see where you stand in the rankings.</p>
-                            <button class="comp-btn">View Leaderboards</button>
-                        </div>
-                    </div>
-                    
-                    <div class="upcoming-matches">
-                        <h3>Featured Matches</h3>
-                        <div class="match-cards">
-                            <div class="match-card">
-                                <div class="match-teams">
-                                    <div class="team">
-                                        <div class="team-logo"></div>
-                                        <div class="team-name">Quantum Flux</div>
-                                    </div>
-                                    <div class="vs">VS</div>
-                                    <div class="team">
-                                        <div class="team-logo"></div>
-                                        <div class="team-name">Nebula Surge</div>
-                                    </div>
-                                </div>
-                                <div class="match-details">
-                                    <div class="match-time">July 24, 2023 - 8:00 PM EST</div>
-                                    <div class="match-event">Summer Championship Finals</div>
-                                </div>
-                                <button class="watch-btn">Watch</button>
-                            </div>
-                            
-                            <div class="match-card">
-                                <div class="match-teams">
-                                    <div class="team">
-                                        <div class="team-logo"></div>
-                                        <div class="team-name">Phantom Echo</div>
-                                    </div>
-                                    <div class="vs">VS</div>
-                                    <div class="team">
-                                        <div class="team-logo"></div>
-                                        <div class="team-name">Cyber Knights</div>
-                                    </div>
-                                </div>
-                                <div class="match-details">
-                                    <div class="match-time">July 26, 2023 - 7:30 PM EST</div>
-                                    <div class="match-event">Regional Qualifier</div>
-                                </div>
-                                <button class="watch-btn">Watch</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
+            // First try to load from module
+            try {
+                if (window.require) {
+                    const socialModule = require('./js/modules/social/social.js');
+                    socialModule.init(contentContainer);
+                    return;
+                }
+            } catch (err) {
+                console.warn('Could not load social module via require:', err);
+            }
             
-            contentContainer.innerHTML = content;
+            // Try to use global SocialModule if it exists
+            if (window.SocialModule) {
+                window.SocialModule.init(contentContainer);
+                return;
+            }
             
-            // Add CSS styles for the Competitive Play section
-            const competitiveStylesheet = document.createElement('style');
-            competitiveStylesheet.textContent = `
-                .competitive-container {
-                    color: #e1e1e1;
-                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            // Show loading state
+            contentContainer.innerHTML = '<div class="section-header"><h2>Competitive Play</h2></div><p class="loading-text">Loading competitive features...</p>';
+            
+            // Load the script dynamically
+            const scriptElement = document.createElement('script');
+            scriptElement.src = './js/modules/social/social.js';
+            scriptElement.async = true;
+            
+            scriptElement.onload = function() {
+                // Once loaded, initialize if global SocialModule is available
+                if (window.SocialModule) {
+                    window.SocialModule.init(contentContainer);
+                } else {
+                    // Fallback if module loading failed completely
+                    contentContainer.innerHTML = '<div class="section-header"><h2>Competitive Play</h2></div><p>Unable to load competitive features. Please try again later.</p>';
                 }
-                
-                .competitive-banner {
-                    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-                    border-radius: 10px;
-                    padding: 2rem;
-                    text-align: center;
-                    margin-bottom: 2rem;
-                }
-                
-                .competitive-banner h3 {
-                    margin: 0;
-                    font-size: 1.8rem;
-                }
-                
-                .competitive-banner p {
-                    margin-top: 0.5rem;
-                    font-size: 1.1rem;
-                }
-                
-                .competitive-sections {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                    gap: 1.5rem;
-                    margin-bottom: 2rem;
-                }
-                
-                .competitive-section {
-                    background-color: #2c2c3c;
-                    border-radius: 8px;
-                    padding: 1.5rem;
-                    text-align: center;
-                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                }
-                
-                .section-icon {
-                    margin-bottom: 1rem;
-                }
-                
-                .competitive-section h3 {
-                    margin-top: 0;
-                    margin-bottom: 0.5rem;
-                    font-size: 1.4rem;
-                }
-                
-                .competitive-section p {
-                    margin-bottom: 1.5rem;
-                    color: #aaa;
-                }
-                
-                .comp-btn {
-                    background-color: #ff7f00;
-                    color: white;
-                    border: none;
-                    padding: 0.6rem 1.2rem;
-                    border-radius: 5px;
-                    font-weight: bold;
-                    cursor: pointer;
-                    transition: background-color 0.2s;
-                }
-                
-                .comp-btn:hover {
-                    background-color: #e67300;
-                }
-                
-                .upcoming-matches h3 {
-                    margin-bottom: 1rem;
-                }
-                
-                .match-cards {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-                    gap: 1.5rem;
-                }
-                
-                .match-card {
-                    background-color: #2c2c3c;
-                    border-radius: 8px;
-                    padding: 1.5rem;
-                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                }
-                
-                .match-teams {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    margin-bottom: 1rem;
-                }
-                
-                .team {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                }
-                
-                .team-logo {
-                    width: 50px;
-                    height: 50px;
-                    background-color: #444;
-                    border-radius: 50%;
-                    margin-bottom: 0.5rem;
-                }
-                
-                .vs {
-                    font-weight: bold;
-                    color: #ff7f00;
-                    position: relative;
-                }
-                
-                .match-details {
-                    text-align: center;
-                    margin-bottom: 1rem;
-                }
-                
-                .match-time {
-                    font-weight: bold;
-                    margin-bottom: 0.3rem;
-                }
-                
-                .match-event {
-                    color: #aaa;
-                }
-                
-                .watch-btn {
-                    display: block;
-                    width: 100%;
-                    background-color: #4caf50;
-                    color: white;
-                    border: none;
-                    padding: 0.6rem;
-                    border-radius: 5px;
-                    font-weight: bold;
-                    cursor: pointer;
-                    transition: background-color 0.2s;
-                }
-                
-                .watch-btn:hover {
-                    background-color: #449d48;
-                }
-            `;
-            document.head.appendChild(competitiveStylesheet);
+            };
+            
+            scriptElement.onerror = function() {
+                console.error('Error loading social.js script');
+                contentContainer.innerHTML = '<div class="section-header"><h2>Competitive Play</h2></div><p>Unable to load competitive features. Please try again later.</p>';
+            };
+            
+            document.head.appendChild(scriptElement);
         }
 
         // Load Social content
@@ -1403,6 +1328,51 @@
             document.head.appendChild(scriptElement);
         }
 
+        // Add VR Battles overview content
+        function loadVRBattlesContent() {
+            // First try to load from module
+            try {
+                if (window.require) {
+                    const socialModule = require('./js/modules/social/social.js');
+                    socialModule.init(contentContainer);
+                    return;
+                }
+            } catch (err) {
+                console.warn('Could not load social module via require:', err);
+            }
+            
+            // Try to use global SocialModule if it exists
+            if (window.SocialModule) {
+                window.SocialModule.init(contentContainer);
+                return;
+            }
+            
+            // Show loading state
+            contentContainer.innerHTML = '<div class="section-header"><h2>VR Battles</h2></div><p class="loading-text">Loading VR Battles features...</p>';
+            
+            // Load the script dynamically
+            const scriptElement = document.createElement('script');
+            scriptElement.src = './js/modules/social/social.js';
+            scriptElement.async = true;
+            
+            scriptElement.onload = function() {
+                // Once loaded, initialize if global SocialModule is available
+                if (window.SocialModule) {
+                    window.SocialModule.init(contentContainer);
+                } else {
+                    // Fallback if module loading failed completely
+                    contentContainer.innerHTML = '<div class="section-header"><h2>VR Battles</h2></div><p>Unable to load VR Battles features. Please try again later.</p>';
+                }
+            };
+            
+            scriptElement.onerror = function() {
+                console.error('Error loading social.js script');
+                contentContainer.innerHTML = '<div class="section-header"><h2>VR Battles</h2></div><p>Unable to load VR Battles features. Please try again later.</p>';
+            };
+            
+            document.head.appendChild(scriptElement);
+        }
+
         // Load a module based on section ID
         function loadModule(sectionId) {
             try {
@@ -1436,10 +1406,40 @@
 
         // Add click event listeners to nav items
         document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', (e) => {
+            const link = item.querySelector('a');
+            
+            link.addEventListener('click', (e) => {
                 e.preventDefault();
+                
+                // Don't process if this is a dropdown toggle click
+                if (e.target.closest('.dropdown-toggle')) {
+                    return;
+                }
+                
                 const sectionId = item.dataset.section;
-                loadModule(sectionId);
+                
+                // Close other dropdowns except the current one
+                document.querySelectorAll('.nav-item.has-dropdown.open').forEach(dropdown => {
+                    if (dropdown !== item) {
+                        dropdown.classList.remove('open');
+                    }
+                });
+                
+                // For dropdown items, toggle the open state and don't load immediately
+                if (item.classList.contains('has-dropdown')) {
+                    item.classList.toggle('open');
+                    
+                    // Only load the module if it's not already open
+                    if (!item.classList.contains('open')) {
+                        loadModule(sectionId);
+                    } else {
+                        // Still load the parent module when opening the dropdown
+                        loadModule(sectionId);
+                    }
+                } else {
+                    // For non-dropdown items, simply load the module
+                    loadModule(sectionId);
+                }
             });
         });
 
@@ -1450,6 +1450,11 @@
             if (featuredItem) {
                 featuredItem.classList.add('active');
             }
+            
+            // Clear active classes from all dropdown menu items on page load
+            document.querySelectorAll('.dropdown-menu a').forEach(item => {
+                item.classList.remove('active');
+            });
             
             // Load the featured content
             loadFeaturedContent();

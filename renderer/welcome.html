@@ -459,8 +459,8 @@
                     <li class="nav-item" data-section="vrwear">
                         <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.47a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.47a2 2 0 00-1.34-2.23z"></path></svg> <span>Merch</span></a>
                     </li>
-                    <li class="nav-item" data-section="ignite">
-                        <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="8" width="20" height="12" rx="2"></rect><circle cx="7" cy="16" r="2"></circle><circle cx="17" cy="16" r="2"></circle><path d="M2 8l4-4h12l4 4"></path></svg> <span>Ignite Drift Club</span></a>
+                    <li class="nav-item" data-section="competitive">
+                        <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15l3 3m0 0l3-3m-3 3V9"></path><path d="M6 9l3-3m0 0l3 3m-3-3v9"></path><path d="M2 12h20"></path></svg> <span>Competitive Play</span></a>
                     </li>
                     <li class="nav-item" data-section="social">
                         <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> <span>Social</span></a>
@@ -593,8 +593,8 @@
             'featured': loadFeaturedContent,
             'spark': loadSparkContent,
             'vrwear': loadMerchContent,
-            'ignite': loadIgniteContent,
             'news': loadNewsContent,
+            'competitive': loadCompetitiveContent,
             'social': loadSocialContent
         };
         
@@ -1110,12 +1110,252 @@
             contentContainer.innerHTML = '<div class="section-header"><h2>Merch</h2></div><p>Merchandise content coming soon!</p>';
         }
         
-        function loadIgniteContent() {
-            contentContainer.innerHTML = '<div class="section-header"><h2>Ignite Drift Club</h2></div><p>Ignite Drift Club content coming soon!</p>';
-        }
-        
         function loadNewsContent() {
             contentContainer.innerHTML = '<div class="section-header"><h2>News</h2></div><p>News content coming soon!</p>';
+        }
+        
+        function loadCompetitiveContent() {
+            const content = `
+                <div class="section-header">
+                    <h2>Competitive Play</h2>
+                </div>
+                
+                <div class="competitive-container">
+                    <div class="competitive-banner">
+                        <h3>Join the VR Battles Competitive Scene</h3>
+                        <p>Participate in tournaments, track your stats, and climb the ranks!</p>
+                    </div>
+                    
+                    <div class="competitive-sections">
+                        <div class="competitive-section">
+                            <div class="section-icon">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ff7f00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+                                </svg>
+                            </div>
+                            <h3>Upcoming Tournaments</h3>
+                            <p>Register for official tournaments and community events.</p>
+                            <button class="comp-btn">View Tournaments</button>
+                        </div>
+                        
+                        <div class="competitive-section">
+                            <div class="section-icon">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ff7f00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M18 8l-2-2H8L6 8H2v10h20V8h-4z"></path>
+                                    <circle cx="12" cy="14" r="3"></circle>
+                                </svg>
+                            </div>
+                            <h3>Player Stats</h3>
+                            <p>Track your performance metrics and improvement over time.</p>
+                            <button class="comp-btn">View Stats</button>
+                        </div>
+                        
+                        <div class="competitive-section">
+                            <div class="section-icon">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ff7f00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                                </svg>
+                            </div>
+                            <h3>Leaderboards</h3>
+                            <p>View the top players and see where you stand in the rankings.</p>
+                            <button class="comp-btn">View Leaderboards</button>
+                        </div>
+                    </div>
+                    
+                    <div class="upcoming-matches">
+                        <h3>Featured Matches</h3>
+                        <div class="match-cards">
+                            <div class="match-card">
+                                <div class="match-teams">
+                                    <div class="team">
+                                        <div class="team-logo"></div>
+                                        <div class="team-name">Quantum Flux</div>
+                                    </div>
+                                    <div class="vs">VS</div>
+                                    <div class="team">
+                                        <div class="team-logo"></div>
+                                        <div class="team-name">Nebula Surge</div>
+                                    </div>
+                                </div>
+                                <div class="match-details">
+                                    <div class="match-time">July 24, 2023 - 8:00 PM EST</div>
+                                    <div class="match-event">Summer Championship Finals</div>
+                                </div>
+                                <button class="watch-btn">Watch</button>
+                            </div>
+                            
+                            <div class="match-card">
+                                <div class="match-teams">
+                                    <div class="team">
+                                        <div class="team-logo"></div>
+                                        <div class="team-name">Phantom Echo</div>
+                                    </div>
+                                    <div class="vs">VS</div>
+                                    <div class="team">
+                                        <div class="team-logo"></div>
+                                        <div class="team-name">Cyber Knights</div>
+                                    </div>
+                                </div>
+                                <div class="match-details">
+                                    <div class="match-time">July 26, 2023 - 7:30 PM EST</div>
+                                    <div class="match-event">Regional Qualifier</div>
+                                </div>
+                                <button class="watch-btn">Watch</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            contentContainer.innerHTML = content;
+            
+            // Add CSS styles for the Competitive Play section
+            const competitiveStylesheet = document.createElement('style');
+            competitiveStylesheet.textContent = `
+                .competitive-container {
+                    color: #e1e1e1;
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                }
+                
+                .competitive-banner {
+                    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+                    border-radius: 10px;
+                    padding: 2rem;
+                    text-align: center;
+                    margin-bottom: 2rem;
+                }
+                
+                .competitive-banner h3 {
+                    margin: 0;
+                    font-size: 1.8rem;
+                }
+                
+                .competitive-banner p {
+                    margin-top: 0.5rem;
+                    font-size: 1.1rem;
+                }
+                
+                .competitive-sections {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                    gap: 1.5rem;
+                    margin-bottom: 2rem;
+                }
+                
+                .competitive-section {
+                    background-color: #2c2c3c;
+                    border-radius: 8px;
+                    padding: 1.5rem;
+                    text-align: center;
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                }
+                
+                .section-icon {
+                    margin-bottom: 1rem;
+                }
+                
+                .competitive-section h3 {
+                    margin-top: 0;
+                    margin-bottom: 0.5rem;
+                    font-size: 1.4rem;
+                }
+                
+                .competitive-section p {
+                    margin-bottom: 1.5rem;
+                    color: #aaa;
+                }
+                
+                .comp-btn {
+                    background-color: #ff7f00;
+                    color: white;
+                    border: none;
+                    padding: 0.6rem 1.2rem;
+                    border-radius: 5px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    transition: background-color 0.2s;
+                }
+                
+                .comp-btn:hover {
+                    background-color: #e67300;
+                }
+                
+                .upcoming-matches h3 {
+                    margin-bottom: 1rem;
+                }
+                
+                .match-cards {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                    gap: 1.5rem;
+                }
+                
+                .match-card {
+                    background-color: #2c2c3c;
+                    border-radius: 8px;
+                    padding: 1.5rem;
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                }
+                
+                .match-teams {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 1rem;
+                }
+                
+                .team {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                }
+                
+                .team-logo {
+                    width: 50px;
+                    height: 50px;
+                    background-color: #444;
+                    border-radius: 50%;
+                    margin-bottom: 0.5rem;
+                }
+                
+                .vs {
+                    font-weight: bold;
+                    color: #ff7f00;
+                    position: relative;
+                }
+                
+                .match-details {
+                    text-align: center;
+                    margin-bottom: 1rem;
+                }
+                
+                .match-time {
+                    font-weight: bold;
+                    margin-bottom: 0.3rem;
+                }
+                
+                .match-event {
+                    color: #aaa;
+                }
+                
+                .watch-btn {
+                    display: block;
+                    width: 100%;
+                    background-color: #4caf50;
+                    color: white;
+                    border: none;
+                    padding: 0.6rem;
+                    border-radius: 5px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    transition: background-color 0.2s;
+                }
+                
+                .watch-btn:hover {
+                    background-color: #449d48;
+                }
+            `;
+            document.head.appendChild(competitiveStylesheet);
         }
 
         // Load Social content

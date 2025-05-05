@@ -1,0 +1,66 @@
+/* Overall calendar background and border */
+.flatpickr-calendar {
+  background: #1e1e2f !important;
+  color: #ffffff !important;
+  border: 1px solid #444;
+}
+
+/* Header: month and year */
+.flatpickr-months,
+.flatpickr-weekdays,
+.flatpickr-time,
+.flatpickr-current-month {
+  background: #1e1e2f !important;
+  color: #ffffff !important;
+  border: none;
+}
+
+/* Year text */
+.flatpickr-current-month .numInputWrapper span,
+.flatpickr-current-month input.cur-year {
+  color: #ffffff !important;
+}
+
+/* Weekday labels (Sun - Sat) */
+.flatpickr-weekday {
+  color: #4caf50 !important; /* green */
+  font-weight: bold;
+}
+
+/* Day numbers (1–31) */
+.flatpickr-day {
+  color: #ffffff !important; /* white */
+}
+
+
+/* Selected day */
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange {
+  background: #4caf50 !important;
+  color: #ffffff !important;
+}
+
+/* Hover effect */
+.flatpickr-day:hover {
+  background: #444 !important;
+  border-color: #4caf50 !important;
+}
+
+/* Today’s outline */
+.flatpickr-day.today {
+  border: 1px solid #4caf50 !important;
+}
+
+/* Time picker styling */
+.flatpickr-time input,
+.flatpickr-am-pm,
+.flatpickr-time .flatpickr-time-separator {
+  background: #1e1e2f !important;
+  color: #ffffff !important;
+  border: none;
+}
+
+.flatpickr-am-pm[disabled] {
+  color: #666 !important;
+}

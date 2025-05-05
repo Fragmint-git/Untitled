@@ -254,11 +254,13 @@ function initBackendIntegration() {
       
           const games = result.data.map(game => {
             if (game.logo && !game.logo.startsWith('http')) {
-              game.logo = `http://localhost/uploads/games/${game.logo}`;
+              game.logo = `https://www.vrbattles.gg/uploads/games/${game.logo}`;
+              //game.logo = `http://localhost/uploads/games/${game.logo}`;
             }
           
             if (game.banner && !game.banner.startsWith('http')) {
-              game.banner = `http://localhost/uploads/games/${game.banner}`;
+              game.banner = `https://www.vrbattles.gg/uploads/games/${game.banner}`;
+              //game.banner = `http://localhost/uploads/games/${game.banner}`;
             }
           
             game.coverImage = game.logo || game.banner || '/assets/default-game-cover.png';

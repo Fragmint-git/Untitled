@@ -38,7 +38,7 @@ async function loadGamesIntoSelect() {
 }
 
 // Handle quick match button click
-async function handleQuickMatch() {
+/*async function handleQuickMatch() {
     try {
         window.uiModule.showNotification('Finding a quick match...', 'info');
         
@@ -60,7 +60,7 @@ async function handleQuickMatch() {
         console.error('Error in quick match:', error);
         window.uiModule.showNotification('Failed to find a match', 'error');
     }
-}
+}*/
 
 // Handle custom match button click
 async function handleCustomMatch() {

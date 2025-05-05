@@ -7,7 +7,12 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="css/titlebar.css">
     <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">\
+    <link rel="stylesheet" href="flatpickr/flatpickr.min.css">
+    <link rel="stylesheet" href="flatpickr/dark.css">
+    <script src="flatpickr/flatpickr.min.js"></script>
+
+
     
     <!-- Debug script for image loading -->
     <script>
@@ -712,7 +717,7 @@
                             <div class="quick-match">
                                 <h3>Quick Match</h3>
                                 <p>Find the fastest available match based on your skill level and preferences. Get into the game instantly!</p>
-                                <button id="quick-match-btn" class="btn-primary">
+                                <button id="quick-match-btn" class="btn-primary" style="margin-bottom: 5px;">
                                     <i class="fas fa-bolt"></i> Quick Match
                                 </button>
                                 <button class="btn-primary">
@@ -754,46 +759,45 @@
                 
                     <form id="modal-quickmatch-form">
                         <div class="modal-form-group">
-                        <label for="modal-game">Select Game</label>
-                        <select id="modal-game" required>
-                            <option value="">Choose a game</option>
-                            <option value="Echo VR">Echo VR</option>
-                            <option value="Nock">Nock</option>
-                            <option value="Breachers">Breachers</option>
-                            <option value="Vail">Vail</option>
-                            <option value="Blacktop Hoops">Blacktop Hoops</option>
-                        </select>
-                        </div>
-                
-                        <div class="modal-form-group">
-                        <label for="modal-matchType">Match Type</label>
-                        <select id="modal-matchType" required>
-                            <option value="">Choose match type</option>
-                            <option value="Ranked">Ranked</option>
-                            <option value="Casual">Casual</option>
-                            <option value="Custom">Custom</option>
-                        </select>
-                        </div>
-                
+                            <label for="modal-game">Select Game</label>
+                            <select id="modal-game" required>
+                              <option value="">Choose a game</option>
+                            </select>
+                          </div>
+
                         <div class="modal-form-group">
                         <label for="modal-teamSize">Team Size</label>
                         <select id="modal-teamSize" required>
                             <option value="">Choose team size</option>
-                            <option value="1">Solo</option>
-                            <option value="2">2v2</option>
-                            <option value="3">3v3</option>
-                            <option value="4">4v4</option>
-                            <option value="5">5v5</option>
+                            <option value="1v1">Solo</option>
+                            <option value="2v2">Duos</option>
+                            <option value="4v4">Squads</option>
+                        </select>
+                        </div>
+                          
+                        <div class="modal-form-group">
+                        <label for="modal-matchType">Match Type</label>
+                        <select id="modal-matchType" required>
+                            <option value="BO3">BO3</option>
+                        </select>
+                        </div>
+
+                        <div class="modal-form-group">
+                        <label for="modal-region">Region</label>
+                        <select id="modal-region" required>
+                            <option value="NA">NA</option>
+                            <option value="EU">EU</option>
+                            <option value="OCE">OCE</option>
                         </select>
                         </div>
                 
                         <div class="modal-form-group">
-                        <label for="modal-time">Preferred Time</label>
-                        <input type="datetime-local" id="modal-time" required>
-                        </div>
+                            <label for="modal-time">Match Time</label>
+                            <input type="text" id="modal-time" required>
+                        </div>                          
                 
                         <div class="modal-form-actions">
-                        <button type="submit" class="btn-primary">Find Match</button>
+                        <button type="submit" class="btn-primary">Submit</button>
                         <button type="button" class="btn-secondary" id="modal-cancel-quickmatch">Cancel</button>
                         </div>
                     </form>
@@ -1195,8 +1199,18 @@
         const quickMatchForm = document.getElementById('modal-quickmatch-form');
 
         quickMatchBtn.addEventListener('click', () => {
-            modalQuickMatch.style.display = 'flex';
+            const modal = document.getElementById('modal-quickmatch');
+            const modalContent = modal.querySelector('.modal-content');
+            
+            modal.style.display = 'flex';
+            populateGameDropdown();
+            initMatchTimePicker();
+
+            modalContent.style.left = '50%';
+            modalContent.style.top = '50%';
+            modalContent.style.transform = 'translate(-50%, -50%)';
         });
+
 
         closeModalQuickMatch.addEventListener('click', () => {
             modalQuickMatch.style.display = 'none';
@@ -1206,29 +1220,64 @@
             modalQuickMatch.style.display = 'none';
         });
 
-        window.addEventListener('click', (e) => {
+        /*window.addEventListener('click', (e) => {
             if (e.target === modalQuickMatch) {
             modalQuickMatch.style.display = 'none';
             }
+        });*/
+
+        document.getElementById('modal-quickmatch-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const findBtn = document.querySelector('#modal-quickmatch-form button[type="submit"]');
+        findBtn.disabled = true;
+        findBtn.textContent = 'Checking...';
+
+        const game = document.getElementById('modal-game').value;
+        const matchType = document.getElementById('modal-matchType').value;
+        const teamSize = document.getElementById('modal-teamSize').value;
+        const matchTime = document.getElementById('modal-time').value;
+        const region = document.getElementById('modal-region')?.value || 'NA';
+
+        const session = await window.api.getSession();
+        if (!session || !session.id) {
+            showNotification('You must be logged in to request a match.');
+            findBtn.disabled = false;
+            findBtn.textContent = 'Submit';
+            return;
+        }
+
+        const matchData = {
+            user_id: session.id,
+            game_name: game,
+            match_type: matchType,
+            team_size: teamSize,
+            time_start: matchTime,
+            region: region
+        };
+
+        const result = await window.api.submitMatchRequest(matchData);
+
+        if (result.success) {
+            showNotification(result.message);
+
+            setTimeout(() => {
+            const modal = document.getElementById('modal-quickmatch');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+            document.getElementById('modal-quickmatch-form').reset();
+            findBtn.disabled = false;
+            findBtn.textContent = 'Submit';
+            }, 300);
+        } else {
+            showNotification(result.message || 'Unknown error');
+            findBtn.disabled = false;
+            findBtn.textContent = 'Submit';
+        }
         });
 
-        quickMatchForm.addEventListener('submit', (e) => {
-            e.preventDefault();
 
-            const game = document.getElementById('modal-game').value;
-            const matchType = document.getElementById('modal-matchType').value;
-            const teamSize = document.getElementById('modal-teamSize').value;
-            const time = document.getElementById('modal-time').value;
-
-            console.log("Game:", game);
-            console.log("Match Type:", matchType);
-            console.log("Team Size:", teamSize);
-            console.log("Preferred Time:", time);
-
-            alert(`Searching match:\nGame: ${game}\nType: ${matchType}\nTeam Size: ${teamSize}\nTime: ${time}`);
-
-            modalQuickMatch.style.display = 'none';
-        });
 
         // Dragging functionality
         let isDragging = false;
@@ -1397,6 +1446,70 @@
         document.getElementById('teams').classList.add('active');
         loadMyTeams();
         });
+
+
+
+    async function populateGameDropdown() {
+    const gameSelect = document.getElementById('modal-game');
+
+        try {
+            const games = await window.api.getGames();
+
+            gameSelect.innerHTML = '<option value="">Choose a game</option>';
+
+            games.forEach(game => {
+            const option = document.createElement('option');
+            option.value = game.name;
+            option.textContent = game.name;
+            gameSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Failed to populate games:', error);
+        }
+    }
+
+    document.getElementById('quick-match-btn').addEventListener('click', () => {
+        document.getElementById('modal-quickmatch').style.display = 'flex';
+        populateGameDropdown();
+        initMatchTimePicker();
+    });
+
+
+    async function initMatchTimePicker() {
+  try {
+    const session = await window.api.getSession();
+    const timeZone = session?.timezone || 'America/Chicago';
+
+    function convertToTimeZone(date, timeZone) {
+      return new Date(date.toLocaleString('en-US', { timeZone }));
+    }
+
+    const now = new Date();
+    const remainder = now.getMinutes() % 15;
+    const minutesToAdd = remainder < 15 ? 30 - remainder : 45 - remainder;
+    now.setMinutes(now.getMinutes() + minutesToAdd);
+    now.setSeconds(0);
+
+    const adjustedDate = convertToTimeZone(now, timeZone);
+
+    if (window.flatpickr) {
+      flatpickr("#modal-time", {
+        enableTime: true,
+        dateFormat: "F j, Y, h:i K",
+        minuteIncrement: 15,
+        minDate: "today",
+        maxDate: new Date().fp_incr(3),
+        time_24hr: false,
+        defaultDate: adjustedDate
+      });
+    } else {
+      alert("Flatpickr failed to load.");
+    }
+  } catch (error) {
+    alert("Time picker init failed: " + error.message);
+    console.error(error);
+  }
+}
 
 
 

@@ -328,10 +328,10 @@ ipcMain.handle('save-personal-info', async (event, formData) => {
     }
 
     if (result.status === 'success') {
-      return { success: true, data: result.data || {} };
+      return { success: true, message: result.message };
     } else {
-      return { success: false, error: result.message || 'Update failed' };
-    }
+      return { success: false, message: result.message || 'Match request failed' };
+    }    
 
   } catch (err) {
     console.error('API Error saving personal info:', err);
@@ -782,8 +782,8 @@ ipcMain.handle('get-user-by-id', async (event, id) => {
 
 ipcMain.handle('teams-fetch', async (event, id) => {
   try {
-    const response = await fetch('http://localhost/api/fetch/teams', {
-    //const response = await fetch('https://www.vrbattles.gg/api/fetch/teams', {
+    //const response = await fetch('http://localhost/api/fetch/teams', {
+    const response = await fetch('https://www.vrbattles.gg/api/fetch/teams', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id })
@@ -800,6 +800,38 @@ ipcMain.handle('teams-fetch', async (event, id) => {
     return { status: 'error', message: err.message };
   }
 });
+
+
+ipcMain.handle('submit-match-request', async (event, matchData) => {
+  try {
+    //const response = await fetch('http://localhost/api/matches/match_request', {
+      const response = await fetch('https://www.vrbattles.gg/api/matches/match_request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(matchData)
+    });
+
+    const text = await response.text();
+    let result;
+
+    try {
+      result = JSON.parse(text);
+    } catch (e) {
+      return { success: false, message: 'Invalid JSON from API', raw: text };
+    }
+
+    if (result.status === 'success') {
+      return { success: true, message: result.message };
+    } else {
+      return { success: false, message: result.message || 'Match request failed' };
+    }
+  } catch (err) {
+    console.error('Match request error:', err);
+    return { success: false, message: err.message };
+  }
+});
+
+
 
 
 ipcMain.handle('get-app-info', () => {

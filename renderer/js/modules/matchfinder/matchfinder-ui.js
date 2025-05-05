@@ -1,3 +1,5 @@
+let sessionUserId = null;
+let cancelRequestId = null;
 /**
  * Matchfinder UI Module
  * Handles UI interactions for the matchmaking functionality
@@ -61,6 +63,148 @@ async function loadGamesIntoSelect() {
         window.uiModule.showNotification('Failed to find a match', 'error');
     }
 }*/
+
+function formatMatchStart(utcDatetimeString, userTimezone = 'America/Chicago') {
+    if (!utcDatetimeString || isNaN(Date.parse(utcDatetimeString))) return 'TBD';
+  
+    try {
+      const utcDate = new Date(utcDatetimeString);
+      const now = new Date();
+  
+      const formatter = new Intl.DateTimeFormat('en-US', {
+        timeZone: userTimezone,
+        month: '2-digit',
+        day: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+  
+      const userTime = new Date(utcDate.toLocaleString('en-US', { timeZone: userTimezone }));
+      const userNow = new Date(now.toLocaleString('en-US', { timeZone: userTimezone }));
+      const diffMs = userTime - userNow;
+  
+      if (diffMs < 0) return 'Match expired';
+  
+      const diffMinutes = Math.floor(diffMs / 60000);
+      const days = Math.floor(diffMinutes / 1440);
+      const hours = Math.floor((diffMinutes % 1440) / 60);
+      const minutes = diffMinutes % 60;
+  
+      return `(${formatter.format(utcDate)})<br>${days} days<br>${hours} hours<br>${minutes} minutes`;
+    } catch (err) {
+      console.error('Time format error:', err);
+      return 'Invalid Date';
+    }
+  }
+  
+
+  
+  async function loadOpenMatchRequests() {
+    try {
+      const result = await window.api.getOpenMatchRequests();
+      const session = await window.api.getSession();
+      sessionUserId = session?.id;
+  
+      if (!Array.isArray(result.data)) return;
+  
+      const tbody = document.getElementById('match-request-body');
+      tbody.innerHTML = '';
+  
+      result.data.forEach(request => {
+        if (request.status !== 'Open') return;
+  
+        const isCreator = sessionUserId === request.created_by_user_id;
+        const combinedDatetime = request.match_date && request.match_time
+          ? `${request.match_date}T${request.match_time}Z`
+          : null;
+  
+        const timeDisplay = formatMatchStart(combinedDatetime, session?.timezone || 'America/Chicago');
+  
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td><img src="/assets/images/games/GameLogos/${request.game_image || 'default.png'}" style="height: 50px;"></td>
+          <td>${request.entry_fee || 'Free'}</td>
+          <td>${request.team_size}</td>
+          <td>
+            ${request.game_name}<br>
+            ${request.region || 'NA'} | ${request.match_type || 'BO3'}
+          </td>
+          <td>${request.skill_level || 'all'}</td>
+          <td>${request.support || 'Enabled'}</td>
+          <td>${timeDisplay}</td>
+          <td>
+            <button 
+              class="${isCreator ? 'btn-cancel' : 'btn-accept'}"
+              data-request-id="${request.id}">
+              ${isCreator ? 'CANCEL' : 'ACCEPT'}
+            </button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+  
+      document.querySelectorAll('.btn-cancel').forEach(button => {
+        button.addEventListener('click', () => {
+          cancelRequestId = button.dataset.requestId;
+          document.getElementById('cancel-confirmation-modal').style.display = 'block';
+        });
+      });
+  
+      const modal = document.getElementById('cancel-confirmation-modal');
+      const cancelNoBtn = document.getElementById('cancel-no');
+      const cancelYesBtn = document.getElementById('cancel-yes');
+      
+      if (cancelNoBtn && cancelYesBtn) {
+        cancelNoBtn.onclick = () => {
+          modal.style.display = 'none';
+          cancelRequestId = null;
+        };
+      
+        cancelYesBtn.onclick = async () => {
+          if (!cancelRequestId || !sessionUserId) {
+            window.uiModule.showNotification('Missing request or user ID', 'error');
+            return;
+          }
+      
+          try {
+            //const response = await fetch('http://localhost/api/matches/cancel_request', {
+            const response = await fetch('https://www.vrbattles.gg/api/matches/cancel_request', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                match_request_id: cancelRequestId,
+                user_id: sessionUserId
+              })
+            });
+      
+            const result = await response.json();
+            //console.log('Cancel result:', result);
+      
+            if (result.status === 'success') {
+              window.uiModule.showNotification('Match request cancelled.', 'success');
+              modal.style.display = 'none';
+              loadOpenMatchRequests();
+            } else {
+              window.uiModule.showNotification(result.message || 'Failed to cancel match.', 'error');
+            }
+          } catch (error) {
+            console.error('Cancel failed:', error);
+            window.uiModule.showNotification('Server error.', 'error');
+          }
+        };
+      }
+      
+    } catch (error) {
+      console.error('Failed to load match requests:', error);
+    }
+  }
+  
+  
+
+  setInterval(loadOpenMatchRequests, 2000);
+  loadOpenMatchRequests();
 
 // Handle custom match button click
 async function handleCustomMatch() {
@@ -181,5 +325,6 @@ window.matchfinderUIModule = {
     initMatchfinderUI,
     handleQuickMatch,
     handleCustomMatch,
-    loadMatchSuggestions
+    loadMatchSuggestions,
+    loadOpenMatchRequests
 }; 

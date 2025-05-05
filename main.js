@@ -804,8 +804,8 @@ ipcMain.handle('teams-fetch', async (event, id) => {
 
 ipcMain.handle('submit-match-request', async (event, matchData) => {
   try {
-      //const response = await fetch('http://localhost/api/matches/match_request', {
-      const response = await fetch('https://www.vrbattles.gg/api/matches/match_request', {
+      const response = await fetch('http://localhost/api/matches/match_request', {
+      //const response = await fetch('https://www.vrbattles.gg/api/matches/match_request', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(matchData)
@@ -828,6 +828,19 @@ ipcMain.handle('submit-match-request', async (event, matchData) => {
   } catch (err) {
     console.error('Match request error:', err);
     return { success: false, message: err.message };
+  }
+});
+
+
+ipcMain.handle('get-open-match-requests', async () => {
+  try {
+    //const response = await fetch('http://localhost/api/fetch/match_requests');
+    const response = await fetch('https://www.vrbattles.gg/api/fetch/match_requests');
+    const result = await response.json();
+    return result;
+  } catch (err) {
+    console.error('Error fetching match requests:', err);
+    return { data: [] };
   }
 });
 

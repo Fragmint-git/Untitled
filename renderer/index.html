@@ -748,6 +748,42 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="match-request-table">
+                            <h3>Match Requests</h3>
+                            <div class="match-request-wrapper">
+                            <table class="match-requests">
+                              <thead>
+                                <tr>
+                                  <th>Game</th>
+                                  <th>Entry</th>
+                                  <th>Team Size</th>
+                                  <th>Competition</th>
+                                  <th>Skill Level</th>
+                                  <th>Support</th>
+                                  <th>Start Time</th>
+                                  <th></th>
+                                </tr>
+                              </thead>
+                              <tbody id="match-request-body">
+                                <tr>
+                                </tr>
+                              </tbody>
+                            </table>
+                            </div>
+                          </div>
+
+                          <div id="cancel-confirmation-modal" class="modal-overlay" style="display: none;">
+                            <div class="modal-content" style="background: #2c2c2c; padding: 20px; border-radius: 10px; max-width: 400px; text-align: center;">
+                              <h3 style="margin-bottom: 10px;">Cancel Match Request?</h3>
+                              <p>Are you sure you want to cancel this match request?</p>
+                              <div style="margin-top: 20px;">
+                                <button id="cancel-yes" class="btn-modal btn-green">Yes</button>
+                                <button id="cancel-no" class="btn-modal btn-red">No</button>
+                              </div>
+                            </div>
+                          </div>
+                          
                     </div>
                 </section>
 

@@ -77,6 +77,7 @@ contextBridge.exposeInMainWorld(
 
         fetchTeams: (id) => ipcRenderer.invoke('teams-fetch', id),
         submitMatchRequest: (matchData) => ipcRenderer.invoke('submit-match-request', matchData),
+        getOpenMatchRequests: () => ipcRenderer.invoke('get-open-match-requests'),
 
         getAppInfo: () => ipcRenderer.invoke('get-app-info'),
 

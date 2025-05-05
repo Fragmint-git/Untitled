@@ -804,7 +804,7 @@ ipcMain.handle('teams-fetch', async (event, id) => {
 
 ipcMain.handle('submit-match-request', async (event, matchData) => {
   try {
-    //const response = await fetch('http://localhost/api/matches/match_request', {
+      //const response = await fetch('http://localhost/api/matches/match_request', {
       const response = await fetch('https://www.vrbattles.gg/api/matches/match_request', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

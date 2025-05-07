@@ -804,8 +804,8 @@ ipcMain.handle('teams-fetch', async (event, id) => {
 
 ipcMain.handle('submit-match-request', async (event, matchData) => {
   try {
-      const response = await fetch('http://localhost/api/matches/match_request', {
-      //const response = await fetch('https://www.vrbattles.gg/api/matches/match_request', {
+      //const response = await fetch('http://localhost/api/matches/match_request', {
+      const response = await fetch('https://www.vrbattles.gg/api/matches/match_request', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(matchData)
@@ -843,6 +843,45 @@ ipcMain.handle('get-open-match-requests', async () => {
     return { data: [] };
   }
 });
+
+ipcMain.handle('accept-match-request', async (event, matchRequestId) => {
+  try {
+    const currentUser = store.get('userSession');
+    const userId = currentUser?.id;
+
+    if (!matchRequestId || !userId) {
+      return { success: false, message: 'Missing match request ID or user session' };
+    }
+
+    const response = await fetch('http://localhost/api/matches/accept_request', {
+    //const response = await fetch('https://www.vrbattles.gg/api/matches/accept_request', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        match_request_id: matchRequestId,
+        user_id: userId,
+        acceptor_user_id: userId
+      })
+    });
+
+    const contentType = response.headers.get('content-type');
+    const text = await response.text();
+
+    if (contentType && contentType.includes('application/json')) {
+      return JSON.parse(text);
+    } else {
+      console.warn('Response not JSON:', text);
+      return { success: false, message: 'Non-JSON response', raw: text };
+    }
+  } catch (err) {
+    console.error('Accept match failed:', err);
+    return { success: false, message: err.message };
+  }
+});
+
+
 
 
 

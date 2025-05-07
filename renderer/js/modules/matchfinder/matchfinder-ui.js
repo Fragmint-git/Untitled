@@ -1,5 +1,6 @@
 let sessionUserId = null;
 let cancelRequestId = null;
+let acceptRequestId = null;
 /**
  * Matchfinder UI Module
  * Handles UI interactions for the matchmaking functionality
@@ -105,7 +106,7 @@ function formatMatchStart(utcDatetimeString, userTimezone = 'America/Chicago') {
     try {
       const result = await window.api.getOpenMatchRequests();
       const session = await window.api.getSession();
-      sessionUserId = session?.id;
+      const sessionUserId = session?.id;
   
       if (!Array.isArray(result.data)) return;
   
@@ -127,17 +128,12 @@ function formatMatchStart(utcDatetimeString, userTimezone = 'America/Chicago') {
           <td><img src="/assets/images/games/GameLogos/${request.game_image || 'default.png'}" style="height: 50px;"></td>
           <td>${request.entry_fee || 'Free'}</td>
           <td>${request.team_size}</td>
-          <td>
-            ${request.game_name}<br>
-            ${request.region || 'NA'} | ${request.match_type || 'BO3'}
-          </td>
+          <td>${request.game_name}<br>${request.region || 'NA'} | ${request.match_type || 'BO3'}</td>
           <td>${request.skill_level || 'all'}</td>
           <td>${request.support || 'Enabled'}</td>
           <td>${timeDisplay}</td>
           <td>
-            <button 
-              class="${isCreator ? 'btn-cancel' : 'btn-accept'}"
-              data-request-id="${request.id}">
+            <button class="${isCreator ? 'btn-cancel' : 'btn-accept'}" data-request-id="${request.id}">
               ${isCreator ? 'CANCEL' : 'ACCEPT'}
             </button>
           </td>
@@ -145,6 +141,7 @@ function formatMatchStart(utcDatetimeString, userTimezone = 'America/Chicago') {
         tbody.appendChild(row);
       });
   
+      //cancel request
       document.querySelectorAll('.btn-cancel').forEach(button => {
         button.addEventListener('click', () => {
           cancelRequestId = button.dataset.requestId;
@@ -152,54 +149,110 @@ function formatMatchStart(utcDatetimeString, userTimezone = 'America/Chicago') {
         });
       });
   
-      const modal = document.getElementById('cancel-confirmation-modal');
-      const cancelNoBtn = document.getElementById('cancel-no');
-      const cancelYesBtn = document.getElementById('cancel-yes');
-      
-      if (cancelNoBtn && cancelYesBtn) {
-        cancelNoBtn.onclick = () => {
-          modal.style.display = 'none';
-          cancelRequestId = null;
-        };
-      
-        cancelYesBtn.onclick = async () => {
-          if (!cancelRequestId || !sessionUserId) {
-            window.uiModule.showNotification('Missing request or user ID', 'error');
-            return;
+      const cancelModal = document.getElementById('cancel-confirmation-modal');
+      document.getElementById('cancel-no').onclick = () => {
+        cancelModal.style.display = 'none';
+        cancelRequestId = null;
+      };
+      document.getElementById('cancel-yes').onclick = async () => {
+        if (!cancelRequestId || !sessionUserId) {
+          window.uiModule.showNotification('Missing request or user ID', 'error');
+          return;
+        }
+        try {
+          const response = await fetch('http://localhost/api/matches/cancel_request', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              match_request_id: cancelRequestId,
+              user_id: sessionUserId
+            })
+          });
+          const result = await response.json();
+          if (result.status === 'success') {
+            window.uiModule.showNotification('Match request cancelled.', 'success');
+            cancelModal.style.display = 'none';
+            loadOpenMatchRequests();
+          } else {
+            window.uiModule.showNotification(result.message || 'Failed to cancel match.', 'error');
           }
+        } catch (error) {
+          console.error('Cancel failed:', error);
+          window.uiModule.showNotification('Server error.', 'error');
+        }
+      };
+  
+      //accept match
+      document.querySelectorAll('.btn-accept').forEach(button => {
+        button.addEventListener('click', () => {
+          acceptRequestId = button.dataset.requestId;
+          document.getElementById('accept-confirmation-modal').style.display = 'block';
+        });
+      });
       
-          try {
-            //const response = await fetch('http://localhost/api/matches/cancel_request', {
-            const response = await fetch('https://www.vrbattles.gg/api/matches/cancel_request', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                match_request_id: cancelRequestId,
-                user_id: sessionUserId
-              })
-            });
+      const acceptModal = document.getElementById('accept-confirmation-modal');
       
-            const result = await response.json();
-            //console.log('Cancel result:', result);
+      document.getElementById('accept-no').onclick = () => {
+        acceptModal.style.display = 'none';
+        acceptRequestId = null;
+      };
       
-            if (result.status === 'success') {
-              window.uiModule.showNotification('Match request cancelled.', 'success');
-              modal.style.display = 'none';
-              loadOpenMatchRequests();
-            } else {
-              window.uiModule.showNotification(result.message || 'Failed to cancel match.', 'error');
-            }
-          } catch (error) {
-            console.error('Cancel failed:', error);
-            window.uiModule.showNotification('Server error.', 'error');
+      document.getElementById('accept-yes').onclick = async () => {
+        const acceptYesButton = document.getElementById('accept-yes');
+        const acceptNoButton = document.getElementById('accept-no');
+      
+        acceptYesButton.disabled = true;
+        acceptNoButton.disabled = true;
+      
+        const originalYesText = acceptYesButton.textContent;
+        acceptYesButton.textContent = 'Checking…';
+      
+        if (!acceptRequestId) {
+          acceptModal.style.display = 'none';
+          window.uiModule.showNotification('Missing match request ID', 'error');
+          acceptYesButton.disabled = false;
+          acceptNoButton.disabled = false;
+          acceptYesButton.textContent = originalYesText;
+          return;
+        }
+      
+        const session = await window.api.getSession();
+        const sessionUserId = session?.id;
+      
+        if (!sessionUserId) {
+          acceptModal.style.display = 'none';
+          window.uiModule.showNotification('Missing session user ID', 'error');
+          acceptYesButton.disabled = false;
+          acceptNoButton.disabled = false;
+          acceptYesButton.textContent = originalYesText;
+          return;
+        }
+      
+        try {
+          const result = await window.api.acceptMatchRequest(acceptRequestId, sessionUserId);
+          if (result.status === 'success') {
+            acceptModal.style.display = 'none';
+            window.uiModule.showNotification('Match accepted.', 'success');
+            loadOpenMatchRequests();
+          } else {
+            window.uiModule.showNotification(result.message || 'Could not accept match.', 'error');
           }
-        };
-      }
+        } catch (error) {
+          console.error('Accept match error:', error);
+          window.uiModule.showNotification('Server error while accepting match.', 'error');
+        } finally {
+          acceptYesButton.disabled = false;
+          acceptNoButton.disabled = false;
+          acceptYesButton.textContent = originalYesText;
+        }
+      };
       
+      
+  
     } catch (error) {
       console.error('Failed to load match requests:', error);
     }
-  }
+  }//////////////
   
   
 

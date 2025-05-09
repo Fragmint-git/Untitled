@@ -82,6 +82,8 @@ contextBridge.exposeInMainWorld(
 
         getAppInfo: () => ipcRenderer.invoke('get-app-info'),
 
+        getMyMatches: (userId) => ipcRenderer.invoke('get-my-matches', userId),
+
         //lootlocker
         lootlockerLogin: (credentials) => ipcRenderer.invoke('lootlocker-login', credentials),
         lootlockerStartSession: (data) => ipcRenderer.invoke('lootlocker-start-session', data),

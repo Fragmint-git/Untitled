@@ -836,13 +836,25 @@ ipcMain.handle('get-open-match-requests', async () => {
   try {
     //const response = await fetch('http://localhost/api/fetch/match_requests');
     const response = await fetch('https://www.vrbattles.gg/api/fetch/match_requests');
-    const result = await response.json();
+    const text = await response.text();
+
+    if (!text || text.trim() === '') {
+      return { status: 'error', message: 'Empty response from server', data: [] };
+    }
+
+    let result;
+    try {
+      result = JSON.parse(text);
+    } catch (e) {
+      return { status: 'error', message: 'Invalid JSON from server', raw: text, data: [] };
+    }
+
     return result;
   } catch (err) {
-    console.error('Error fetching match requests:', err);
-    return { data: [] };
+    return { status: 'error', message: err.message, data: [] };
   }
 });
+
 
 ipcMain.handle('accept-match-request', async (event, matchRequestId) => {
   try {
@@ -853,8 +865,8 @@ ipcMain.handle('accept-match-request', async (event, matchRequestId) => {
       return { success: false, message: 'Missing match request ID or user session' };
     }
 
-    const response = await fetch('http://localhost/api/matches/accept_request', {
-    //const response = await fetch('https://www.vrbattles.gg/api/matches/accept_request', {
+    //const response = await fetch('http://localhost/api/matches/accept_request', {
+    const response = await fetch('https://www.vrbattles.gg/api/matches/accept_request', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -877,6 +889,31 @@ ipcMain.handle('accept-match-request', async (event, matchRequestId) => {
     }
   } catch (err) {
     console.error('Accept match failed:', err);
+    return { success: false, message: err.message };
+  }
+});
+
+ipcMain.handle('get-my-matches', async (event, userId) => {
+  try {
+    //const response = await fetch('http://localhost/api/fetch/matches', {
+    const response = await fetch('https://www.vrbattles.gg/api/fetch/matches', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: userId })
+    });
+
+    const text = await response.text();
+    let result;
+
+    try {
+      result = JSON.parse(text);
+    } catch (e) {
+      return { success: false, message: 'Invalid JSON from API', raw: text };
+    }
+
+    return result;
+  } catch (err) {
+    console.error('[get-my-matches] Error:', err);
     return { success: false, message: err.message };
   }
 });

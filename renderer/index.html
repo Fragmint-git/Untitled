@@ -720,13 +720,16 @@
                                 <button id="quick-match-btn" class="btn-primary" style="margin-bottom: 5px;">
                                     <i class="fas fa-bolt"></i> Quick Match
                                 </button>
-                                <button class="btn-primary">
+                                <!--<button class="btn-primary">
                                     <i class="fas fa-wallet"></i> Add Funds
+                                </button>-->
+                                <button id="my-matches-btn" class="btn-primary" style="margin-bottom: 5px;">
+                                    <i class="fas fa-arrow-right"></i> My matches
                                 </button>
                             </div>
                         </div>
                         <div class="match-suggestions">
-                            <h3>Suggested Matches</h3>
+                            <h3>Current Matches</h3>
                             <div id="match-suggestions-list" class="suggestions-list">
                                 <!-- Example suggestion (will be replaced by dynamic content) -->
                                 <div class="match-suggestion">
@@ -796,10 +799,9 @@
                               </div>
                             </div>
                           </div>
-                          
-                          
                     </div>
                 </section>
+                  
 
                 <!-- Quick Match Modal -->
                 <div id="modal-quickmatch" class="modal-overlay" style="display: none;">
@@ -1066,6 +1068,13 @@
                             </section>
                         </div>
                     </div>
+                </section>
+
+                <section id="my-matches-tab" class="content-section">
+                    <h2>My Matches</h2>
+                    <div id="my-matches-content"></div>
+                  </section>
+
                 </div>
                 
 
@@ -1560,6 +1569,23 @@
     console.error(error);
   }
 }
+
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        const session = await window.api.getSession();
+        
+        if (session && session.id) {
+            if (window.preloadMatchesInBackground) {
+                window.preloadMatchesInBackground();
+            } else if (typeof preloadMatchesInBackground === 'function') {
+                preloadMatchesInBackground();
+            }
+        }
+    } catch (error) {
+        console.error('Error in preload match session check:', error);
+    }
+});
+
 
 
 

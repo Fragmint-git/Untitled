@@ -2846,3 +2846,60 @@ body.dark-mode .btn-secondary:hover {
     background-color: #2ecc71;
   }
   
+
+  .match-preview-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1f1f2f;
+    color: white;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 10px;
+    position: relative;
+    flex-wrap: wrap;
+  }
+  
+  .match-preview-card .team-name {
+    flex: 1;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  .match-preview-card .team-name.left {
+    text-align: left;
+  }
+  
+  .match-preview-card .team-name.right {
+    text-align: right;
+  }
+  
+  .match-preview-card .match-info {
+    flex: 2;
+    text-align: center;
+  }
+  
+  .match-preview-card .team-buttons {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    margin-top: 10px;
+  }
+  
+  .completed-match-card {
+    background-color: #2e2f38;
+    padding: 15px;
+    margin-bottom: 10px;
+    border: 1px solid #ff5e00;
+    border-radius: 6px;
+    color: #fff;
+  }
+  
+  .content-section {
+    display: none;
+  }
+  
+  .content-section.active {
+    display: block;
+  }

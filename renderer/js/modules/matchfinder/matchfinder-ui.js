@@ -242,7 +242,7 @@ async function renderCompletedMatches(matches) {
 
 
 
-
+//scores details and form
 document.getElementById('my-matches-btn').addEventListener('click', async () => {
   if (!cachedMatchData.session || cachedMatchData.matches.length === 0) {
     await preloadMatchesInBackground();
@@ -271,10 +271,220 @@ document.getElementById('my-matches-btn').addEventListener('click', async () => 
   );
 
   if (myMatch) {
+
+    const team1Name = myMatch.team1_details?.name || 'Team A';
+    const team2Name = myMatch.team2_details?.name || 'Team B';
+    const gameName = myMatch.game_name;
+    const region = myMatch.request_details?.region || 'N/A';
+    const teamSize = myMatch.request_details?.team_size || 'N/A';
+    const map = myMatch.map_name || 'Coming soon';
+    const formattedDate = formatDate(myMatch.start_time);
+    const formattedTime = formatTime(myMatch.start_time);
+
     if (myMatch.status === 'in-progress') {
-      const info = document.createElement('p');
-      info.innerHTML = 'You have an <strong>in-progress</strong> match. Please proceed to score entry.';
-      contentDiv.appendChild(info);
+      contentDiv.innerHTML = `
+      <div class="match-scores-details">
+        <h2 style="text-align: center;">Current Match Details</h2>
+        <div class="match-score-submission" style="margin-top: 1rem;">
+          <div style="display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap;">
+            <div style="text-align: center; margin-bottom: 1rem;">
+              <strong class="team-label">(${team1Name})</strong>
+              <img src="/assets/images/no-image.png" alt="Team 1" style="max-width: 100px; display: block; margin: 10px auto;">
+              <button class="btn-gradient">View Team</button>
+            </div>
+            <div class="match-center-info" style="text-align: center;">
+              <h3>${gameName} - BO3</h3>
+              <p>Team Size: ${teamSize}</p>
+              <p>Map: ${map}</p>
+              <p>Date: ${formattedDate}</p>
+              <p>Time: ${formattedTime}</p>
+              <p>Region: ${region}</p>
+              <p>Status: <strong style="color: orange;">${myMatch.status}</strong></p>
+            </div>
+            <div style="text-align: center; margin-bottom: 1rem;">
+              <strong class="team-label">(${team2Name})</strong>
+              <img src="/assets/images/no-image.png" alt="Team 2" style="max-width: 100px; display: block; margin: 10px auto;">
+              <button class="btn-gradient">View Team</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="match-score-submission">
+          <div class="match-header">
+            <h2>Submit Match Results</h2>
+          </div>
+
+          <form id="submit-score-form">
+            <div class="form-group">
+              <label for="winner">Select Match Winner:</label>
+              <select id="winner" name="winner" class="form-select" required>
+                <option value="">Select Winner</option>
+                <option value="1">${team1Name}</option>
+                <option value="2">${team2Name}</option>
+                <option value="3">Draw</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="rounds_played">Rounds Played:</label>
+              <select id="rounds_played" name="rounds_played" class="form-select" onchange="updateRounds()" required>
+                <option value="2">2 Rounds</option>
+                <option value="3">3 Rounds</option>
+              </select>
+            </div>
+
+            <div id="score_inputs"></div>
+
+            <div class="form-group" style="text-align: center; margin-top: 30px;">
+              <input type="checkbox" id="no_proof" name="no_proof" onchange="toggleProofInput()" />
+              <label for="no_proof" style="margin-left: 8px;">No proof available</label>
+              <div style="font-size: 12px; color: var(--text-color); margin-top: 5px;">Check this box if you cannot provide proof.</div>
+
+              <div style="margin-top: 20px;">
+                <label for="proof" style="display: block; font-weight: bold; margin-bottom: 5px;">Provide link of Proof:</label>
+                <input type="text" id="proof" name="proof" class="form-input" required
+                  style="width: 90%; max-width: 800px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; background: var(--bg-input, #fff); color: var(--text-color, #000);" />
+                <div style="font-size: 12px; margin-top: 8px; color: var(--text-color);">
+                  Note: Upload a screenshot or video to Google Drive and share the link.<br>
+                  Rename as <code>GameName_Mode_Team_Round</code>.
+                </div>
+              </div>
+            </div>
+            
+          <div class="form-group" style="display: flex; justify-content: center; gap: 15px; margin-top: 30px; flex-wrap: wrap;">
+            <button type="submit" class="btn-submit"
+              style="background: #28a745; color: white; padding: 12px 20px; border: none; border-radius: 6px; font-size: 16px; font-weight: bold;">
+              Submit
+            </button>
+            <button type="button" class="btn-forfeit"
+              style="background: #007bff; color: white; padding: 12px 20px; border: none; border-radius: 6px; font-size: 16px; font-weight: bold;">
+              Forfeit
+            </button>
+            <button type="button" class="btn-dispute"
+              style="background: #dc3545; color: white; padding: 12px 20px; border: none; border-radius: 6px; font-size: 16px; font-weight: bold;">
+              Dispute Match
+            </button>
+          </div>
+
+          </form>
+        </div>
+      `;
+      window.updateRounds = function () {
+      const roundsPlayed = parseInt(document.getElementById('rounds_played').value);
+      const teamA = document.querySelector('option[value="1"]').textContent;
+      const teamB = document.querySelector('option[value="2"]').textContent;
+      const container = document.getElementById('score_inputs');
+      container.innerHTML = '';
+
+      for (let i = 1; i <= roundsPlayed; i++) {
+        container.innerHTML += `
+          <div class="round-scores" style="margin-top: 30px;">
+            <h5 style="text-align: center; font-size: 16px; margin-bottom: 15px;">Round ${i} Scores:</h5>
+            <div class="form-row" style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+              <div class="form-group" style="flex: 1; min-width: 200px; max-width: 300px;">
+                <label style="display: block; margin-bottom: 5px;">${teamA}:</label>
+              <input type="text" name="round${i}_team1" class="form-input round-score-input" required
+                placeholder="Enter ${teamA} score">
+              </div>
+              <div class="form-group" style="flex: 1; min-width: 200px; max-width: 300px;">
+                <label style="display: block; margin-bottom: 5px;">${teamB}:</label>
+              <input type="text" name="round${i}_team2" class="form-input round-score-input" required
+                placeholder="Enter ${teamB} score">
+              </div>
+              <div class="form-group" style="flex: 1; min-width: 200px; max-width: 300px;">
+                <label style="display: block; margin-bottom: 5px;">Round Winner:</label>
+                <select name="round${i}_winner" class="form-select" required
+                  style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; background: var(--bg-input, #fff); color: inherit;">
+                  <option value="">Select Winner</option>
+                  <option value="1">${teamA}</option>
+                  <option value="2">${teamB}</option>
+                  <option value="3">Draw</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+    };
+
+      window.toggleProofInput = function () {
+        const checkbox = document.getElementById('no_proof');
+        const proofInput = document.getElementById('proof');
+        proofInput.disabled = checkbox.checked;
+        if (checkbox.checked) proofInput.value = '';
+      };
+
+      updateRounds();
+      return; 
+    } else if (myMatch.status === 'unconfirmed') {
+      const round = myMatch.rounds?.[0];
+      const submittedBy = round?.score_submitted_by_user_id;
+      const currentUserId = session.id;
+
+      const team1 = myMatch.team1_details?.name || 'Team A';
+      const team2 = myMatch.team2_details?.name || 'Team B';
+      const matchWinner =
+        myMatch.rounds?.[0]?.match_winner_id == '1' ? team1 :
+        myMatch.rounds?.[0]?.match_winner_id == '2' ? team2 :
+        'Draw';
+      const gameName = myMatch.game_name;
+      const formattedDate = formatDate(myMatch.start_time);
+      const formattedTime = formatTime(myMatch.start_time);
+
+      let roundResultsHTML = myMatch.rounds.map((r, index) => {
+        const winner =
+          r.round_winner_id == '1' ? team1 :
+          r.round_winner_id == '2' ? team2 :
+          'Draw';
+        return `
+          <div style="background: #5b6673; border: 1px solid #ccc; border-radius: 8px; padding: 15px; margin-bottom: 15px; color: white;">
+            <strong>Round ${r.round_number}</strong><br>
+            Round Winner : <span style="color: #f07a3f; font-weight: bold;">${winner}</span><br>
+            ${team1} : ${r.team_1_score}<br>
+            ${team2} : ${r.team_2_score}
+          </div>
+        `;
+      }).join('');
+
+      if (submittedBy == currentUserId) {
+        contentDiv.innerHTML = `
+          <div class="match-score-submission">
+            <h2 style="text-align: center;">Confirm Match Results</h2>
+            <p style="text-align: center; font-size: 18px;">
+              Match Winner: <strong style="color: orange;">${matchWinner}</strong>
+            </p>
+            <p style="text-align: center; font-size: 16px;">${gameName}</p>
+            <p style="text-align: center; font-size: 14px;">Date: <strong>${formattedDate}</strong> at <strong>${formattedTime}</strong></p>
+            ${roundResultsHTML}
+            <div style="text-align: center; font-size: 14px; margin-top: 15px;">
+              Waiting for other team to confirm results. If results aren't confirmed in 10 mins, match will auto-confirm based on current results.
+            </div>
+          </div>
+        `;
+      } else {
+        contentDiv.innerHTML = `
+          <div class="match-score-submission">
+            <h2 style="text-align: center;">Confirm Match Results</h2>
+            <p style="text-align: center; font-size: 18px;">
+              Match Winner: <strong style="color: orange;">${matchWinner}</strong>
+            </p>
+            <p style="text-align: center; font-size: 16px;">${gameName}</p>
+            <p style="text-align: center; font-size: 14px;">Date: <strong>${formattedDate}</strong> at <strong>${formattedTime}</strong></p>
+            ${roundResultsHTML}
+            <div style="display: flex; justify-content: center; gap: 20px; margin-top: 20px;">
+              <button class="btn-confirm" onclick="confirmMatch(${myMatch.match_id})">Confirm Results</button>
+              <button class="btn-dispute" onclick="disputeMatch(${myMatch.match_id})">Dispute Results</button>
+            </div>
+          </div>
+        `;
+
+        setTimeout(() => {
+          confirmMatch(myMatch.match_id);
+        }, 600000);
+      }
     } else if (myMatch.status === 'scheduled') {
       const team1Name = myMatch.team1_details?.name || 'Team 1';
       const team2Name = myMatch.team2_details?.name || 'Team 2';
@@ -343,10 +553,36 @@ document.getElementById('my-matches-btn').addEventListener('click', async () => 
     contentDiv.appendChild(info);
   }
 
-  const completed = matches.filter(m => m.current_match == 0);
-  renderCompletedMatches(completed);
+  if (!myMatch || myMatch.status !== 'unconfirmed') {
+    const completed = matches.filter(m => m.current_match == 0);
+    renderCompletedMatches(completed);
+  }
+
 });//////////////
 
+
+function renderRoundsHTML(match) {
+  const team1 = match.team1_details?.name || 'Team A';
+  const team2 = match.team2_details?.name || 'Team B';
+
+  return match.rounds.map(r => {
+    const winner =
+      r.round_winner_id == '1' ? team1 :
+      r.round_winner_id == '2' ? team2 :
+      'Draw';
+
+    return `
+      <div style="background: #5b6673; border: 1px solid #ccc; border-radius: 8px; padding: 15px; margin-bottom: 15px; color: white;">
+        <div style="font-weight: bold; font-size: 16px;">Round ${r.round_number}</div>
+        <div style="margin-top: 5px;">
+          Round Winner : <span style="color: #f07a3f; font-weight: bold;">${winner}</span>
+        </div>
+        <div style="margin-top: 5px;">${team1} : ${r.team_1_score}</div>
+        <div>${team2} : ${r.team_2_score}</div>
+      </div>
+    `;
+  }).join('');
+}
 
 
 
@@ -429,7 +665,7 @@ function formatMatchStart(utcDatetimeString, userTimezone = 'America/Chicago') {
   }
   
 
-  
+  //load match requests
   async function loadOpenMatchRequests() {
     try {
       const result = await window.api.getOpenMatchRequests();
@@ -489,6 +725,7 @@ function formatMatchStart(utcDatetimeString, userTimezone = 'America/Chicago') {
         }
         try {
           const response = await fetch('http://localhost/api/matches/cancel_request', {
+          //const response = await fetch('https://vrbattles.gg/api/matches/cancel_request', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -607,6 +844,133 @@ async function pollMatchesInBackground() {
 setInterval(pollMatchesInBackground, 5000);
 
 pollMatchesInBackground();
+
+
+document.getElementById('submit-score-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const form = e.target;
+  const submitBtn = form.querySelector('.btn-submit');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Submitting...';
+
+  const winner = form.winner.value;
+  const roundsPlayed = parseInt(form.rounds_played.value);
+  const proof = form.proof.value;
+  const noProof = form.no_proof.checked ? 1 : 0;
+  const session = cachedMatchData.session;
+  const matchId = cachedMatchData.matches.find(m => m.current_match == 1)?.match_id;
+
+  const team_scores = {};
+  for (let i = 1; i <= roundsPlayed; i++) {
+    team_scores[`round${i}`] = {
+      team_a: form[`round${i}_team1`].value,
+      team_b: form[`round${i}_team2`].value,
+      winner: form[`round${i}_winner`].value
+    };
+  }
+
+  const payload = {
+    match_id: matchId,
+    user_id: session.id,
+    winner,
+    proof: noProof ? 0 : proof,
+    team_scores
+  };
+
+  try {
+    const response = await fetch('http://localhost/api/matches/submit_scores', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+    if (result.status === 'success') {
+      const refetch = await fetch('http://localhost/api/fetch/matches', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: session.id })
+      });
+
+      const refetchResult = await refetch.json();
+      if (refetchResult.status === 'success') {
+        cachedMatchData.matches = refetchResult.data;
+        renderMatchDetails(session.id);
+      } else {
+        alert('Failed to reload updated match info.');
+      }
+    } else {
+      alert(result.message || 'Failed to submit score.');
+    }
+  } catch (error) {
+    console.error('[Score Submit Error]', error);
+    alert('An error occurred while submitting the score.');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Submit';
+  }
+});
+
+
+/*document.addEventListener('submit', async (e) => {
+  if (e.target.id !== 'submit-score-form') return;
+  e.preventDefault();
+
+  const form = e.target;
+  const submitBtn = form.querySelector('.btn-submit');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Submitting...';
+
+  const winner = form.winner.value;
+  const roundsPlayed = parseInt(form.rounds_played.value);
+  const proof = form.proof.value;
+  const noProof = form.no_proof.checked ? 1 : 0;
+  const session = cachedMatchData.session;
+  const matchId = cachedMatchData.matches.find(m => m.current_match == 1)?.match_id;
+
+  const team_scores = {};
+  for (let i = 1; i <= roundsPlayed; i++) {
+    team_scores[`round${i}`] = {
+      team_a: form[`round${i}_team1`].value,
+      team_b: form[`round${i}_team2`].value,
+      winner: form[`round${i}_winner`].value
+    };
+  }
+
+  const payload = {
+    match_id: matchId,
+    user_id: session.id,
+    winner,
+    proof: noProof ? 0 : proof,
+    team_scores
+  };
+
+  console.log('[Submitting Payload]', payload);
+
+  try {
+    const response = await fetch('http://localhost/api/matches/submit_scores', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+    if (result.status === 'success') {
+      alert('Score submitted successfully!');
+      // document.getElementById('my-matches-btn').click(); // enable this if needed
+    } else {
+      alert(result.message || 'Failed to submit score.');
+    }
+  } catch (error) {
+    console.error('[Score Submit Error]', error);
+    alert('An error occurred while submitting the score.');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Submit';
+  }
+});*/
+
 
 
 // Handle custom match button click

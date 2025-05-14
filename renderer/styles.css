@@ -2903,3 +2903,134 @@ body.dark-mode .btn-secondary:hover {
   .content-section.active {
     display: block;
   }
+
+/* match details */
+.match-score-submission {
+  background-color: #1e1e1e;
+  color: #ffffff;
+  padding: 30px;
+  border-radius: 10px;
+  max-width: 800px;
+  margin: auto;
+}
+
+body.light-mode .match-score-submission {
+  background-color: #ffffff;
+  color: #000000;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.btn-gradient {
+  background: linear-gradient(135deg, #ff8a00, #e52e71);
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: bold;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+body.light-mode .match-center-info,
+body.light-mode .team-label {
+  color: #000000;
+}
+
+
+/* score submission form */
+.match-score-submission {
+  background-color: #1e1e1e;
+  color: #ffffff;
+  padding: 30px;
+  border-radius: 10px;
+  max-width: 800px;
+  margin: auto;
+  border: 1px solid #2a2a2a;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.03);
+  position: relative;
+}
+
+body.light-mode .match-score-submission {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+body.dark-mode select,
+body.dark-mode option {
+  color: #ffffff;
+  background-color: #333333;
+}
+
+body.light-mode select,
+body.light-mode option {
+  color: #000000;
+  background-color: #ffffff;
+}
+
+.round-score-input,
+.round-score-select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+body.light-mode .round-score-input,
+body.light-mode .round-score-select {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+body.dark-mode .round-score-input,
+body.dark-mode .round-score-select {
+  background-color: #333333;
+  color: #ffffff;
+  border-color: #555555;
+}
+
+body.dark-mode .round-score-input::placeholder {
+  color: #bbbbbb;
+}
+
+
+/* accept scores */
+
+.round-display {
+  background: #5b6673;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+  color: white;
+}
+
+.round-display .winner {
+  color: #f07a3f;
+  font-weight: bold;
+}
+
+.btn-confirm {
+  background-color: #28a745;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.btn-confirm:hover {
+  background-color: #218838;
+}
+
+.btn-dispute {
+  background-color: #dc3545;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.btn-dispute:hover {
+  background-color: #bd2130;
+}

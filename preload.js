@@ -80,6 +80,8 @@ contextBridge.exposeInMainWorld(
         getOpenMatchRequests: () => ipcRenderer.invoke('get-open-match-requests'),
         acceptMatchRequest: (matchRequestId) => ipcRenderer.invoke('accept-match-request', matchRequestId),
 
+        calculateMMR: (payload) => ipcRenderer.invoke('calculate-mmr', payload),
+
         getAppInfo: () => ipcRenderer.invoke('get-app-info'),
 
         getMyMatches: (userId) => ipcRenderer.invoke('get-my-matches', userId),

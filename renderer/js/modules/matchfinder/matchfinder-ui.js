@@ -1,6 +1,7 @@
 let sessionUserId = null;
 let cancelRequestId = null;
 let acceptRequestId = null;
+
 /**
  * Matchfinder UI Module
  * Handles UI interactions for the matchmaking functionality
@@ -145,7 +146,7 @@ async function preloadMatchesInBackground() {
       };
     }
   } catch (err) {
-    console.error('[Background Match Preload Error]', err);
+    //console.error('[Background Match Preload Error]', err);
   }
 }
 
@@ -244,9 +245,7 @@ async function renderCompletedMatches(matches) {
 
 //scores details and form
 document.getElementById('my-matches-btn').addEventListener('click', async () => {
-  if (!cachedMatchData.session || cachedMatchData.matches.length === 0) {
-    await preloadMatchesInBackground();
-  }
+  await preloadMatchesInBackground();
 
   document.querySelectorAll('.content-section').forEach(section => {
     section.classList.remove('active');
@@ -254,7 +253,6 @@ document.getElementById('my-matches-btn').addEventListener('click', async () => 
   document.getElementById('my-matches-tab').classList.add('active');
 
   const tab = document.getElementById('my-matches-tab');
-
   const contentDiv = document.getElementById('my-matches-content');
   contentDiv.innerHTML = '';
 
@@ -846,8 +844,11 @@ setInterval(pollMatchesInBackground, 5000);
 pollMatchesInBackground();
 
 
-document.getElementById('submit-score-form').addEventListener('submit', async (e) => {
+document.addEventListener('submit', async (e) => {
+  if (e.target.id !== 'submit-score-form') return;
+
   e.preventDefault();
+  e.stopPropagation();
 
   const form = e.target;
   const submitBtn = form.querySelector('.btn-submit');
@@ -896,7 +897,9 @@ document.getElementById('submit-score-form').addEventListener('submit', async (e
       const refetchResult = await refetch.json();
       if (refetchResult.status === 'success') {
         cachedMatchData.matches = refetchResult.data;
-        renderMatchDetails(session.id);
+
+        document.getElementById('my-matches-tab').classList.add('active');
+        loadMyMatchTab();
       } else {
         alert('Failed to reload updated match info.');
       }
@@ -911,6 +914,176 @@ document.getElementById('submit-score-form').addEventListener('submit', async (e
     submitBtn.textContent = 'Submit';
   }
 });
+
+
+async function confirmMatch(matchId) {
+  const session = await window.api.getSession();
+  const userId = session?.id;
+  if (!userId) return alert('Session error');
+
+  const currentMatch = cachedMatchData.matches.find(m => m.match_id == matchId);
+  if (!currentMatch) return alert('Match not found.');
+  //console.log('[Current Match]', currentMatch);
+
+  const team1_id = currentMatch.team1_id;
+  const team2_id = currentMatch.team2_id;
+  const team1_team_id = currentMatch.team1_details?.id;
+  const team2_team_id = currentMatch.team2_details?.id;
+
+  const game_name = currentMatch.game_name;
+  const game_mode = currentMatch.game_mode || currentMatch.request_details?.team_size || 'N/A';
+
+  const match_winner_id = currentMatch.rounds?.[0]?.match_winner_id;
+  const match_loser_id = match_winner_id == 1 ? 2 : 1;
+  const match_winner = match_winner_id == 1 ? team1_id : team2_id;
+  const match_loser = match_loser_id == 1 ? team1_id : team2_id;
+
+  const forfeit_value = currentMatch.rounds?.some(r => r.proof === 'Win-via-Forfeit') ? 'true' : 'false';
+
+  const matchDetails = currentMatch.rounds?.map(r => ({
+    team_1_score: parseInt(r.team_1_score),
+    team_2_score: parseInt(r.team_2_score)
+  })) || [];
+
+  //console.log('[Match Details]', matchDetails);
+  //console.log('[Team IDs]', { team1_id, team2_id, team1_team_id, team2_team_id });
+  //console.log('[Game]', { game_name, game_mode });
+  //console.log('[Match Outcome]', { match_winner_id, match_loser_id, match_winner, match_loser, forfeit_value });
+
+  const response = await fetch('http://localhost/api/fetch/get_teams_by_ids', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ team_ids: [team1_team_id, team2_team_id] })
+  });
+
+  const allTeams = await response.json();
+  //console.log('[Fetched Teams]', allTeams);
+  if (allTeams.status !== 'success') return alert('Failed to fetch teams');
+
+  const team1 = allTeams.data.find(t => parseInt(t.id) === parseInt(team1_team_id));
+  const team2 = allTeams.data.find(t => parseInt(t.id) === parseInt(team2_team_id));
+  if (!team1 || !team2) return alert('Teams not found');
+
+  const extractRatings = (players) => {
+    const ratings = {};
+    players.forEach(p => {
+      const data = typeof p.player_data === 'string'
+        ? JSON.parse(p.player_data || '{}')
+        : (p.player_data || {});
+
+      const mmr = data.player_mmr || {};
+      const mu = parseFloat(mmr.mu);
+      const sigma = parseFloat(mmr.sigma);
+      const ordinal = parseFloat(mmr.ordinal);
+
+      //console.log(`[Player ${p.username} MMR] mu: ${mu}, sigma: ${sigma}, ordinal: ${ordinal}`);
+
+      ratings[p.id] = {
+        mu: !isNaN(mu) && mu > 0 ? mu : 25,
+        sigma: !isNaN(sigma) && sigma > 0 ? sigma : 8.333
+      };
+    });
+    return ratings;
+  };
+
+  const team1_player_ids = team1.players.map(p => p.id);
+  const team2_player_ids = team2.players.map(p => p.id);
+  const team1_ratings = extractRatings(team1.players);
+  const team2_ratings = extractRatings(team2.players);
+
+  //console.log('[Team 1 Players]', team1.players);
+  //console.log('[Team 2 Players]', team2.players);
+  //console.log('[Extracted Ratings]', { team1_ratings, team2_ratings });
+
+  const prevRatingTeam1 = {
+    mu: parseFloat(team1.mu) || 25,
+    sigma: parseFloat(team1.sigma) || 8.333
+  };
+  const prevRatingTeam2 = {
+    mu: parseFloat(team2.mu) || 25,
+    sigma: parseFloat(team2.sigma) || 8.333
+  };
+
+  //console.log('[Previous Team Ratings]', { team1: prevRatingTeam1, team2: prevRatingTeam2 });
+
+  const mmrPayload = {
+    team1_player_ids,
+    team2_player_ids,
+    team1_ratings,
+    team2_ratings,
+    prevRatingTeam1,
+    prevRatingTeam2,
+    matchDetails
+  };
+
+  //console.log('[MMR Payload]', mmrPayload);
+
+  const mmrResult = await window.api.calculateMMR(mmrPayload);
+  //console.log('[MMR Result]', mmrResult);
+
+  if (mmrResult.status !== 'success') return alert('Failed to calculate MMR');
+
+  const confirmPayload = {
+    match_id: matchId,
+    user_id: userId,
+    winner_id: match_winner,
+    loser_id: match_loser,
+    team_winner: team1_id === match_winner ? team1_team_id : team2_team_id,
+    team_loser: team1_id === match_loser ? team1_team_id : team2_team_id,
+    match_winner,
+    match_loser,
+    mu1: mmrResult.team1_avg.mu,
+    sigma1: mmrResult.team1_avg.sigma,
+    ordinal1: mmrResult.team1_avg.ordinal,
+    mu2: mmrResult.team2_avg.mu,
+    sigma2: mmrResult.team2_avg.sigma,
+    ordinal2: mmrResult.team2_avg.ordinal,
+    team1_id,
+    team2_id,
+    team1_team_id,
+    team2_team_id,
+    game_name,
+    game_mode,
+    forfeit_value,
+    team1_ratings: JSON.stringify(mmrResult.team1_players),
+    team2_ratings: JSON.stringify(mmrResult.team2_players)
+  };
+
+  //console.log('[Final Confirm Payload]', confirmPayload);
+
+  try {
+      const confirmBtn = document.querySelector('.btn-confirm');
+      if (confirmBtn) confirmBtn.disabled = true;
+      
+    const response = await fetch('http://localhost/api/matches/confirm_match', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(confirmPayload)
+    });
+
+    const result = await response.json();
+    //console.log('[Confirm Match Response]', result);
+
+    if (result.status === 'success') {
+      window.uiModule.showNotification('Match confirmed successfully!', 'success');
+
+      setTimeout(async () => {
+        await preloadMatchesInBackground();
+        loadMyMatchTab();
+      }, 2000);
+    } else {
+      alert(result.message || 'Failed to confirm match.');
+    }
+  } catch (err) {
+    //console.error('[Confirm Match Error]', err);
+    alert('An error occurred while confirming match.');
+  }
+}/////////////
+
+
+
+
+
 
 
 /*document.addEventListener('submit', async (e) => {
@@ -1081,6 +1254,9 @@ function updateSuggestionsList(suggestions) {
     });
 }
 
+
+
+
 // Helper function to get current user ID (implement this based on your auth system)
 async function getCurrentUserId() {
     // Implement this based on your authentication system
@@ -1088,6 +1264,115 @@ async function getCurrentUserId() {
 }
 preloadMatchesInBackground();
 setInterval(preloadMatchesInBackground, 1000);
+
+
+async function loadMyMatchTab() {
+  if (!cachedMatchData.session || cachedMatchData.matches.length === 0) {
+    await preloadMatchesInBackground();
+  }
+
+  document.querySelectorAll('.content-section').forEach(section => {
+    section.classList.remove('active');
+  });
+  document.getElementById('my-matches-tab').classList.add('active');
+
+  const tab = document.getElementById('my-matches-tab');
+  const contentDiv = document.getElementById('my-matches-content');
+  contentDiv.innerHTML = '';
+
+  const { session, matches } = cachedMatchData;
+
+  if (!session || !matches || matches.length === 0) {
+    contentDiv.innerHTML = '<p>No session or matches available.</p>';
+    return;
+  }
+
+  const myMatch = matches.find(m =>
+    (m.team1_id == session.id || m.team2_id == session.id) &&
+    m.current_match == 1
+  );
+
+  if (myMatch) {
+    document.getElementById('my-matches-btn').click();
+    return;
+  } else {
+    const info = document.createElement('p');
+    info.textContent = 'You are not in a current match.';
+    contentDiv.appendChild(info);
+  }
+
+  if (!myMatch || myMatch.status !== 'unconfirmed') {
+    const completed = matches.filter(m => m.current_match == 0);
+    renderCompletedMatches(completed);
+  }
+}
+
+let lastMatchStatus = null;
+let lastMatchId = null;
+
+async function watchMatchStatus() {
+  try {
+    const session = await window.api.getSession();
+    if (!session || !session.id) return;
+
+    const result = await window.api.getMyMatches(session.id);
+    if (result.status !== 'success') return;
+
+    const currentMatch = result.data.find(m =>
+      (m.team1_id == session.id || m.team2_id == session.id) &&
+      m.current_match == 1
+    );
+
+    if (!currentMatch && (lastMatchStatus !== null || lastMatchId !== null)) {
+      const isTabActive = document.getElementById('my-matches-tab')?.classList.contains('active');
+      if (isTabActive) {
+        cachedMatchData = {
+          session,
+          matches: result.data
+        };
+        loadMyMatchTab();
+      }
+      lastMatchStatus = null;
+      lastMatchId = null;
+      return;
+    }
+
+
+    const currentStatus = currentMatch.status;
+    const currentId = currentMatch.match_id;
+
+    if (lastMatchStatus === null || lastMatchId === null) {
+      lastMatchStatus = currentStatus;
+      lastMatchId = currentId;
+      return;
+    }
+
+    const statusChanged = currentStatus !== lastMatchStatus;
+    const matchChanged = currentId !== lastMatchId;
+
+    if (statusChanged || matchChanged) {
+      lastMatchStatus = currentStatus;
+      lastMatchId = currentId;
+
+      const isTabActive = document.getElementById('my-matches-tab')?.classList.contains('active');
+      if (isTabActive) {
+
+        cachedMatchData = {
+          session,
+          matches: result.data
+        };
+
+        loadMyMatchTab();
+      }
+    }
+
+  } catch (error) {
+    //console.error('[watchMatchStatus Error]', error);
+  }
+}
+setInterval(watchMatchStatus, 1000);
+
+
 
 // Export module
 window.matchfinderUIModule = {

@@ -6,6 +6,7 @@ const path = require('path');
 const url = require('url');
 const packageJson = require('./package.json');
 
+
 // Set the application name for macOS menu bar
 app.name = 'VR Battles Nexus';
 
@@ -16,6 +17,7 @@ const axios = require('axios');
 const crypto = require('crypto');
 const Store = require('electron-store');
 const store = new Store();
+const { rating, rate, ordinal } = require('openskill');
 
 
 const apiUrl = process.env.API_URL;
@@ -56,6 +58,8 @@ function createWindow() {
       webviewTag: false
     }
   });
+
+  mainWindow.webContents.openDevTools();
 
   // Set Content Security Policy
   mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
@@ -919,7 +923,94 @@ ipcMain.handle('get-my-matches', async (event, userId) => {
   }
 });
 
+ipcMain.handle('calculate-mmr', async (event, payload) => {
+  const {
+    team1_player_ids,
+    team2_player_ids,
+    team1_ratings,
+    team2_ratings,
+    prevRatingTeam1,
+    prevRatingTeam2,
+    matchDetails
+  } = payload;
 
+  //console.log('[MMR Input Payload]', payload);
+
+  try {
+    let updatedTeam1Players = team1_player_ids.map(id => rating({
+      mu: parseFloat(team1_ratings[id]?.mu) || 25,
+      sigma: parseFloat(team1_ratings[id]?.sigma) || 8.333
+    }));
+
+    let updatedTeam2Players = team2_player_ids.map(id => rating({
+      mu: parseFloat(team2_ratings[id]?.mu) || 25,
+      sigma: parseFloat(team2_ratings[id]?.sigma) || 8.333
+    }));
+
+    let updatedPlayer1 = rating({
+      mu: parseFloat(prevRatingTeam1.mu) || 25,
+      sigma: parseFloat(prevRatingTeam1.sigma) || 8.333
+    });
+
+    let updatedPlayer2 = rating({
+      mu: parseFloat(prevRatingTeam2.mu) || 25,
+      sigma: parseFloat(prevRatingTeam2.sigma) || 8.333
+    });
+
+    const scores = matchDetails.map(r => ({
+      team1: parseFloat(r.team_1_score),
+      team2: parseFloat(r.team_2_score)
+    }));
+
+    //console.log('[Initial Scores]', scores);
+
+    for (const round of scores) {
+      [updatedTeam1Players, updatedTeam2Players] = rate([updatedTeam1Players, updatedTeam2Players], {
+        score: [round.team1, round.team2]
+      });
+    }
+
+    for (const round of scores) {
+      [updatedPlayer1, updatedPlayer2] = rate([[updatedPlayer1], [updatedPlayer2]], {
+        score: [round.team1, round.team2]
+      });
+      updatedPlayer1 = updatedPlayer1[0];
+      updatedPlayer2 = updatedPlayer2[0];
+    }
+
+    const result = {
+      status: 'success',
+      team1_avg: {
+        mu: updatedPlayer1.mu,
+        sigma: updatedPlayer1.sigma,
+        ordinal: ordinal({ mu: updatedPlayer1.mu, sigma: updatedPlayer1.sigma })
+      },
+      team2_avg: {
+        mu: updatedPlayer2.mu,
+        sigma: updatedPlayer2.sigma,
+        ordinal: ordinal({ mu: updatedPlayer2.mu, sigma: updatedPlayer2.sigma })
+      },
+      team1_players: updatedTeam1Players.map((p, i) => ({
+        id: team1_player_ids[i],
+        mu: p.mu,
+        sigma: p.sigma,
+        ordinal: ordinal({ mu: p.mu, sigma: p.sigma })
+      })),
+      team2_players: updatedTeam2Players.map((p, i) => ({
+        id: team2_player_ids[i],
+        mu: p.mu,
+        sigma: p.sigma,
+        ordinal: ordinal({ mu: p.mu, sigma: p.sigma })
+      }))
+    };
+
+    //console.log('[MMR Calculation Result]', result);
+    return result;
+  } catch (err) {
+    //console.error('[MMR Error]', err);
+    return { status: 'error', message: err.message };
+  }
+});
 
 
 

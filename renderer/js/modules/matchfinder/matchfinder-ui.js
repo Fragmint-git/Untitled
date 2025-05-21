@@ -416,6 +416,47 @@ document.getElementById('my-matches-btn').addEventListener('click', async () => 
       };
 
       updateRounds();
+
+      //dispute
+      document.querySelector('.btn-dispute')?.addEventListener('click', async () => {
+      const roundsPlayed = parseInt(document.getElementById('rounds_played')?.value, 10);
+      selectedRoundsPlayed = roundsPlayed;
+      const matchId = myMatch.match_id;
+
+      if (!roundsPlayed || isNaN(roundsPlayed)) {
+        window.uiModule.showNotification('Please select how many rounds were played.', 'warning');
+        return;
+      }
+
+      const payload = {
+        match_id: matchId,
+        rounds_played: roundsPlayed,
+        dispute_explanation: '',
+        user_id: session.id,
+        evidence: ''
+      };
+
+      try {
+        const res = await fetch('http://localhost/api/matches/dispute_rounds', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await res.json();
+        if (result.status === 'success') {
+          window.uiModule.showNotification('Match moved to disputed state.', 'success');
+          await preloadMatchesInBackground();
+          loadMyMatchTab();
+        } else {
+          window.uiModule.showNotification(result.message || 'Dispute failed.', 'error');
+        }
+      } catch (err) {
+        console.error('[Dispute Trigger Error]', err);
+        window.uiModule.showNotification('Server error while starting dispute.', 'error');
+      }
+    });
+
       return; 
     } else if (myMatch.status === 'unconfirmed') {
       const round = myMatch.rounds?.[0];
@@ -543,7 +584,94 @@ document.getElementById('my-matches-btn').addEventListener('click', async () => 
       `;
     
       contentDiv.appendChild(card);
-    }
+    }else if (myMatch.status === 'disputed') {
+    contentDiv.innerHTML = `
+      <div class="match-score-submission">
+        <h2 style="text-align: center;">Submit Dispute Details</h2>
+
+        <div class="form-group">
+          <label for="dispute-explanation">Explanation of Dispute:</label>
+          <textarea id="dispute-explanation" rows="4" class="form-input" placeholder="Explain the issue..."
+            style="width: 100%; padding: 10px; border-radius: 5px;"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="dispute-proof">Link to Evidence:</label>
+          <input type="text" id="dispute-proof" class="form-input" placeholder="Paste proof link" style="width: 100%; padding: 10px; border-radius: 5px;" />
+            <small style="color: #6c757d; font-size: 12px;">
+              Note: Upload a screenshot or video as proof of the match dispute into your google drive and provide the link. 
+              Set the General Access to "Anyone with the link" and the proof(s) should be renamed as 
+              GameName_GameMode_TeamName_Dispute (BlacktopHoops_1v1_BlueEagles_Dispute).
+            </small>
+        </div>
+        
+
+        <div class="form-group" style="text-align: center; margin-top: 20px;">
+          <button id="submit-final-dispute" class="btn-dispute"
+            style="background: #dc3545; color: white; padding: 12px 24px; border-radius: 6px;">
+            Submit Dispute
+          </button>
+        </div>
+      </div>
+    `;
+
+    let disputeSubmitting = false;
+
+    document.getElementById('submit-final-dispute')?.addEventListener('click', async () => {
+      if (disputeSubmitting) return;
+      disputeSubmitting = true;
+
+      const button = document.getElementById('submit-final-dispute');
+      button.disabled = true;
+      button.textContent = 'Submitting...';
+
+      const explanation = document.getElementById('dispute-explanation').value.trim();
+      const evidence = document.getElementById('dispute-proof').value.trim();
+      const matchId = myMatch.match_id;
+
+      if (!explanation || !evidence) {
+        window.uiModule.showNotification('Please provide both explanation and proof.', 'warning');
+        button.disabled = false;
+        button.textContent = 'Submit Dispute';
+        disputeSubmitting = false;
+        return;
+      }
+
+      const payload = {
+        match_id: matchId,
+        dispute_explanation: explanation,
+        evidence: evidence
+      };
+
+      try {
+        const res = await fetch('http://localhost/api/matches/dispute_match', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await res.json();
+        if (result.status === 'success') {
+          window.uiModule.showNotification('Match successfully disputed.', 'success');
+          await preloadMatchesInBackground();
+          loadMyMatchTab();
+        } else {
+          window.uiModule.showNotification(result.message || 'Dispute submission failed.', 'error');
+          button.disabled = false;
+          button.textContent = 'Submit Dispute';
+          disputeSubmitting = false;
+        }
+      } catch (err) {
+        console.error('[Dispute Submission Error]', err);
+        window.uiModule.showNotification('Server error submitting dispute.', 'error');
+        button.disabled = false;
+        button.textContent = 'Submit Dispute';
+        disputeSubmitting = false;
+      }
+    });
+
+  }
+
     
   } else {
     const info = document.createElement('p');
@@ -551,7 +679,7 @@ document.getElementById('my-matches-btn').addEventListener('click', async () => 
     contentDiv.appendChild(info);
   }
 
-  if (!myMatch || myMatch.status !== 'unconfirmed') {
+  if (!myMatch || (myMatch.status !== 'unconfirmed' && myMatch.status !== 'disputed')) {
     const completed = matches.filter(m => m.current_match == 0);
     renderCompletedMatches(completed);
   }
@@ -916,7 +1044,7 @@ document.addEventListener('submit', async (e) => {
 });
 
 
-async function confirmMatch(matchId) {
+/*async function confirmMatch(matchId) {
   const session = await window.api.getSession();
   const userId = session?.id;
   if (!userId) return alert('Session error');
@@ -1078,8 +1206,201 @@ async function confirmMatch(matchId) {
     //console.error('[Confirm Match Error]', err);
     alert('An error occurred while confirming match.');
   }
-}/////////////
+}*/
 
+let isConfirmingMatch = false;
+
+async function confirmMatch(matchId) {
+  if (isConfirmingMatch) return;
+  isConfirmingMatch = true;
+
+  const confirmBtn = document.querySelector('.btn-confirm');
+  if (confirmBtn) {
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = 'Confirming...';
+  }
+
+  const session = await window.api.getSession();
+  const userId = session?.id;
+  if (!userId) {
+    alert('Session error');
+    isConfirmingMatch = false;
+    if (confirmBtn) {
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = 'Confirm Results';
+    }
+    return;
+  }
+
+  const currentMatch = cachedMatchData.matches.find(m => m.match_id == matchId);
+  if (!currentMatch) {
+    alert('Match not found.');
+    isConfirmingMatch = false;
+    if (confirmBtn) {
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = 'Confirm Results';
+    }
+    return;
+  }
+
+  const team1_id = currentMatch.team1_id;
+  const team2_id = currentMatch.team2_id;
+  const team1_team_id = currentMatch.team1_details?.id;
+  const team2_team_id = currentMatch.team2_details?.id;
+
+  const game_name = currentMatch.game_name;
+  const game_mode = currentMatch.game_mode || currentMatch.request_details?.team_size || 'N/A';
+
+  const match_winner_id = currentMatch.rounds?.[0]?.match_winner_id;
+  const match_loser_id = match_winner_id == 1 ? 2 : 1;
+  const match_winner = match_winner_id == 1 ? team1_id : team2_id;
+  const match_loser = match_loser_id == 1 ? team1_id : team2_id;
+
+  const forfeit_value = currentMatch.rounds?.some(r => r.proof === 'Win-via-Forfeit') ? 'true' : 'false';
+
+  const matchDetails = currentMatch.rounds?.map(r => ({
+    team_1_score: parseInt(r.team_1_score),
+    team_2_score: parseInt(r.team_2_score)
+  })) || [];
+
+  const response = await fetch('http://localhost/api/fetch/get_teams_by_ids', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ team_ids: [team1_team_id, team2_team_id] })
+  });
+
+  const allTeams = await response.json();
+  if (allTeams.status !== 'success') {
+    alert('Failed to fetch teams');
+    isConfirmingMatch = false;
+    if (confirmBtn) {
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = 'Confirm Results';
+    }
+    return;
+  }
+
+  const team1 = allTeams.data.find(t => parseInt(t.id) === parseInt(team1_team_id));
+  const team2 = allTeams.data.find(t => parseInt(t.id) === parseInt(team2_team_id));
+  if (!team1 || !team2) {
+    alert('Teams not found');
+    isConfirmingMatch = false;
+    if (confirmBtn) {
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = 'Confirm Results';
+    }
+    return;
+  }
+
+  const extractRatings = (players) => {
+    const ratings = {};
+    players.forEach(p => {
+      const data = typeof p.player_data === 'string'
+        ? JSON.parse(p.player_data || '{}')
+        : (p.player_data || {});
+      const mmr = data.player_mmr || {};
+      const mu = parseFloat(mmr.mu);
+      const sigma = parseFloat(mmr.sigma);
+      ratings[p.id] = {
+        mu: !isNaN(mu) && mu > 0 ? mu : 25,
+        sigma: !isNaN(sigma) && sigma > 0 ? sigma : 8.333
+      };
+    });
+    return ratings;
+  };
+
+  const team1_player_ids = team1.players.map(p => p.id);
+  const team2_player_ids = team2.players.map(p => p.id);
+  const team1_ratings = extractRatings(team1.players);
+  const team2_ratings = extractRatings(team2.players);
+
+  const prevRatingTeam1 = {
+    mu: parseFloat(team1.mu) || 25,
+    sigma: parseFloat(team1.sigma) || 8.333
+  };
+  const prevRatingTeam2 = {
+    mu: parseFloat(team2.mu) || 25,
+    sigma: parseFloat(team2.sigma) || 8.333
+  };
+
+  const mmrPayload = {
+    team1_player_ids,
+    team2_player_ids,
+    team1_ratings,
+    team2_ratings,
+    prevRatingTeam1,
+    prevRatingTeam2,
+    matchDetails
+  };
+
+  const mmrResult = await window.api.calculateMMR(mmrPayload);
+  if (mmrResult.status !== 'success') {
+    alert('Failed to calculate MMR');
+    isConfirmingMatch = false;
+    if (confirmBtn) {
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = 'Confirm Results';
+    }
+    return;
+  }
+
+  const confirmPayload = {
+    match_id: matchId,
+    user_id: userId,
+    winner_id: match_winner,
+    loser_id: match_loser,
+    team_winner: team1_id === match_winner ? team1_team_id : team2_team_id,
+    team_loser: team1_id === match_loser ? team1_team_id : team2_team_id,
+    match_winner,
+    match_loser,
+    mu1: mmrResult.team1_avg.mu,
+    sigma1: mmrResult.team1_avg.sigma,
+    ordinal1: mmrResult.team1_avg.ordinal,
+    mu2: mmrResult.team2_avg.mu,
+    sigma2: mmrResult.team2_avg.sigma,
+    ordinal2: mmrResult.team2_avg.ordinal,
+    team1_id,
+    team2_id,
+    team1_team_id,
+    team2_team_id,
+    game_name,
+    game_mode,
+    forfeit_value,
+    team1_ratings: JSON.stringify(mmrResult.team1_players),
+    team2_ratings: JSON.stringify(mmrResult.team2_players)
+  };
+
+  try {
+    const response = await fetch('http://localhost/api/matches/confirm_match', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(confirmPayload)
+    });
+
+    const result = await response.json();
+    if (result.status === 'success') {
+      window.uiModule.showNotification('Match confirmed successfully!', 'success');
+      setTimeout(async () => {
+        await preloadMatchesInBackground();
+        loadMyMatchTab();
+      }, 2000);
+    } else {
+      alert(result.message || 'Failed to confirm match.');
+      if (confirmBtn) {
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Confirm Results';
+      }
+      isConfirmingMatch = false;
+    }
+  } catch (err) {
+    alert('An error occurred while confirming match.');
+    if (confirmBtn) {
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = 'Confirm Results';
+    }
+    isConfirmingMatch = false;
+  }
+}/////////
 
 
 

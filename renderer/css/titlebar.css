@@ -57,5 +57,5 @@
 .content {
   margin-top: 32px;
   height: calc(100vh - 32px);
-  overflow: auto;
+  overflow: hidden;
 } 

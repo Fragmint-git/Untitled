@@ -1012,7 +1012,48 @@ ipcMain.handle('calculate-mmr', async (event, payload) => {
   }
 });
 
+ipcMain.handle('get-all-matches', async () => {
+    try {
+        const res = await fetch('http://localhost/api/fetch/all_matches');
+        return await res.json();
+    } catch (err) {
+        console.error('[Match Fetch Error]', err);
+        return { status: 'error', message: 'Failed to fetch matches' };
+    }
+});
 
+
+ipcMain.handle('get-all-teams', async () => {
+    try {
+        const res = await fetch('http://localhost/api/fetch/all_teams');
+        return await res.json();
+    } catch (err) {
+        console.error('[Teams Fetch Error]', err);
+        return { status: 'error', message: 'Failed to fetch teams' };
+    }
+});
+
+
+ipcMain.handle('get-all-games', async () => {
+    try {
+        const res = await fetch('http://localhost/api/fetch/games');
+        return await res.json();
+    } catch (err) {
+        console.error('[games Fetch Error]', err);
+        return { status: 'error', message: 'Failed to fetch games' };
+    }
+});
+
+
+ipcMain.handle('get-all-players', async () => {
+    try {
+        const res = await fetch('http://localhost/api/fetch/all_players');
+        return await res.json();
+    } catch (err) {
+        console.error('[Players Fetch Error]', err);
+        return { status: 'error', message: 'Failed to fetch players' };
+    }
+});
 
 
 ipcMain.handle('get-app-info', () => {

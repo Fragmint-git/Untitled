@@ -138,11 +138,15 @@
             const result = await response.json();
 
             if (response.ok && result.status === 'success') {
-                window.api.saveSession(result.user);
+                window.api.saveSession({
+                    ...result.user,
+                    lootlocker_token: result.lootlocker?.session_token || null
+                });
                 window.location.href = 'index.html';
             } else {
                 errorMessage.textContent = result.message || 'Login failed.';
             }
+            
         } catch (err) {
             console.error(err);
             errorMessage.textContent = 'Server error';

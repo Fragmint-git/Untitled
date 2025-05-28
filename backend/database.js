@@ -269,7 +269,7 @@ Player.belongsToMany(Match, { through: MatchPlayer });
 // Database operations
 const db = {
     // Game operations
-    getAllGames: async () => {
+    /*getAllGames: async () => {
         try {
             const games = await Game.findAll({
                 order: [['name', 'ASC']]
@@ -291,7 +291,7 @@ const db = {
             console.error('Error getting all games:', error);
             throw error;
         }
-    },
+    },*/
     
     getGameById: async (id) => {
         try {

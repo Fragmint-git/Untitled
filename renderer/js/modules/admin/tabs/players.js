@@ -30,83 +30,59 @@ window.adminPlayersTabModule = {
     },
     
     // Load players
-    loadPlayers: async function() {
-        try {
-            // Fetch players from the backend
-            const response = await fetch('http://localhost:3000/api/players');
-            
-            // If the API endpoint doesn't exist yet, use mock data
-            let players;
-            if (response.ok) {
-                players = await response.json();
-            } else {
-                // Mock data for development
-                players = this.getMockPlayers();
-            }
-            
-            // Update players table
-            const playersTable = document.getElementById('players-table-body');
-            if (playersTable) {
-                if (players.length === 0) {
-                    playersTable.innerHTML = '<tr><td colspan="7" class="empty-state">No players found</td></tr>';
-                    return;
-                }
-                
-                let html = '';
-                players.forEach(player => {
-                    // Format join date
-                    const joinDate = new Date(player.joinDate);
-                    const formattedJoinDate = joinDate.toLocaleDateString();
-                    
-                    // Status class
-                    const statusClass = player.status.toLowerCase();
-                    
-                    html += `
-                        <tr data-player-id="${player.id}">
-                            <td>${player.id}</td>
-                            <td>
-                                <img src="${player.avatar || '../assets/images/default-avatar.png'}" alt="${player.username}" class="player-avatar-thumb">
-                                ${player.username}
-                            </td>
-                            <td>${player.email}</td>
-                            <td>${formattedJoinDate}</td>
-                            <td>${player.tournaments}</td>
-                            <td><span class="status-badge ${statusClass}">${player.status}</span></td>
-                            <td class="actions">
-                                <button class="edit-player-btn" data-player-id="${player.id}">Edit</button>
-                                <button class="view-player-btn" data-player-id="${player.id}">View</button>
-                            </td>
-                        </tr>
-                    `;
-                });
-                
-                playersTable.innerHTML = html;
-                
-                // Add event listeners to action buttons
-                document.querySelectorAll('.edit-player-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const playerId = e.target.getAttribute('data-player-id');
-                        const player = players.find(p => p.id.toString() === playerId);
-                        if (player) {
-                            this.editPlayer(player);
-                        }
-                    });
-                });
-                
-                document.querySelectorAll('.view-player-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const playerId = e.target.getAttribute('data-player-id');
-                        this.viewPlayer(playerId);
-                    });
-                });
-            }
-        } catch (error) {
-            console.error('Error loading players:', error);
-            if (window.adminModule) {
-                window.adminModule.showMessage('Error loading players. Please try again.', 'error');
-            }
+loadPlayers: async function () {
+    try {
+        const result = await window.api.getAllPlayers();
+        const players = Array.isArray(result?.data) ? result.data : [];
+
+        const tbody = document.getElementById('players-table-body');
+        tbody.innerHTML = '';
+
+        if (players.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8">No players found</td></tr>';
+            return;
         }
-    },
+
+        players.forEach(player => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${player.id}</td>
+                <td>
+                    <img src="${player.profile || '/assets/images/default-avatar.png'}" alt="${player.username}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin-right: 0.5rem;">
+                </td>
+                
+                <td>${player.date_registered?.split(' ')[0] || ''}</td>
+                <td>${player.firstname} ${player.lastname}</td>
+                <td>${player.username}</td>
+                <td>${player.email}</td>
+                <td>${player.is_delete}</span></td>
+                <td>
+                    <button class="btn-primary edit-player-btn" data-player-id="${player.id}">Edit</button>
+                    <button class="btn-secondary view-player-btn" data-player-id="${player.id}">Credits</button>
+                </td>
+            `;
+            row.querySelector('.edit-player-btn')?.addEventListener('click', () => {
+                window.editPlayer(player);
+            });
+            
+            tbody.appendChild(row);
+        });
+
+        document.querySelectorAll('.view-player-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const playerId = e.target.getAttribute('data-player-id');
+                if (typeof this.viewPlayer === 'function') {
+                    this.viewPlayer(playerId);
+                }
+            });
+        });
+
+    } catch (error) {
+        console.error('Error loading players:', error);
+        document.getElementById('players-table-body').innerHTML = '<tr><td colspan="8">Failed to load players</td></tr>';
+    }
+}
+,
     
     // Filter players
     filterPlayers: function() {

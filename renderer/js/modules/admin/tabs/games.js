@@ -2,11 +2,13 @@
  * Admin Games Tab Module
  * Handles the games management functionality in the admin panel
  */
-
+let gamesTabInitialized = false;
 // Admin Games Tab Module
 window.adminGamesTabModule = {
     // Initialize games tab
     initGamesTab: function() {
+        if (gamesTabInitialized) return;
+        gamesTabInitialized = true;
         console.log('Initializing games tab...');
         
         // Game management elements
@@ -86,106 +88,40 @@ window.adminGamesTabModule = {
     },
     
     // Load games
-    loadGames: async function() {
-        try {
-            // Fetch games from the backend
-            const response = await fetch('http://localhost:3000/api/games');
-            
-            // If the API endpoint doesn't exist yet, use mock data
-            let games;
-            if (response.ok) {
-                games = await response.json();
-            } else {
-                // Mock data for development
-                games = this.getMockGames();
-            }
-            
-            // Update games table
-            const gamesTable = document.getElementById('games-table-body');
-            if (gamesTable) {
-                if (games.length === 0) {
-                    gamesTable.innerHTML = '<tr><td colspan="9" class="empty-state">No games found</td></tr>';
-                    return;
-                }
-                
-                let html = '';
-                games.forEach(game => {
-                    // Format release date
-                    const releaseDate = new Date(game.releaseDate);
-                    const formattedDate = releaseDate.toLocaleDateString();
-                    
-                    // Format platforms
-                    const platforms = game.platforms.join(', ');
-                    
-                    // Status class
-                    const statusClass = game.status.toLowerCase();
-                    
-                    html += `
-                        <tr data-game-id="${game.id}">
-                            <td>${game.id}</td>
-                            <td>
-                                <img src="${game.coverImage || '/assets/default-game-cover.png'}" alt="${game.name}" class="game-cover-thumb">
-                            </td>
-                            <td>${game.name}</td>
-                            <td>${game.developer}</td>
-                            <td>${formattedDate}</td>
-                            <td>${platforms}</td>
-                            <td>${game.tournaments || 0}</td>
-                            <td><span class="status-badge ${statusClass}">${game.status}</span></td>
-                            <td class="actions">
-                                <button class="edit-game-btn" data-game-id="${game.id}">Edit</button>
-                                <button class="delete-game-btn" data-game-id="${game.id}">Delete</button>
-                                <button class="view-game-btn" data-game-id="${game.id}">View</button>
-                            </td>
-                        </tr>
-                    `;
-                });
-                
-                gamesTable.innerHTML = html;
-                
-                // Add event listeners to action buttons
-                document.querySelectorAll('.edit-game-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const gameId = e.target.getAttribute('data-game-id');
-                        const game = games.find(g => g.id.toString() === gameId);
-                        if (game) {
-                            this.openGameForm(game);
-                        }
-                    });
-                });
-                
-                document.querySelectorAll('.delete-game-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const gameId = e.target.getAttribute('data-game-id');
-                        const game = games.find(g => g.id.toString() === gameId);
-                        if (game) {
-                            if (window.adminModule) {
-                                window.adminModule.showConfirmModal(
-                                    'Confirm Delete',
-                                    `Are you sure you want to delete the game "${game.name}"?`,
-                                    () => {
-                                        this.deleteGame(gameId);
-                                    }
-                                );
-                            }
-                        }
-                    });
-                });
-                
-                document.querySelectorAll('.view-game-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const gameId = e.target.getAttribute('data-game-id');
-                        this.viewGame(gameId);
-                    });
-                });
-            }
-        } catch (error) {
-            console.error('Error loading games:', error);
-            if (window.adminModule) {
-                window.adminModule.showMessage('Error loading games. Please try again.', 'error');
-            }
+    loadGames: async function () {
+    const tableBody = document.getElementById('games-table-body');
+    tableBody.innerHTML = '';
+
+    try {
+        const response = await window.api.getAllGames(); // use your Electron preload API
+        const games = response?.data || [];
+
+        if (!Array.isArray(games) || games.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="6">No games found</td></tr>`;
+        return;
         }
+
+        games.forEach(game => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${game.id}</td>
+            <td><img src="${game.logo}" alt="Logo" style="width: 60px; height: 60px; object-fit: cover;"></td>
+            <td>${game.date_created?.split(' ')[0] || 'N/A'}</td>
+            <td>${game.name}</td>
+            <td>${game.status || 'Open'}</td>
+            <td><button class="btn-primary">EDIT</button></td>
+        `;
+        row.querySelector('button')?.addEventListener('click', () => {
+            loadGameEditor(game);
+        });
+        tableBody.appendChild(row);
+        });
+    } catch (err) {
+        console.error('[loadGames Error]', err);
+        tableBody.innerHTML = `<tr><td colspan="6">Failed to load games</td></tr>`;
+    }
     },
+
     
     // Filter games
     filterGames: function() {

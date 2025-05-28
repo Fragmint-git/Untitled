@@ -7,8 +7,39 @@
     <link rel="stylesheet" href="../styles/admin.css">
     <link rel="stylesheet" href="../styles/toast.css">
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+    <!--<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/titlebar.css">
+    <style>
+        .admin-section { display: none; }
+        .admin-section.active { display: block; }
+        .admin-container{
+           padding-top: 20px;
+        }
+        html, body {
+        overflow-x: hidden;
+        }
+    </style>
 </head>
 <body class="admin-panel">
+
+    <div class="titlebar">
+        <div class="titlebar-title">VR Battles Admin</div>
+            <div class="titlebar-controls">
+                <button id="minimize-button" class="titlebar-button">
+                <i class="fas fa-window-minimize"></i>
+                </button>
+                <button id="maximize-button" class="titlebar-button">
+                <i class="fas fa-window-maximize"></i>
+                </button>
+                <button id="close-button" class="titlebar-button close">
+                <i class="fas fa-times"></i>
+                </button>
+            </div>
+    </div>
+
     <div class="admin-container">
         <header class="admin-header">
             <h1>VR Tournament Admin Panel</h1>
@@ -21,378 +52,224 @@
         <div class="admin-content">
             <div class="admin-sidebar">
                 <ul class="admin-menu">
-                    <li><a href="#" data-section="dashboard" class="admin-menu-link active">Dashboard</a></li>
-                    <li><a href="#" data-section="games" class="admin-menu-link">Manage Games</a></li>
-                    <li><a href="#" data-section="tournaments" class="admin-menu-link">Manage Tournaments</a></li>
-                    <li><a href="#" data-section="players" class="admin-menu-link">Manage Players</a></li>
-                    <li><a href="#" data-section="release-notes" class="admin-menu-link">Release Notes</a></li>
-                    <li><a href="#" data-section="settings" class="admin-menu-link">Admin Settings</a></li>
+                    <li><a href="#" data-section="dashboard" class="admin-menu-link active">Overview</a></li>
+                    <li><a href="#" data-section="tournaments" class="admin-menu-link">Tournaments</a></li>
+                    <li><a href="#" data-section="games" class="admin-menu-link">Games</a></li>
+                    <li><a href="#" data-section="teams" class="admin-menu-link">Teams</a></li>
+                    <li><a href="#" data-section="matches" class="admin-menu-link">Matches</a></li>
+                    <li><a href="#" data-section="disputes" class="admin-menu-link">Disputes</a></li>
+                    <li><a href="#" data-section="players" class="admin-menu-link">Players</a></li>
+                    <li style="display: none;"><a href="#" data-section="match-edit" class="admin-menu-link">Edit Match</a></li>
                     <li><a href="../index.html" class="back-to-app">Back to Application</a></li>
                 </ul>
             </div>
 
             <div class="admin-main">
-                <!-- Admin Dashboard Section -->
-                <div id="admin-dashboard" class="admin-section active">
-                    <h2>Admin Dashboard</h2>
-                    <div class="admin-stats">
-                        <div class="admin-stat-card">
-                            <h3>Total Games</h3>
-                            <p class="stat-count" id="total-games-count">0</p>
-                        </div>
-                        <div class="admin-stat-card">
-                            <h3>Total Tournaments</h3>
-                            <p class="stat-count" id="total-tournaments-count">0</p>
-                        </div>
-                        <div class="admin-stat-card">
-                            <h3>Total Players</h3>
-                            <p class="stat-count" id="total-players-count">0</p>
-                        </div>
-                        <div class="admin-stat-card">
-                            <h3>Active Tournaments</h3>
-                            <p class="stat-count" id="active-tournaments-count">0</p>
-                        </div>
-                    </div>
-                    
-                    <div class="admin-recent-activity">
-                        <h3>Recent Activity</h3>
-                        <div id="recent-activity-list" class="activity-list">
-                            <!-- Activity items will be populated by JavaScript -->
+                <!-- Admin Overview Section -->
+                <div id="admin-dashboard" class="admin-section active" style="display: flex; justify-content: center; align-items: center; min-height: 90vh; background: #f9f9f9;">
+                    <div style="text-align: center;">
+                        <h2 style="font-size: 2.5rem; margin-bottom: 2rem; color: #333;">Dashboard Overview</h2>
+                        <div class="admin-stats-card" style="background: #ffffff; padding: 3rem; border: 2px solid #007bff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); min-width: 400px;">
+                            <div style="display: flex; justify-content: space-between; padding: 1rem 0; font-size: 1.25rem; color: #333;">
+                                <strong>Games</strong><span id="stat-games-count" style="font-weight: bold;">0</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 1rem 0; font-size: 1.25rem; color: #333;">
+                                <strong>Tournaments</strong><span id="stat-tournaments-count" style="font-weight: bold;">0</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 1rem 0; font-size: 1.25rem; color: #333;">
+                                <strong>Teams</strong><span id="stat-teams-count" style="font-weight: bold;">0</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 1rem 0; font-size: 1.25rem; color: #333;">
+                                <strong>Matches</strong><span id="stat-matches-count" style="font-weight: bold;">0</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 1rem 0; font-size: 1.25rem; color: #333;">
+                                <strong>Players</strong><span id="stat-players-count" style="font-weight: bold;">0</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Admin Games Section -->
+
+
+                <!-- Admin Matches Section -->
                 <div id="admin-games" class="admin-section">
-                    <h2>Manage Games</h2>
-                    <div class="admin-actions">
-                        <button id="add-game-btn" class="btn-primary">Add New Game</button>
-                        <div class="admin-filter">
-                            <input type="text" id="game-search" placeholder="Search games...">
-                            <select id="game-filter">
-                                <option value="all">All Status</option>
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
-                        </div>
+                    <h2>All Games</h2>
+                    <div style="margin-bottom: 1rem;">
+                        <button class="btn-primary">NEW GAME</button>
                     </div>
-                    
-                    <div class="admin-table-container">
-                        <table class="admin-table">
+                    <table id="admin-games-table" class="admin-table datatable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Logo</th>
+                                <th>Date Created</th>
+                                <th>Name</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="games-table-body"></tbody>
+                    </table>
+                </div>
+
+                <div id="admin-game-edit" class="admin-section">
+                    <button id="back-to-games-btn" class="btn-secondary" style="margin-bottom: 1rem;">← Back to Games</button>
+                    <div id="edit-game-container"></div>
+                </div>
+
+                
+                <!-- Admin Matches Section -->
+                <div id="admin-teams" class="admin-section">
+                    <h2>All Teams</h2>
+                    <div id="teams-table-container">
+                        <table id="admin-teams-table" class="admin-table datatable">
                             <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Cover</th>
+                                    <th>Logo</th>
                                     <th>Name</th>
-                                    <th>Developer</th>
-                                    <th>Release Date</th>
-                                    <th>Platforms</th>
-                                    <th>Tournaments</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
+                                    <th>Date Created</th>
+                                    <th>Matches</th>
+                                    <th>Wins</th>
+                                    <th>Losses</th>
+                                    <th>Forfeits</th>
+                                    <th>Mu</th>
+                                    <th>Sigma</th>
+                                    <th>Ordinal</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody id="games-table-body">
-                                <!-- Game rows will be populated by JavaScript -->
+                            <tbody id="teams-table-body">
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- Admin Tournaments Section -->
-                <div id="admin-tournaments" class="admin-section">
-                    <h2>Manage Tournaments</h2>
-                    <p class="placeholder-text">Tournament management interface will be implemented in a future update.</p>
+                <div id="admin-team-edit" class="admin-section">
+                    <button id="back-to-teams-btn" class="btn-secondary" style="margin-bottom: 1rem;">← Back to Teams</button>
+                    <div id="edit-team-container"></div>
                 </div>
-                
+
+
+                <!-- Admin Matches Section -->
+                <div id="admin-matches" class="admin-section">
+                    <h2>All Matches</h2>
+                    <div id="matches-table-container">
+                        <table id="admin-matches-table" class="admin-table datatable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Game</th>
+                                    <th>Mode</th>
+                                    <th>Status</th>
+                                    <th>Start Time</th>
+                                    <th>Team 1</th>
+                                    <th>Team 2</th>
+                                    <th>Winner</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="matches-table-body">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="admin-match-edit" class="admin-section">
+                    <button id="back-to-matches-btn" class="btn-secondary" style="margin-bottom: 1rem;">← Back to Matches</button>
+                    <div id="edit-match-container"></div>
+                </div>
+
+
+
+                <!-- Admin Disputes Section -->
+                <div id="admin-disputes" class="admin-section">
+                    <h2>Disputed Matches</h2>
+                    <table id="admin-disputes-table" class="admin-table datatable">
+                        <thead>
+                            <tr>
+                                <th>Match ID</th>
+                                <th>Game</th>
+                                <th>Mode</th>
+                                <th>Status</th>
+                                <th>Start Time</th>
+                                <th>Team 1</th>
+                                <th>Team 2</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="disputes-table-body">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="admin-dispute-resolve" class="admin-section">
+                    <button id="back-to-disputes-btn" class="btn-secondary" style="margin-bottom: 1rem;">← Back to Disputes</button>
+                    <div id="resolve-dispute-container"></div>
+                </div>
+
+
+
+                <!-- Admin Players Section -->
                 <div id="admin-players" class="admin-section">
-                    <h2>Manage Players</h2>
-                    <p class="placeholder-text">Player management interface will be implemented in a future update.</p>
+                    <h2>USERS / PLAYERS</h2>
+                    <table id="admin-players-table" class="admin-table datatable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Profile</th>
+                                <th>Date Registered</th>
+                                <th>Name</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Delete Request</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="players-table-body"></tbody>
+                    </table>
                 </div>
-                
-                <!-- Release Notes Management Section -->
-                <div id="admin-release-notes" class="admin-section">
-                    <h2>Manage Release Notes</h2>
-                    <div class="admin-actions">
-                        <button id="add-release-btn" class="btn-primary">Add New Version</button>
-                    </div>
-                    
-                    <div class="release-notes-editor">
-                        <div class="release-versions-list">
-                            <h3>Version History</h3>
-                            <ul id="version-list">
-                                <!-- Versions will be populated by JavaScript -->
-                                <li class="version-item active" data-version="2.0.1">v2.0.1 <span class="version-tag current">Current</span></li>
-                                <li class="version-item" data-version="2.0.0">v2.0.0</li>
-                                <li class="version-item" data-version="1.5.0">v1.5.0 <span class="version-tag beta">Beta</span></li>
-                            </ul>
-                        </div>
-                        
-                        <div class="release-editor">
-                            <div class="version-info-form">
-                                <div class="form-group">
-                                    <label for="version-number">Version Number</label>
-                                    <input type="text" id="version-number" placeholder="e.g., 2.0.1">
-                                </div>
-                                <div class="form-group">
-                                    <label for="release-date">Release Date</label>
-                                    <input type="date" id="release-date">
-                                </div>
-                                <div class="form-group">
-                                    <label for="release-status">Status</label>
-                                    <select id="release-status">
-                                        <option value="current">Current</option>
-                                        <option value="stable">Stable</option>
-                                        <option value="beta">Beta</option>
-                                        <option value="alpha">Alpha</option>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <div class="release-content-editor">
-                                <h3>Release Content</h3>
-                                
-                                <div class="release-section">
-                                    <h4>New Features</h4>
-                                    <div class="release-entry-list" id="features-list">
-                                        <div class="release-entry">
-                                            <input type="text" class="release-entry-text" placeholder="Add feature description...">
-                                            <button class="remove-entry-btn"><i class="fas fa-times"></i></button>
-                                        </div>
-                                        <button class="add-entry-btn" data-section="features">Add Feature</button>
-                                    </div>
-                                </div>
-                                
-                                <div class="release-section">
-                                    <h4>Improvements</h4>
-                                    <div class="release-entry-list" id="improvements-list">
-                                        <div class="release-entry">
-                                            <input type="text" class="release-entry-text" placeholder="Add improvement description...">
-                                            <button class="remove-entry-btn"><i class="fas fa-times"></i></button>
-                                        </div>
-                                        <button class="add-entry-btn" data-section="improvements">Add Improvement</button>
-                                    </div>
-                                </div>
-                                
-                                <div class="release-section">
-                                    <h4>Bug Fixes</h4>
-                                    <div class="release-entry-list" id="bugfixes-list">
-                                        <div class="release-entry">
-                                            <input type="text" class="release-entry-text" placeholder="Add bug fix description...">
-                                            <button class="remove-entry-btn"><i class="fas fa-times"></i></button>
-                                        </div>
-                                        <button class="add-entry-btn" data-section="bugfixes">Add Bug Fix</button>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="form-actions">
-                                <button id="save-release-btn" class="btn-primary">Save Changes</button>
-                                <button id="delete-release-btn" class="btn-danger">Delete Version</button>
-                                <button id="preview-release-btn" class="btn-secondary">Preview</button>
-                            </div>
-                        </div>
-                    </div>
+
+                <div id="admin-player-edit" class="admin-section">
+                    <button id="back-to-players-btn" class="btn-secondary">← Back to Players</button>
+                    <div id="edit-player-container"></div>
                 </div>
-                
-                <div id="admin-settings" class="admin-section">
-                    <h2>Admin Settings</h2>
-                    <form id="admin-settings-form" class="settings-form">
-                        <div class="settings-section">
-                            <h3>General Settings</h3>
-                            <div class="form-group">
-                                <label for="site-name">Site Name</label>
-                                <input type="text" id="site-name" name="site-name">
-                            </div>
-                            <div class="form-group">
-                                <label for="site-description">Site Description</label>
-                                <textarea id="site-description" name="site-description" rows="3"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="maintenance-mode">Maintenance Mode</label>
-                                <div class="toggle-switch">
-                                    <input type="checkbox" id="maintenance-mode" name="maintenance-mode">
-                                    <span class="toggle-slider"></span>
-                                </div>
-                            </div>
-                        </div>
 
-                        <div class="settings-section">
-                            <h3>Email Settings</h3>
-                            <div class="form-group">
-                                <label for="email-notifications">Enable Email Notifications</label>
-                                <div class="toggle-switch">
-                                    <input type="checkbox" id="email-notifications" name="email-notifications">
-                                    <span class="toggle-slider"></span>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="email-from">From Email</label>
-                                <input type="email" id="email-from" name="email-from">
-                            </div>
-                            <div class="form-group">
-                                <label for="email-smtp-host">SMTP Host</label>
-                                <input type="text" id="email-smtp-host" name="email-smtp-host">
-                            </div>
-                            <div class="form-group">
-                                <label for="email-smtp-port">SMTP Port</label>
-                                <input type="text" id="email-smtp-port" name="email-smtp-port">
-                            </div>
-                            <div class="form-group">
-                                <label for="email-smtp-user">SMTP Username</label>
-                                <input type="text" id="email-smtp-user" name="email-smtp-user">
-                            </div>
-                            <div class="form-group">
-                                <label for="email-smtp-password">SMTP Password</label>
-                                <input type="password" id="email-smtp-password" name="email-smtp-password">
-                            </div>
-                        </div>
 
-                        <div class="settings-section">
-                            <h3>Tournament Settings</h3>
-                            <div class="form-group">
-                                <label for="max-tournaments">Maximum Active Tournaments</label>
-                                <input type="number" id="max-tournaments" name="max-tournaments" min="1" max="50">
-                            </div>
-                            <div class="form-group">
-                                <label for="tournament-approval">Require Tournament Approval</label>
-                                <div class="toggle-switch">
-                                    <input type="checkbox" id="tournament-approval" name="tournament-approval">
-                                    <span class="toggle-slider"></span>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="tournament-registration-days">Registration Period (Days)</label>
-                                <input type="number" id="tournament-registration-days" name="tournament-registration-days" min="1" max="30">
-                            </div>
-                        </div>
-
-                        <div class="settings-section">
-                            <h3>Security Settings</h3>
-                            <div class="form-group">
-                                <label for="two-factor-auth">Enable Two-Factor Authentication</label>
-                                <div class="toggle-switch">
-                                    <input type="checkbox" id="two-factor-auth" name="two-factor-auth">
-                                    <span class="toggle-slider"></span>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="session-timeout">Session Timeout (Minutes)</label>
-                                <input type="number" id="session-timeout" name="session-timeout" min="5" max="240">
-                            </div>
-                            <div class="form-group">
-                                <label for="max-login-attempts">Maximum Login Attempts</label>
-                                <input type="number" id="max-login-attempts" name="max-login-attempts" min="1" max="10">
-                            </div>
-                        </div>
-
-                        <div class="form-actions">
-                            <button type="submit" class="btn-primary">Save Settings</button>
-                            <button type="button" id="reset-settings-btn" class="btn-secondary">Reset to Default</button>
-                        </div>
-                    </form>
-                </div>
             </div>
         </div>
     </div>
 
-    <!-- Game Modal -->
-    <div id="game-modal" class="modal">
+    <!-- Confirm Modal -->
+    <div id="confirm-modal" class="modal" style="display: none;">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="game-form-title">Add New Game</h2>
-                <span class="close-modal">&times;</span>
-            </div>
-            <div class="modal-body">
-                <form id="game-form">
-                    <input type="hidden" id="game-id">
-                    <div class="form-group">
-                        <label for="game-name">Game Name*</label>
-                        <input type="text" id="game-name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="game-developer">Developer*</label>
-                        <input type="text" id="game-developer" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="game-release-date">Release Date*</label>
-                        <input type="date" id="game-release-date" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="game-description">Description</label>
-                        <textarea id="game-description" rows="4"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Platforms</label>
-                        <div class="checkbox-group">
-                            <label><input type="checkbox" name="game-platforms" value="Oculus"> Oculus</label>
-                            <label><input type="checkbox" name="game-platforms" value="SteamVR"> SteamVR</label>
-                            <label><input type="checkbox" name="game-platforms" value="PSVR"> PSVR</label>
-                            <label><input type="checkbox" name="game-platforms" value="Other"> Other</label>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Genres</label>
-                        <div class="checkbox-group">
-                            <label><input type="checkbox" name="game-genres" value="Action"> Action</label>
-                            <label><input type="checkbox" name="game-genres" value="Adventure"> Adventure</label>
-                            <label><input type="checkbox" name="game-genres" value="FPS"> FPS</label>
-                            <label><input type="checkbox" name="game-genres" value="Rhythm"> Rhythm</label>
-                            <label><input type="checkbox" name="game-genres" value="Puzzle"> Puzzle</label>
-                            <label><input type="checkbox" name="game-genres" value="Social"> Social</label>
-                            <label><input type="checkbox" name="game-genres" value="Casual"> Casual</label>
-                            <label><input type="checkbox" name="game-genres" value="Survival"> Survival</label>
-                            <label><input type="checkbox" name="game-genres" value="Horror"> Horror</label>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="game-cover">Cover Image</label>
-                        <div class="image-upload-container">
-                            <input type="file" id="game-cover" accept="image/*">
-                            <span class="image-upload-hint">Recommended size: 600x800px (3:4 aspect ratio)</span>
-                            <div id="cover-preview-container">
-                                <img id="cover-preview" src="" alt="Cover Preview">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="game-status">Status*</label>
-                        <select id="game-status" required>
-                            <option value="Active">Active</option>
-                            <option value="Inactive">Inactive</option>
-                        </select>
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="btn-primary">Save Game</button>
-                        <button type="button" class="btn-secondary close-modal">Cancel</button>
-                    </div>
-                </form>
+            <span class="close-modal" style="float: right; cursor: pointer;">&times;</span>
+            <h3 id="confirm-modal-title">Confirm</h3>
+            <p id="confirm-modal-message">Are you sure you want to proceed?</p>
+            <div style="margin-top: 1rem; text-align: right;">
+            <button id="cancel-btn" class="btn-secondary">Cancel</button>
+            <button id="confirm-btn" class="btn-primary">Confirm</button>
             </div>
         </div>
     </div>
 
-    <!-- Confirmation Modal -->
-    <div id="confirm-modal" class="modal">
-        <div class="modal-content confirm-modal-content">
-            <span class="close-modal">&times;</span>
-            <h3 id="confirm-modal-title">Confirm Action</h3>
-            <p id="confirm-modal-message">Are you sure you want to perform this action?</p>
-            <div class="form-actions">
-                <button id="confirm-btn" class="btn-primary">Yes</button>
-                <button id="cancel-btn" class="btn-secondary">No</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Load the main admin script which will load all modules -->
-    <script src="../js/admin.js"></script>
-    <!-- Game Modal Script -->
+    <script src="country-state-region.js"></script>
+    <script type="module" src="../js/admin.js"></script>
+    <script src="../js/renderer.js"></script>
     <script src="../js/modules/admin/games.js"></script>
     <script src="../js/modules/admin/release-notes.js" type="module"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-// ... existing code ...
+        document.getElementById('minimize-button').addEventListener('click', () => {
+            window.api.minimizeWindow();
+        });
+
+        document.getElementById('maximize-button').addEventListener('click', () => {
+            window.api.maximizeWindow();
+        });
+
+        document.getElementById('close-button').addEventListener('click', () => {
+            window.api.closeWindow();
         });
     </script>
 </body>
-</html> 
+</html>

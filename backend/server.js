@@ -190,7 +190,7 @@ app.post('/api/upload/game-image', upload.single('image'), (req, res) => {
 });
 
 // Games API
-app.get('/api/games', async (req, res) => {
+/*app.get('/api/games', async (req, res) => {
     try {
         // Check if db is defined
         if (!db || typeof db.getAllGames !== 'function') {
@@ -208,7 +208,7 @@ app.get('/api/games', async (req, res) => {
         console.error('Error fetching games:', error);
         res.status(500).json({ error: 'Failed to fetch games' });
     }
-});
+});*/
 
 app.get('/api/games/:id', async (req, res) => {
     try {

@@ -85,6 +85,12 @@ contextBridge.exposeInMainWorld(
         getAppInfo: () => ipcRenderer.invoke('get-app-info'),
 
         getMyMatches: (userId) => ipcRenderer.invoke('get-my-matches', userId),
+        
+        getAllMatches: () => ipcRenderer.invoke('get-all-matches'),
+        getAllTeams: () => ipcRenderer.invoke('get-all-teams'),
+        getAllGames: () => ipcRenderer.invoke('get-all-games'),
+        getAllPlayers: () => ipcRenderer.invoke('get-all-players'),
+
 
         //lootlocker
         lootlockerLogin: (credentials) => ipcRenderer.invoke('lootlocker-login', credentials),

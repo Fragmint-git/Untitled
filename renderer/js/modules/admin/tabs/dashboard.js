@@ -7,48 +7,37 @@
 window.adminDashboardModule = {
     // Initialize dashboard
     initDashboard: function() {
-        console.log('Initializing admin dashboard...');
-        
-        // Load dashboard data
+        //console.log('Initializing admin dashboard...');
         this.loadDashboard();
     },
     
     // Load dashboard data
-    loadDashboard: async function() {
+    loadDashboard: async function () {
         try {
-            // Fetch dashboard data from the backend
-            const response = await fetch('http://localhost:3000/api/dashboard');
-            
-            // If the API endpoint doesn't exist yet, use mock data
-            let dashboardData;
+            const response = await fetch('http://localhost/api/fetch/dashboard');
             if (response.ok) {
-                dashboardData = await response.json();
+                const result = await response.json();
+                if (result.status === 'success') {
+                    this.updateDashboardStats(result.data);
+                    this.updateRecentActivity(result.data.recentActivity || []);
+                }
             } else {
-                // Mock data for development
-                dashboardData = this.getMockDashboardData();
+                throw new Error('API failed');
             }
-            
-            // Update dashboard stats
-            this.updateDashboardStats(dashboardData);
-            
-            // Update recent activity
-            this.updateRecentActivity(dashboardData.recentActivity);
-            
-        } catch (error) {
-            console.error('Error updating admin dashboard:', error);
-            if (window.adminModule && window.adminModule.showMessage) {
-                window.adminModule.showMessage('Error loading dashboard data', 'error');
-            }
+        } catch (err) {
+            //console.error('Error loading dashboard:', err);
+            window.adminModule?.showMessage('Error loading dashboard data', 'error');
         }
     },
-    
-    // Update dashboard statistics
-    updateDashboardStats: function(dashboardData) {
-        document.getElementById('total-games-count').textContent = dashboardData.totalGames;
-        document.getElementById('total-tournaments-count').textContent = dashboardData.totalTournaments;
-        document.getElementById('total-players-count').textContent = dashboardData.totalPlayers;
-        document.getElementById('active-tournaments-count').textContent = dashboardData.activeTournaments;
+
+    updateDashboardStats: function (data) {
+        document.getElementById('stat-games-count').textContent = data.games;
+        document.getElementById('stat-tournaments-count').textContent = data.tournaments;
+        document.getElementById('stat-teams-count').textContent = data.teams;
+        document.getElementById('stat-matches-count').textContent = data.matches;
+        document.getElementById('stat-players-count').textContent = data.players;
     },
+
     
     // Update recent activity list
     updateRecentActivity: function(activities) {
@@ -142,3 +131,6 @@ window.adminDashboardModule = {
         };
     }
 }; 
+window.addEventListener('DOMContentLoaded', () => {
+    window.adminDashboardModule.initDashboard();
+});

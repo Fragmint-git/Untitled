@@ -200,6 +200,19 @@
         });
     </script>
     <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .app-container, .admin-container {
+            height: calc(100vh - 30px);
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+
         .modal-overlay {
         position: fixed;
         z-index: 9999;

@@ -88,26 +88,26 @@ async function loadGames() {
                 
                 // Get proper image path for game
                 let imagePath = '/assets/default-game-cover.png'; // Default fallback
-                if (game.coverImage) {
-                    console.log(`Raw coverImage for ${game.name}:`, game.coverImage);
-                    
-                    // Check if coverImage already has a full path
-                    if (game.coverImage.startsWith('http://') || game.coverImage.startsWith('https://')) {
-                        imagePath = game.coverImage;
+
+                if (game.logo) {
+                    console.log(`Raw logo for ${game.name}:`, game.logo);
+
+                    if (game.logo.startsWith('http://') || game.logo.startsWith('https://')) {
+                        imagePath = game.logo;
                         console.log(`Using server-provided URL: ${imagePath}`);
-                    } else if (game.coverImage.startsWith('/assets/')) {
-                        imagePath = game.coverImage;
+                    } else if (game.logo.startsWith('/assets/')) {
+                        imagePath = game.logo;
                         console.log(`Using asset path: ${imagePath}`);
                     } else {
-                        // Otherwise construct the full path
-                        imagePath = `/assets/images/games/GameLogos/${game.coverImage}`;
+                        imagePath = `/assets/images/games/GameLogos/${game.logo}`;
                         console.log(`Constructed asset path: ${imagePath}`);
                     }
-                    // Log the final image path for debugging
+
                     console.log(`Final image path for game ${game.name}:`, imagePath);
                 } else {
-                    console.warn(`No cover image found for game ${game.name}, using default`);
+                    console.warn(`No logo found for game ${game.name}, using default`);
                 }
+
                 
                 gameCard.innerHTML = `
                     <div class="game-image">

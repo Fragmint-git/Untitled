@@ -14,7 +14,8 @@ window.adminDashboardModule = {
     // Load dashboard data
     loadDashboard: async function () {
         try {
-            const response = await fetch('http://localhost/api/fetch/dashboard');
+            //const response = await fetch('http://localhost/api/fetch/dashboard');
+            const response = await fetch('https://vrbattles.gg/api/fetch/dashboard');
             if (response.ok) {
                 const result = await response.json();
                 if (result.status === 'success') {

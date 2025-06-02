@@ -126,9 +126,31 @@ function handleLoadPersonalInfo(e) {
     ///document.getElementById('full-name').textContent = personalInfo.fullName || '';
     //document.getElementById('display-name').textContent = personalInfo.displayName || '';
 
-    if (personalInfo.avatar) {
-        document.getElementById('profile-picture').src = `assets/uploads/profile/${personalInfo.avatar}`;
-    }
+        const profileImg = document.getElementById('profile-picture');
+        const fallbackURL = 'http://localhost/assets/images/no-image.jpg';
+
+        //console.log(`user profile: ${personalInfo.avatar}`);
+
+        profileImg.src = personalInfo.avatar 
+            ? `https://vrbattles.gg/assets/uploads/profile/${personalInfo.avatar}`
+            : fallbackURL;
+
+        profileImg.onerror = () => {
+            profileImg.src = fallbackURL;
+        };
+
+        const userProfile = document.getElementById('user-profile');
+
+        userProfile.src = personalInfo.avatar 
+            ? `https://vrbattles.gg/assets/uploads/profile/${personalInfo.avatar}`
+            : fallbackURL;
+
+        userProfile.onerror = () => {
+            userProfile.src = fallbackURL;
+        };
+
+
+
 
     if (personalInfo.banner) {
         document.getElementById('profile-banner').style.backgroundImage = `url('assets/uploads/banner/${personalInfo.banner}')`;

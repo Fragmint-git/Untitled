@@ -437,7 +437,8 @@ document.getElementById('my-matches-btn').addEventListener('click', async () => 
       };
 
       try {
-        const res = await fetch('http://localhost/api/matches/dispute_rounds', {
+        //const res = await fetch('http://localhost/api/matches/dispute_rounds', {
+        const res = await fetch('https://vrbattles.gg/api/matches/dispute_rounds', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -644,7 +645,8 @@ document.getElementById('my-matches-btn').addEventListener('click', async () => 
       };
 
       try {
-        const res = await fetch('http://localhost/api/matches/dispute_match', {
+        //const res = await fetch('http://localhost/api/matches/dispute_match', {
+        const res = await fetch('https://vrbattles.gg/api/matches/dispute_match', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -850,8 +852,8 @@ function formatMatchStart(utcDatetimeString, userTimezone = 'America/Chicago') {
           return;
         }
         try {
-          const response = await fetch('http://localhost/api/matches/cancel_request', {
-          //const response = await fetch('https://vrbattles.gg/api/matches/cancel_request', {
+          //const response = await fetch('http://localhost/api/matches/cancel_request', {
+          const response = await fetch('https://vrbattles.gg/api/matches/cancel_request', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -1008,7 +1010,8 @@ document.addEventListener('submit', async (e) => {
   };
 
   try {
-    const response = await fetch('http://localhost/api/matches/submit_scores', {
+    //const response = await fetch('http://localhost/api/matches/submit_scores', {
+    const response = await fetch('https://vrbattles.gg/api/matches/submit_scores', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -1016,7 +1019,8 @@ document.addEventListener('submit', async (e) => {
 
     const result = await response.json();
     if (result.status === 'success') {
-      const refetch = await fetch('http://localhost/api/fetch/matches', {
+      //const refetch = await fetch('http://localhost/api/fetch/matches', {
+      const refetch = await fetch('https://vrbattles.gg/api/fetch/matches', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: session.id })
@@ -1263,7 +1267,8 @@ async function confirmMatch(matchId) {
     team_2_score: parseInt(r.team_2_score)
   })) || [];
 
-  const response = await fetch('http://localhost/api/fetch/get_teams_by_ids', {
+  //const response = await fetch('http://localhost/api/fetch/get_teams_by_ids', {
+  const response = await fetch('https://vrbattles.gg/api/fetch/get_teams_by_ids', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ team_ids: [team1_team_id, team2_team_id] })
@@ -1371,7 +1376,8 @@ async function confirmMatch(matchId) {
   };
 
   try {
-    const response = await fetch('http://localhost/api/matches/confirm_match', {
+    //const response = await fetch('http://localhost/api/matches/confirm_match', {
+    const response = await fetch('https://vrbattles.gg/api/matches/confirm_match', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(confirmPayload)

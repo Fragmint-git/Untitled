@@ -306,8 +306,8 @@ ipcMain.handle('save-personal-info', async (event, formData) => {
       return { success: false, error: 'Missing user ID.' };
     }
 
-    const response = await fetch('http://localhost/api/profile/my_profile_update', {
-    //const response = await fetch('https://vrbattles.gg/api/profile/my_profile_update', {
+    //const response = await fetch('http://localhost/api/profile/my_profile_update', {
+    const response = await fetch('https://vrbattles.gg/api/profile/my_profile_update', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -733,8 +733,8 @@ ipcMain.handle('get-user-by-id', async (event, id) => {
 
     id = id || session.id;
 
-    const response = await fetch('http://localhost/api/fetch/user', {
-    //const response = await fetch('https://vrbattles.gg/api/fetch/user', {
+    //const response = await fetch('http://localhost/api/fetch/user', {
+    const response = await fetch('https://vrbattles.gg/api/fetch/user', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id })
@@ -787,8 +787,8 @@ ipcMain.handle('get-user-by-id', async (event, id) => {
 
 ipcMain.handle('teams-fetch', async (event, id) => {
   try {
-    const response = await fetch('http://localhost/api/fetch/teams', {
-    //const response = await fetch('https://vrbattles.gg/api/fetch/teams', {
+    //const response = await fetch('http://localhost/api/fetch/teams', {
+    const response = await fetch('https://vrbattles.gg/api/fetch/teams', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id })
@@ -809,8 +809,8 @@ ipcMain.handle('teams-fetch', async (event, id) => {
 
 ipcMain.handle('submit-match-request', async (event, matchData) => {
   try {
-      const response = await fetch('http://localhost/api/matches/match_request', {
-      //const response = await fetch('https://vrbattles.gg/api/matches/match_request', {
+      //const response = await fetch('http://localhost/api/matches/match_request', {
+      const response = await fetch('https://vrbattles.gg/api/matches/match_request', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(matchData)
@@ -839,8 +839,8 @@ ipcMain.handle('submit-match-request', async (event, matchData) => {
 
 ipcMain.handle('get-open-match-requests', async () => {
   try {
-    const response = await fetch('http://localhost/api/fetch/match_requests');
-    //const response = await fetch('https://vrbattles.gg/api/fetch/match_requests');
+    //const response = await fetch('http://localhost/api/fetch/match_requests');
+    const response = await fetch('https://vrbattles.gg/api/fetch/match_requests');
     const text = await response.text();
 
     if (!text || text.trim() === '') {
@@ -870,8 +870,8 @@ ipcMain.handle('accept-match-request', async (event, matchRequestId) => {
       return { success: false, message: 'Missing match request ID or user session' };
     }
 
-    const response = await fetch('http://localhost/api/matches/accept_request', {
-    //const response = await fetch('https://vrbattles.gg/api/matches/accept_request', {
+    //const response = await fetch('http://localhost/api/matches/accept_request', {
+    const response = await fetch('https://vrbattles.gg/api/matches/accept_request', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -900,8 +900,8 @@ ipcMain.handle('accept-match-request', async (event, matchRequestId) => {
 
 ipcMain.handle('get-my-matches', async (event, userId) => {
   try {
-    const response = await fetch('http://localhost/api/fetch/matches', {
-    //const response = await fetch('https://vrbattles.gg/api/fetch/matches', {
+    //const response = await fetch('http://localhost/api/fetch/matches', {
+    const response = await fetch('https://vrbattles.gg/api/fetch/matches', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ user_id: userId })
@@ -1014,7 +1014,8 @@ ipcMain.handle('calculate-mmr', async (event, payload) => {
 
 ipcMain.handle('get-all-matches', async () => {
     try {
-        const res = await fetch('http://localhost/api/fetch/all_matches');
+        //const res = await fetch('http://localhost/api/fetch/all_matches');
+        const res = await fetch('https://vrbattles.gg/api/fetch/all_matches');
         return await res.json();
     } catch (err) {
         console.error('[Match Fetch Error]', err);
@@ -1025,7 +1026,8 @@ ipcMain.handle('get-all-matches', async () => {
 
 ipcMain.handle('get-all-teams', async () => {
     try {
-        const res = await fetch('http://localhost/api/fetch/all_teams');
+        //const res = await fetch('http://localhost/api/fetch/all_teams');
+        const res = await fetch('https://vrbattles.gg/api/fetch/all_teams');
         return await res.json();
     } catch (err) {
         console.error('[Teams Fetch Error]', err);
@@ -1036,7 +1038,8 @@ ipcMain.handle('get-all-teams', async () => {
 
 ipcMain.handle('get-all-games', async () => {
     try {
-        const res = await fetch('http://localhost/api/fetch/games');
+        //const res = await fetch('http://localhost/api/fetch/games');
+        const res = await fetch('https://vrbattles.gg/api/fetch/games');
         return await res.json();
     } catch (err) {
         console.error('[games Fetch Error]', err);
@@ -1047,7 +1050,8 @@ ipcMain.handle('get-all-games', async () => {
 
 ipcMain.handle('get-all-players', async () => {
     try {
-        const res = await fetch('http://localhost/api/fetch/all_players');
+        //const res = await fetch('http://localhost/api/fetch/all_players');
+        const res = await fetch('https://vrbattles.gg/api/fetch/all_players');
         return await res.json();
     } catch (err) {
         console.error('[Players Fetch Error]', err);

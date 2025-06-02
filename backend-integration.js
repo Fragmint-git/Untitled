@@ -242,39 +242,39 @@ function initBackendIntegration() {
         }
       });*/
 
-      ipcMain.handle('get-games', async () => {
+        ipcMain.handle('get-games', async () => {
         try {
-          //const response = await fetch('http://localhost/api/fetch/games');
-          const response = await fetch('https://www.vrbattles.gg/api/fetch/games');
-          const result = await response.json();
-      
-          if (result.status !== 'success') {
+            const response = await fetch('https://www.vrbattles.gg/api/fetch/games');
+            const result = await response.json();
+
+            if (result.status !== 'success') {
             throw new Error(result.message || 'Failed to fetch games from API');
-          }
-      
-          const games = result.data.map(game => {
+            }
+
+            const games = result.data.map(game => {
+            const basePath = 'https://www.vrbattles.gg/assets/uploads/ladders/';
+
             if (game.logo && !game.logo.startsWith('http')) {
-              game.logo = `https://www.vrbattles.gg/uploads/games/${game.logo}`;
-              //game.logo = `http://localhost/uploads/games/${game.logo}`;
+                game.logo = `${basePath}${game.logo}`;
             }
-          
+
             if (game.banner && !game.banner.startsWith('http')) {
-              game.banner = `https://www.vrbattles.gg/uploads/games/${game.banner}`;
-              //game.banner = `http://localhost/uploads/games/${game.banner}`;
+                game.banner = `${basePath}${game.banner}`;
             }
-          
-            game.coverImage = game.logo || game.banner || '/assets/default-game-cover.png';
-          
+
+            game.logo = game.logo || '';
+            game.banner = game.banner || '';
+
             return game;
-          });
-          
-      
-          return games;
+            });
+
+            return games;
         } catch (error) {
-          console.error('Error fetching games:', error);
-          return [];
+            console.error('Error fetching games:', error);
+            return [];
         }
-      });
+        });
+
       
 
     ipcMain.handle('get-game', async (event, id) => {

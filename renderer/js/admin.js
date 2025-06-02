@@ -253,7 +253,8 @@ function loadGameEditor(game) {
 
 
         try {
-            const res = await fetch('http://localhost/api/games/games_update', {
+            //const res = await fetch('http://localhost/api/games/games_update', {
+            const res = await fetch('https://vrbattles.gg/api/games/games_update', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -270,7 +271,8 @@ function loadGameEditor(game) {
         if (!confirm('Are you sure you want to delete this game?')) return;
 
         try {
-            const res = await fetch('http://localhost/api/games/delete', {
+            //const res = await fetch('http://localhost/api/games/delete', {
+            const res = await fetch('https://vrbattles.gg/api/games/delete', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id: game.id })
@@ -459,7 +461,8 @@ async function submitMatchScores(matchId, team1Id, team2Id) {
     };
 
     try {
-        const res = await fetch('http://localhost/api/matches/save_match_scores', {
+        //const res = await fetch('http://localhost/api/matches/save_match_scores', {
+        const res = await fetch('https://vrbattles.gg/api/matches/save_match_scores', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -494,7 +497,8 @@ async function submitMatchStatus(matchId) {
     };
 
     try {
-        const res = await fetch('http://localhost/api/matches/save_match_status', {
+        //const res = await fetch('http://localhost/api/matches/save_match_status', {
+        const res = await fetch('https://vrbattles.gg/api/matches/save_match_status', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -670,7 +674,8 @@ function loadTeamEditor(team) {
         //console.log('[Team Save] Payload to send:', payload);
 
         try {
-            const res = await fetch('http://localhost/api/teams/teams_update', {
+            //const res = await fetch('http://localhost/api/teams/teams_update', {
+            const res = await fetch('https://vrbattles.gg/api/teams/teams_update', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -712,7 +717,8 @@ function loadTeamEditor(team) {
         //console.log('[Team MMR Save] Payload:', payload);
 
         try {
-            const res = await fetch('http://localhost/api/teams/mmr_update', {
+            //const res = await fetch('http://localhost/api/teams/mmr_update', {
+            const res = await fetch('https://vrbattles.gg/api/teams/mmr_update', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -922,7 +928,8 @@ function loadDisputeResolver(match) {
         team_2_score: parseInt(r.team_2_score)
     }));
 
-    const response = await fetch('http://localhost/api/fetch/get_teams_by_ids', {
+    //const response = await fetch('http://localhost/api/fetch/get_teams_by_ids', {
+    const response = await fetch('https://vrbattles.gg/api/fetch/get_teams_by_ids', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ team_ids: [team1_team_id, team2_team_id] })
@@ -1029,7 +1036,8 @@ function loadDisputeResolver(match) {
         };
 
         try {
-            const res = await fetch('http://localhost/api/disputes/save_scores', {
+            //const res = await fetch('http://localhost/api/disputes/save_scores', {
+            const res = await fetch('https://vrbattles.gg/api/disputes/save_scores', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -1079,7 +1087,8 @@ function loadDisputeResolver(match) {
         };
 
         try {
-            const res = await fetch('http://localhost/api/disputes/save_mmr', {
+            //const res = await fetch('http://localhost/api/disputes/save_mmr', {
+            const res = await fetch('https://vrbattles.gg/api/disputes/save_mmr', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -1112,7 +1121,8 @@ function loadDisputeResolver(match) {
         };
 
         try {
-            const res = await fetch('http://localhost/api/disputes/save_status', {
+            //const res = await fetch('http://localhost/api/disputes/save_status', {
+            const res = await fetch('https://vrbattles.gg/api/disputes/save_status', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -1270,7 +1280,8 @@ window.editPlayer = function (player) {
     }
 
     try {
-        const res = await fetch('http://localhost/api/players/update', {
+        //const res = await fetch('http://localhost/api/players/update', {
+        const res = await fetch('https://vrbattles.gg/api/players/update', {
             method: 'POST',
             body: formData
         });
